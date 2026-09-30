@@ -1,0 +1,148 @@
+:root {
+  --azul-claro: #4aa8f0;
+  --azul: #1560c4;
+  --azul-escuro: #0f3f80;
+  --azul-texto: #0f4c9e;
+  --gradiente-azul: linear-gradient(135deg, var(--azul-claro), var(--azul));
+  --gradiente-hero: linear-gradient(150deg, #4aa8f0 0%, #1560c4 60%, #0f3f80 100%);
+
+  --fundo: #eef4fb;
+  --fundo-input: #fbfdff;
+  --fundo-destaque: #f4f9ff;
+  --fundo-card: #fff;
+
+  --texto: #12283f;
+  --texto-suave: #5a7392;
+  --texto-label: #33506f;
+
+  --borda: #e3ecf7;
+  --borda-input: #cfe0f3;
+  --borda-destaque: #dfeaf9;
+
+  --verde-fundo: #eaf7f0;
+  --verde-texto: #1b6f4e;
+  --verde: #1f8a5f;
+
+  --azul-fundo: #eaf3fe;
+
+  --amarelo-fundo: #fff7ec;
+  --amarelo-texto: #8a6a33;
+  --amarelo: #d89b2a;
+
+  --vermelho-fundo: #fdf3f1;
+  --vermelho-texto: #a9372a;
+  --vermelho: #c0392b;
+  --vermelho-borda: #e6c4bf;
+
+  --raio-pequeno: 12px;
+  --raio-medio: 16px;
+  --raio-grande: 24px;
+  --raio-pilula: 999px;
+
+  --altura-barra-superior: 60px;
+
+  --sombra-card: 0 4px 16px rgba(19, 58, 110, 0.05);
+  --sombra-grande: 0 18px 40px rgba(19, 58, 110, 0.08);
+  --sombra-botao: 0 10px 22px rgba(21, 96, 196, 0.24);
+
+  --fonte: 'Nunito', 'Segoe UI', Helvetica, Arial, sans-serif;
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--fundo);
+  font-family: var(--fonte);
+  color: var(--texto);
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: calc(100vh / var(--fator-zoom, 1));
+}
+
+input,
+select,
+textarea,
+button {
+  font-family: inherit;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 3px solid rgba(21, 96, 196, 0.35);
+  outline-offset: 1px;
+}
+
+a {
+  color: var(--azul);
+}
+
+a:hover {
+  color: var(--azul-escuro);
+}
+
+button {
+  cursor: pointer;
+}
+
+@keyframes cm-toast {
+  0% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  10% {
+    opacity: 1;
+    transform: none;
+  }
+  88% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+@keyframes cm-modal-fundo {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cm-modal-caixa {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

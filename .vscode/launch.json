@@ -1,0 +1,44 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+    
+        {
+            // App no celular conectado por USB (o aparelho escolhido na barra
+            // inferior do VS Code). O "adb reverse" da tarefa faz o localhost:8080
+            // do celular chegar no back-end do PC.
+            "name": "CuidaMed Mobile (Celular USB)",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "C:/Users/arthu/OneDrive/Desktop/CuidaMed/mobile cuidamed",
+            "program": "lib/main.dart",
+            "preLaunchTask": "mobile: preparar celular USB",
+            "args": ["--dart-define=API_BASE_URL=http://localhost:8080"]
+        },
+    
+        {
+            // App Flutter no Chrome, porta fixa 5050 (liberada no CORS do back-end).
+            "name": "CuidaMed Mobile (Chrome)",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "C:/Users/arthu/OneDrive/Desktop/CuidaMed/mobile cuidamed",
+            "program": "lib/main.dart",
+            "deviceId": "chrome",
+            "preLaunchTask": "mobile: liberar pasta build",
+            "args": ["--web-port", "5050", "--dart-define=API_BASE_URL=http://localhost:8080"]
+        },
+        {
+            // Mesmo app no Edge, caso prefira.
+            "name": "CuidaMed Mobile (Edge)",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "C:/Users/arthu/OneDrive/Desktop/CuidaMed/mobile cuidamed",
+            "program": "lib/main.dart",
+            "deviceId": "edge",
+            "preLaunchTask": "mobile: liberar pasta build",
+            "args": ["--web-port", "5050", "--dart-define=API_BASE_URL=http://localhost:8080"]
+        }
+    ]
+}

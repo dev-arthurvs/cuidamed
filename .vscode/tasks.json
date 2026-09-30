@@ -1,0 +1,38 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            // Roda antes de cada F5 do app mobile (preLaunchTask no launch.json):
+            // tira o "somente leitura" que o OneDrive coloca nas pastas e que faz o
+            // Flutter falhar ao apagar build\flutter_assets. Detalhes no .ps1.
+            "label": "mobile: liberar pasta build",
+            "type": "process",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/.vscode/liberar-build.ps1"
+            ],
+            "presentation": { "reveal": "silent", "panel": "shared", "close": true },
+            "problemMatcher": []
+        },
+        {
+            // Antes do F5 no celular: libera a pasta build e faz o "adb reverse"
+            // (localhost:8080 do celular -> back-end do PC). Detalhes no .ps1.
+            "label": "mobile: preparar celular USB",
+            "type": "process",
+            "command": "powershell",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}/.vscode/preparar-celular.ps1"
+            ],
+            "presentation": { "reveal": "silent", "panel": "shared", "close": true },
+            "problemMatcher": []
+        }
+    ]
+}

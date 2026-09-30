@@ -1,0 +1,149 @@
+.agenda {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.agenda__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.agenda__descricao {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  margin: 0;
+}
+
+.agenda__topo-acoes {
+  margin-left: auto; /* sempre à direita, mesmo sem a descrição ao lado */
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.agenda__link-encerrados {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--azul);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.agenda__link-encerrados:hover {
+  text-decoration: underline;
+}
+
+.agenda__grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 18px;
+}
+
+.agenda__cartao {
+  border: 1px solid var(--borda);
+  border-radius: 22px;
+  padding: 22px;
+  background: #fff;
+  box-shadow: var(--sombra-card);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.agenda__cartao-cabecalho {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.agenda__cartao-icone {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--azul-fundo);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.agenda__cartao-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.agenda__cartao-nome {
+  font-size: 21px;
+  font-weight: 800;
+}
+
+.agenda__cartao-dose {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.agenda__cartao-pilulas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.agenda__pilula {
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--raio-pilula);
+  padding: 7px 14px;
+}
+
+.agenda__pilula--horario {
+  font-weight: 800;
+  color: var(--azul-texto);
+  background: var(--azul-fundo);
+}
+
+.agenda__pilula--frequencia {
+  color: var(--texto-suave);
+  background: #f4f6f9;
+}
+
+.agenda__pilula--inicio {
+  color: var(--amarelo-texto);
+  background: var(--amarelo-fundo);
+}
+
+.agenda__estoque {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  background: #f4f6f9;
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.agenda__estoque--baixo {
+  color: var(--amarelo-texto);
+  background: var(--amarelo-fundo);
+}
+
+.agenda__estoque--suficiente {
+  color: var(--verde-texto);
+  background: var(--verde-fundo);
+}
+
+.agenda__estoque--esgotado {
+  color: var(--vermelho-texto);
+  background: var(--vermelho-fundo);
+}
+
+.agenda__cartao-acoes {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}

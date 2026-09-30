@@ -1,0 +1,1 @@
+org.springframework.boot.env.EnvironmentPostProcessor=com.cuidamed.cuidamed_backend.configuracao.CarregadorDotenv

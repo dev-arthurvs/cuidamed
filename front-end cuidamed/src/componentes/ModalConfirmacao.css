@@ -1,0 +1,43 @@
+.modal-confirmacao__fundo {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 35, 66, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 40;
+  animation: cm-modal-fundo 0.18s ease;
+}
+
+.modal-confirmacao__caixa {
+  width: 100%;
+  max-width: 480px;
+  background: #fff;
+  border-radius: var(--raio-grande);
+  padding: 32px;
+  box-shadow: 0 24px 60px rgba(12, 35, 66, 0.32);
+  animation: cm-modal-caixa 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-confirmacao__titulo {
+  font-size: 24px;
+  font-weight: 800;
+  margin: 0 0 10px;
+}
+
+.modal-confirmacao__mensagem {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--texto-suave);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.modal-confirmacao__acoes {
+  display: flex;
+  gap: 12px;
+  margin-top: 26px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}

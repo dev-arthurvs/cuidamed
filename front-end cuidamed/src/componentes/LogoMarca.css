@@ -1,0 +1,59 @@
+.logo-marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logo-marca__icone {
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.logo-marca__icone--gradiente {
+  background: var(--gradiente-azul);
+  box-shadow: 0 8px 16px rgba(21, 96, 196, 0.26);
+}
+
+.logo-marca__icone--transparente {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.logo-marca__capsula {
+  border-radius: 999px;
+  background: #fff;
+  transform: rotate(-45deg);
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-marca__capsula-metade {
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: #bfdcff;
+}
+
+.logo-marca__texto {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+}
+
+.logo-marca__texto--claro {
+  color: #fff;
+}
+
+.logo-marca__texto--claro .logo-marca__destaque {
+  color: #fff;
+}
+
+.logo-marca__texto--escuro {
+  color: var(--texto);
+}
+
+.logo-marca__texto--escuro .logo-marca__destaque {
+  color: var(--azul);
+}

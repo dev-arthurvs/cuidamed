@@ -1,0 +1,32 @@
+.botao-chat-flutuante {
+  position: fixed;
+  right: 22px;
+  /* Fica acima da área onde o Toast (avisos do sistema) aparece — os dois são
+     ancorados no canto inferior direito, então não podem disputar o mesmo espaço. */
+  bottom: 96px;
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+  background: var(--gradiente-azul);
+  box-shadow: var(--sombra-botao);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+  transition: filter 0.15s ease, transform 0.1s ease;
+}
+
+.botao-chat-flutuante:hover {
+  filter: brightness(1.05);
+  transform: translateY(-2px);
+}
+
+.botao-chat-flutuante:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 560px) {
+  .botao-chat-flutuante {
+    bottom: 152px;
+  }
+}

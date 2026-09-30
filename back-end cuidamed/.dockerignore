@@ -1,0 +1,7 @@
+# Fora da imagem: segredos locais, compilados e arquivos do editor.
+.env
+target/
+.idea/
+.vscode/
+*.log
+HELP.md

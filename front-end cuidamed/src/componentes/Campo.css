@@ -1,0 +1,27 @@
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.campo__rotulo {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--texto-label);
+}
+
+.campo__entrada {
+  min-height: 56px;
+  font-size: 18px;
+  border: 1.5px solid var(--borda-input);
+  border-radius: var(--raio-medio);
+  padding: 0 16px;
+  background: var(--fundo-input);
+  width: 100%;
+}
+
+.campo__entrada--area {
+  min-height: 96px;
+  padding: 14px 16px;
+  resize: vertical;
+}
