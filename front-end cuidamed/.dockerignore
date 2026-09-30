@@ -1,0 +1,7 @@
+# Fora da imagem: dependências (reinstaladas no build), compilados e segredos.
+node_modules/
+dist/
+.env
+.env.*
+*.log
+*.png
