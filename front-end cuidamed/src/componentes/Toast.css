@@ -1,0 +1,26 @@
+.toast {
+  position: fixed;
+  right: 32px;
+  bottom: 32px;
+  left: 32px;
+  margin-left: auto;
+  background: #0f2c50;
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+  padding: 16px 22px;
+  border-radius: 14px;
+  box-shadow: 0 12px 30px rgba(12, 35, 66, 0.35);
+  z-index: 50;
+  max-width: 420px;
+  animation: cm-toast 2.6s ease forwards;
+}
+
+@media (max-width: 560px) {
+  .toast {
+    left: 16px;
+    right: 16px;
+    bottom: 88px;
+    max-width: none;
+  }
+}

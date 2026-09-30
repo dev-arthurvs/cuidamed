@@ -1,0 +1,24 @@
+.botao-whatsapp {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 999px;
+  border: none;
+  background: var(--verde-fundo);
+  color: var(--verde);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.botao-whatsapp:hover:not(:disabled) {
+  background: var(--verde);
+  color: #fff;
+}
+
+.botao-whatsapp:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

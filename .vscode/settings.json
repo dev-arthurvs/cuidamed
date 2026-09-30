@@ -1,0 +1,6 @@
+{
+    // Barra de depuração (Continuar, Hot Reload, Hot Restart, Parar) fixa no
+    // centro de comando, no alto da janela. No modo "floating" (padrão) ela
+    // pode ser arrastada para fora da tela ou ficar escondida atrás de painéis.
+    "debug.toolBarLocation": "commandCenter"
+}

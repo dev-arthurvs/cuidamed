@@ -1,0 +1,25 @@
+# Rede de segurança do repositório inteiro (vale para back-end, web e mobile,
+# além dos .gitignore de cada pasta). NUNCA versionar segredos.
+
+# Segredos: chaves de API, senhas de banco, segredo dos tokens.
+# Os modelos .env.example (sem valores) podem ir.
+.env
+.env.*
+!.env.example
+
+# Chave de assinatura do APK e senhas dela.
+*.jks
+*.keystore
+key.properties
+local.properties
+
+# Gerados na compilação (pesados e recriados a cada build).
+node_modules/
+target/
+dist/
+build/
+.dart_tool/
+
+# Arquivos locais de ferramentas.
+.claude/
+*.log

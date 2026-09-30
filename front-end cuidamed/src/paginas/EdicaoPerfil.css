@@ -1,0 +1,117 @@
+.edicao-perfil {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.edicao-perfil__linha-dupla {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  align-items: stretch;
+}
+
+@media (max-width: 760px) {
+  .edicao-perfil__linha-dupla {
+    grid-template-columns: 1fr;
+  }
+}
+
+.edicao-perfil__cartao {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.edicao-perfil__cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.edicao-perfil__avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 999px;
+  background: var(--gradiente-azul);
+  color: #fff;
+  font-size: 25px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.edicao-perfil__nome {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.edicao-perfil__papel {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.edicao-perfil__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.edicao-perfil__grade-dupla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.edicao-perfil__divisor {
+  height: 1px;
+  background: #eef3f9;
+}
+
+.edicao-perfil__cuidador-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--fundo-destaque);
+  border: 1.5px solid var(--borda-destaque);
+  border-radius: 16px;
+}
+
+.edicao-perfil__cuidador-linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.edicao-perfil__cuidador-rotulo {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--texto-suave);
+}
+
+.edicao-perfil__cuidador-nota {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--texto-suave);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.edicao-perfil__fonte-opcoes {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.edicao-perfil__fonte-opcoes .botao {
+  flex: 1;
+  min-width: 90px;
+}

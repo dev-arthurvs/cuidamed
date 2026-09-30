@@ -1,0 +1,69 @@
+.acessibilidade {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.acessibilidade__guia-descricao {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--texto-suave);
+  margin: 0 0 14px;
+}
+
+.acessibilidade__lista {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.acessibilidade__item {
+  border: 1.5px solid var(--borda);
+  border-radius: var(--raio-medio);
+  background: var(--fundo-input);
+  overflow: hidden;
+}
+
+.acessibilidade__item-cabecalho {
+  width: 100%;
+  padding: 18px 20px;
+  border: none;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--texto);
+  text-align: left;
+  cursor: pointer;
+}
+
+.acessibilidade__item-cabecalho:hover {
+  background: var(--fundo-destaque);
+}
+
+.acessibilidade__item-cabecalho--ativo {
+  color: var(--azul-texto);
+}
+
+.acessibilidade__item-seta {
+  flex: none;
+  opacity: 0.6;
+  transition: transform 0.15s ease;
+}
+
+.acessibilidade__item-conteudo {
+  overflow: hidden;
+}
+
+.acessibilidade__item-miolo {
+  padding: 0 20px 20px;
+  border-top: 1px solid var(--borda);
+}
+
+.acessibilidade__item-miolo .secao-ajuda__para-que-serve {
+  margin-top: 16px;
+}

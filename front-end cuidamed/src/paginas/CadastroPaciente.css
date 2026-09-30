@@ -1,0 +1,96 @@
+.cadastro-paciente__fundo {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 35, 66, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 40;
+  animation: cm-modal-fundo 0.18s ease;
+}
+
+.cadastro-paciente__caixa {
+  width: 100%;
+  max-width: 780px;
+  max-height: calc((100vh - 48px) / var(--fator-zoom, 1));
+  overflow-y: auto;
+  background: #fff;
+  border-radius: var(--raio-grande);
+  padding: 32px;
+  box-shadow: 0 24px 60px rgba(12, 35, 66, 0.32);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: cm-modal-caixa 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cadastro-paciente__cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cadastro-paciente__kicker {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--azul);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.cadastro-paciente__titulo {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  margin: 4px 0 0;
+}
+
+.cadastro-paciente__fechar {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  border: none;
+  background: var(--fundo-destaque);
+  color: var(--texto-suave);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  cursor: pointer;
+}
+
+.cadastro-paciente__formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.cadastro-paciente__descricao {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--texto-suave);
+  margin: 0;
+}
+
+.cadastro-paciente__grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.cadastro-paciente__campo-largo {
+  grid-column: 1 / -1;
+}
+
+.cadastro-paciente__rodape {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  border-top: 1px solid #eef3f9;
+  padding-top: 20px;
+}

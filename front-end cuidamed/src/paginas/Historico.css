@@ -1,0 +1,160 @@
+.historico {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.historico__filtros {
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: 22px;
+  padding: 22px;
+  box-shadow: var(--sombra-card);
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.historico__filtro-periodo {
+  flex: 1 1 300px;
+  min-width: 0;
+}
+
+.historico__filtro-medicamento {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.historico__filtro-titulo {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--texto-label);
+  margin-bottom: 10px;
+}
+
+.historico__select {
+  width: 100%;
+  min-height: 50px;
+  font-size: 17px;
+  border: 1.5px solid var(--borda-input);
+  border-radius: 12px;
+  padding: 0 12px;
+  background: var(--fundo-input);
+}
+
+.historico__datas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.historico__data {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.historico__data-rotulo {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--texto-suave);
+  flex-shrink: 0;
+}
+
+.historico__data .historico__select {
+  min-width: 0;
+  font-family: inherit;
+}
+
+.historico__resumo {
+  display: flex;
+  gap: 10px;
+  flex: 1 1 320px;
+}
+
+.historico__resumo-item {
+  flex: 1;
+  border-radius: 14px;
+  padding: 12px;
+  text-align: center;
+}
+
+.historico__resumo-numero {
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.historico__resumo-rotulo {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.historico__lista {
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-grande);
+  padding: 24px;
+  box-shadow: var(--sombra-card);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.historico__dia {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--texto-suave);
+  margin: 14px 0 10px;
+}
+
+.historico__item {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 18px;
+  border: 1.5px solid #eef3f9;
+  border-radius: 16px;
+  background: var(--fundo-input);
+  flex-wrap: wrap;
+}
+
+.historico__ponto {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  flex: none;
+}
+
+.historico__item-hora {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--azul-texto);
+  min-width: 64px;
+}
+
+.historico__item-nome {
+  flex: 1;
+  min-width: 120px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.historico__item-dose {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--texto-suave);
+  min-width: 90px;
+}
+
+.historico__vazio {
+  padding: 34px;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--texto-suave);
+  background: #f7fafd;
+  border-radius: 16px;
+}

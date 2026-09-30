@@ -1,0 +1,295 @@
+.painel-cuidador {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.painel-cuidador__estatisticas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.painel-cuidador__estatistica {
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: 20px;
+  padding: 22px;
+  box-shadow: var(--sombra-card);
+}
+
+.painel-cuidador__estatistica--alerta {
+  border-color: #f2e0c2;
+}
+
+.painel-cuidador__estatistica-numero {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--texto);
+}
+
+.painel-cuidador__estatistica-rotulo {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.painel-cuidador__dica {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.painel-cuidador__acao-cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.painel-cuidador__grade-pacientes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 14px;
+}
+
+.painel-cuidador__solicitacao {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border: 1.5px solid var(--amarelo-fundo);
+  border-radius: 20px;
+  background: var(--amarelo-fundo);
+  width: 100%;
+}
+
+.painel-cuidador__solicitacao-acoes {
+  display: flex;
+  gap: 10px;
+  flex: none;
+}
+
+.painel-cuidador__paciente {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px;
+  border: 1.5px solid var(--borda);
+  border-radius: 20px;
+  background: var(--fundo-input);
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+}
+
+.painel-cuidador__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  background: var(--gradiente-azul);
+  color: #fff;
+  font-size: 19px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.painel-cuidador__avatar--grande {
+  width: 64px;
+  height: 64px;
+  font-size: 22px;
+}
+
+.painel-cuidador__paciente-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.painel-cuidador__paciente-nome {
+  font-size: 19px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.painel-cuidador__paciente-sub {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.painel-cuidador__barra {
+  margin-top: 10px;
+  height: 9px;
+  border-radius: 999px;
+  background: #eaf0f8;
+  overflow: hidden;
+}
+
+.painel-cuidador__barra-preenchida {
+  height: 100%;
+  border-radius: 999px;
+}
+
+.painel-cuidador__paciente-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  flex: none;
+}
+
+.painel-cuidador__status-badge {
+  font-size: 13px;
+  font-weight: 800;
+  padding: 7px 12px;
+  border-radius: var(--raio-pilula);
+  white-space: nowrap;
+}
+
+.painel-cuidador__paciente-pct {
+  font-size: 18px;
+  font-weight: 800;
+  color: #3c5c80;
+}
+
+/* Detalhe do paciente */
+
+.painel-cuidador-detalhe {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  align-items: flex-start;
+}
+
+.painel-cuidador-detalhe__grade {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 22px;
+  align-items: start;
+  width: 100%;
+}
+
+.painel-cuidador-detalhe__cabecalho {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.painel-cuidador-detalhe__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.painel-cuidador-detalhe__nome {
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.painel-cuidador-detalhe__sub {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.painel-cuidador-detalhe__pct {
+  text-align: right;
+}
+
+.painel-cuidador-detalhe__pct-numero {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--azul-texto);
+}
+
+.painel-cuidador-detalhe__pct-rotulo {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+.painel-cuidador-detalhe__subtitulo {
+  font-size: 20px;
+  font-weight: 800;
+  margin: 0 0 14px;
+}
+
+.painel-cuidador-detalhe__coluna {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.painel-cuidador-detalhe__acoes {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.painel-cuidador-detalhe__ativacao-texto {
+  margin: 0 0 12px;
+  color: var(--texto-suave);
+  font-weight: 600;
+}
+
+/* Código de ativação: grande e espaçado, fácil de ler em voz alta ou copiar. */
+.painel-cuidador-detalhe__codigo {
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  text-align: center;
+  color: var(--azul-texto);
+  background: var(--fundo-destaque);
+  border: 1.5px solid var(--borda-destaque);
+  border-radius: 14px;
+  padding: 12px;
+  user-select: all;
+}
+
+.painel-cuidador-detalhe__observacoes {
+  background: var(--fundo-destaque);
+  border: 1.5px solid var(--borda-destaque);
+  border-radius: var(--raio-grande);
+  padding: 24px;
+}
+
+.painel-cuidador-detalhe__observacoes-titulo {
+  display: block;
+  font-size: 18px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.painel-cuidador-detalhe__observacoes-campo {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 110px;
+  resize: vertical;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--borda-input);
+  background: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  color: #3c5c80;
+  line-height: 1.5;
+}
+
+.painel-cuidador-detalhe__observacoes-campo:focus {
+  outline: none;
+  border-color: var(--azul);
+}
+
+.painel-cuidador-detalhe__observacoes-acoes {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+

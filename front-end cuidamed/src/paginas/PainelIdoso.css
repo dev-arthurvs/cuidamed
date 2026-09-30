@@ -1,0 +1,185 @@
+.painel-idoso {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 22px;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .painel-idoso {
+    grid-template-columns: 1fr;
+  }
+}
+
+.painel-idoso__agenda-completa {
+  grid-column: 1 / -1;
+}
+
+.painel-idoso__banner-notificacao {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding: 18px 24px;
+  border-radius: var(--raio-grande);
+  background: var(--azul-fundo);
+  border: 1.5px solid var(--borda-destaque);
+}
+
+.painel-idoso__banner-notificacao strong {
+  font-size: 17px;
+  color: var(--texto);
+}
+
+.painel-idoso__banner-notificacao p {
+  margin: 4px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.painel-idoso__proximo {
+  border-radius: var(--raio-grande);
+  padding: 28px;
+  background: var(--gradiente-azul);
+  color: #fff;
+  box-shadow: 0 14px 32px rgba(21, 96, 196, 0.22);
+  display: flex;
+  flex-direction: column;
+}
+
+.painel-idoso__proximo-kicker {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  opacity: 0.9;
+}
+
+.painel-idoso__proximo-linha {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  margin: 12px 0 6px;
+  flex-wrap: wrap;
+}
+
+.painel-idoso__proximo-hora {
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.painel-idoso__proximo-nome {
+  font-size: 28px;
+  font-weight: 800;
+  margin-top: 12px;
+}
+
+.painel-idoso__proximo-dose {
+  font-size: 18px;
+  font-weight: 600;
+  opacity: 0.92;
+}
+
+.painel-idoso__proximo-botao {
+  margin-top: 22px;
+  align-self: flex-start;
+  background: #fff;
+  color: var(--azul-texto);
+  box-shadow: 0 8px 18px rgba(9, 38, 80, 0.18);
+}
+
+.painel-idoso__coluna-direita {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-height: 0;
+}
+
+.painel-idoso__link {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--azul);
+  text-decoration: none;
+}
+
+.painel-idoso__lista-doses {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.painel-idoso__dose {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 16px 18px;
+  border: 1.5px solid var(--borda);
+  border-radius: 18px;
+  background: var(--fundo-input);
+}
+
+.painel-idoso__dose-hora {
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--azul-texto);
+  min-width: 66px;
+}
+
+.painel-idoso__dose-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.painel-idoso__dose-nome {
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.painel-idoso__dose-dosagem {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.painel-idoso__estatisticas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  /* Sem os "Acessos rápidos", os contadores ocupam a coluna toda e ficam da
+     mesma altura do card "Próximo medicamento" (sem espaço vazio embaixo). */
+  flex: 1;
+}
+
+.painel-idoso__estatistica {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--borda);
+  border-radius: 20px;
+  padding: 20px 14px;
+  text-align: center;
+  box-shadow: var(--sombra-card);
+}
+
+.painel-idoso__estatistica-numero {
+  font-size: 32px;
+  font-weight: 800;
+}
+
+.painel-idoso__estatistica-rotulo {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--texto-suave);
+}
+
+@media (max-width: 640px) {
+  .painel-idoso__proximo-hora {
+    font-size: 42px;
+  }
+}

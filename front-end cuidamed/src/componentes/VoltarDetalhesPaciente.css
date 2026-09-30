@@ -1,0 +1,7 @@
+/* Alinhado à esquerda, na linha de cima, em qualquer layout de página
+   (flex em coluna ou grid). */
+.voltar-detalhes-paciente {
+  align-self: flex-start;
+  justify-self: start;
+  grid-column: 1 / -1;
+}

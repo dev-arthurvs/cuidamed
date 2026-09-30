@@ -1,0 +1,39 @@
+.modal-ajuda__fundo {
+  position: fixed;
+  inset: 0;
+  background: rgba(12, 35, 66, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 40;
+  animation: cm-modal-fundo 0.18s ease;
+}
+
+.modal-ajuda__caixa {
+  width: 100%;
+  max-width: 520px;
+  max-height: calc(85vh / var(--fator-zoom, 1));
+  overflow-y: auto;
+  background: #fff;
+  border-radius: var(--raio-grande);
+  padding: 32px;
+  box-shadow: 0 24px 60px rgba(12, 35, 66, 0.32);
+  animation: cm-modal-caixa 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-ajuda__acoes {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+}
+
+.modal-ajuda__link {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--azul);
+  text-decoration: none;
+}

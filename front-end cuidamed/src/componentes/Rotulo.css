@@ -1,0 +1,9 @@
+.rotulo {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 7px 12px;
+  border-radius: var(--raio-pilula);
+  white-space: nowrap;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
