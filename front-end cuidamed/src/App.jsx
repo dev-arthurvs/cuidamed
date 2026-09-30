@@ -1,20 +1,24 @@
+import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import LayoutApp from './componentes/LayoutApp'
 import RotaProtegida from './componentes/RotaProtegida'
 import { useApp } from './contexto/useApp'
-import Acessibilidade from './paginas/Acessibilidade'
 import AgendaMedicamentos from './paginas/AgendaMedicamentos'
-import Cadastro from './paginas/Cadastro'
-import Chat from './paginas/Chat'
-import CiclosEncerrados from './paginas/CiclosEncerrados'
-import DefinirSenha from './paginas/DefinirSenha'
-import EdicaoPerfil from './paginas/EdicaoPerfil'
-import Farmacias from './paginas/Farmacias'
-import Historico from './paginas/Historico'
 import Login from './paginas/Login'
 import PainelCuidador from './paginas/PainelCuidador'
 import PainelIdoso from './paginas/PainelIdoso'
-import PainelPaciente from './paginas/PainelPaciente'
+
+// Telas carregadas só quando abertas (o primeiro acesso baixa menos): as
+// menos usadas no dia a dia e as pesadas, como Farmácias (com o mapa).
+const Acessibilidade = lazy(() => import('./paginas/Acessibilidade'))
+const Cadastro = lazy(() => import('./paginas/Cadastro'))
+const Chat = lazy(() => import('./paginas/Chat'))
+const CiclosEncerrados = lazy(() => import('./paginas/CiclosEncerrados'))
+const DefinirSenha = lazy(() => import('./paginas/DefinirSenha'))
+const EdicaoPerfil = lazy(() => import('./paginas/EdicaoPerfil'))
+const Farmacias = lazy(() => import('./paginas/Farmacias'))
+const Historico = lazy(() => import('./paginas/Historico'))
+const PainelPaciente = lazy(() => import('./paginas/PainelPaciente'))
 
 function PainelPrincipal() {
   const { usuario } = useApp()
@@ -28,6 +32,7 @@ export default function App() {
   if (carregandoSessao) return null
 
   return (
+    <Suspense fallback={null}>
     <Routes>
       <Route path="/login" element={autenticado ? <Navigate to="/painel" replace /> : <Login />} />
       <Route path="/cadastro" element={autenticado ? <Navigate to="/painel" replace /> : <Cadastro />} />
@@ -53,5 +58,6 @@ export default function App() {
 
       <Route path="*" element={<Navigate to={autenticado ? '/painel' : '/login'} replace />} />
     </Routes>
+    </Suspense>
   )
 }

@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useLocation, useOutlet } from 'react-router-dom'
 import BarraNavegacao from './BarraNavegacao'
 import BarraSuperior from './BarraSuperior'
@@ -33,7 +33,8 @@ export default function LayoutApp() {
             exit="exit"
             transition={{ duration: 0.22, ease: 'easeInOut' }}
           >
-            {outlet}
+            {/* Telas carregadas sob demanda: o menu e a barra continuam na tela enquanto baixam. */}
+            <Suspense fallback={null}>{outlet}</Suspense>
           </motion.div>
         </AnimatePresence>
       </div>
