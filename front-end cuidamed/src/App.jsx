@@ -9,14 +9,13 @@ import PainelCuidador from './paginas/PainelCuidador'
 import PainelIdoso from './paginas/PainelIdoso'
 
 // Telas carregadas só quando abertas (o primeiro acesso baixa menos): as
-// menos usadas no dia a dia e as pesadas, como Farmácias (com o mapa).
+// menos usadas no dia a dia.
 const Acessibilidade = lazy(() => import('./paginas/Acessibilidade'))
 const Cadastro = lazy(() => import('./paginas/Cadastro'))
 const Chat = lazy(() => import('./paginas/Chat'))
 const CiclosEncerrados = lazy(() => import('./paginas/CiclosEncerrados'))
 const DefinirSenha = lazy(() => import('./paginas/DefinirSenha'))
 const EdicaoPerfil = lazy(() => import('./paginas/EdicaoPerfil'))
-const Farmacias = lazy(() => import('./paginas/Farmacias'))
 const Historico = lazy(() => import('./paginas/Historico'))
 const PainelPaciente = lazy(() => import('./paginas/PainelPaciente'))
 
@@ -50,7 +49,6 @@ export default function App() {
           <Route path="/historico" element={<Historico />} />
           <Route path="/historico/:pacienteId" element={<Historico />} />
           <Route path="/perfil" element={<EdicaoPerfil />} />
-          <Route path="/farmacias" element={<Farmacias />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/acessibilidade" element={<Acessibilidade />} />
         </Route>

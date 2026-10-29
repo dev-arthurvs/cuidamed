@@ -37,12 +37,6 @@ export const ICONES_NAVEGACAO = {
       <path d="M12 9.5v4.5M12 14l-3 6M12 14l3 6" />
     </svg>
   ),
-  farmacias: (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M12 3.5 4 7.5v9L12 20.5l8-4v-9L12 3.5Z" />
-      <path d="M12 8v8M8.5 10v6M15.5 10v6" />
-    </svg>
-  ),
 }
 
 export const ITENS_NAVEGACAO = [
@@ -50,6 +44,5 @@ export const ITENS_NAVEGACAO = [
   { rota: '/agenda', rotulo: 'Agenda', icone: 'agenda' },
   { rota: '/ciclos-encerrados', rotulo: 'Ciclos encerrados', icone: 'encerrados' },
   { rota: '/historico', rotulo: 'Histórico', icone: 'historico' },
-  { rota: '/farmacias', rotulo: 'Farmácias', icone: 'farmacias' },
   { rota: '/perfil', rotulo: 'Perfil', icone: 'perfil' },
 ]

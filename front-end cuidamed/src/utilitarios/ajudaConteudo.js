@@ -27,6 +27,7 @@ export const GUIA_SECOES = [
       'Se aparecer "Solicitações pendentes", é porque um paciente pediu para se vincular a você — clique em "Aceitar" ou "Recusar".',
       'Clique em qualquer paciente da lista "Pacientes vinculados" para abrir os detalhes dele.',
       'Use o botão "+ Cadastrar paciente" para registrar um novo paciente que ainda não tem conta própria. Preencha o telefone dele se quiser poder mandar lembretes de dose pelo WhatsApp depois.',
+      'Depois de cadastrar, abra os detalhes do paciente para ver o código de ativação: é com ele (e o e-mail cadastrado) que o paciente cria a própria senha em "Ativar meu acesso".',
     ],
   },
   {
@@ -43,6 +44,8 @@ export const GUIA_SECOES = [
       'Use "Ver ciclos encerrados" para ver remédios cujo tratamento já terminou.',
       'Ao lado do status de cada dose em "Doses de hoje", use o ícone verde de telefone para mandar um lembrete pelo WhatsApp direto pro paciente. Só aparece pra doses ainda não tomadas, e fica desabilitado se o paciente não tiver telefone cadastrado.',
       'Use "Painel do paciente ⚙️" para gerenciar permissões e desvincular o paciente, se precisar.',
+      'Se o paciente ainda não ativou o acesso ao app, o card "Acesso do paciente" mostra o código de ativação. Passe esse código para ele usar em "Ativar meu acesso", junto com o e-mail cadastrado. Depois de usado, o card some.',
+      'No card "Observações clínicas", escreva informações importantes (alergias, cuidados ao tomar os remédios) e clique em "Salvar observações". O assistente do chat também usa essas observações para responder o paciente.',
     ],
   },
   {
@@ -64,10 +67,13 @@ export const GUIA_SECOES = [
     paraQueServe:
       'É onde os remédios são cadastrados, com nome, dosagem, forma, frequência e horários. Cuidadores veem a agenda do paciente selecionado; pacientes veem a própria.',
     passos: [
+      'Se você é cuidador, escolha de qual paciente ver a agenda pelo menu do topo (passe o mouse ou clique em "Agenda" e selecione o paciente) ou pelo botão "Acessar agenda" nos detalhes do paciente.',
       'Clique em "+ Inserir medicamento" para cadastrar um novo remédio: preencha nome, dosagem, forma (comprimido, gotas, etc.), frequência e os horários do dia.',
       'Em cada card já cadastrado, use "Editar" para mudar alguma informação ou "Excluir" para remover.',
       'Remédios saem daqui automaticamente assim que a última dose do ciclo é confirmada (mesmo no próprio dia em que o tratamento termina) e vão para "Ciclos encerrados".',
+      'Cada card mostra o estoque do remédio: suficiente até o fim do tratamento (verde), baixo (amarelo, hora de repor) ou esgotado (vermelho).',
       'Se você é paciente e não vê os botões de inserir/editar/excluir, é porque seu cuidador ainda não liberou essa permissão para você — fale com ele.',
+      'Se você é cuidador, use "‹ Voltar para os detalhes do paciente" no topo para voltar aos detalhes do paciente.',
     ],
   },
   {
@@ -77,8 +83,10 @@ export const GUIA_SECOES = [
     paraQueServe:
       'Guarda os remédios cujo período de tratamento já terminou, para consulta futura. Um remédio entra aqui assim que a última dose do ciclo é confirmada, mesmo no próprio dia da data final — ou, o mais tardar, no dia seguinte, mesmo que a última dose não tenha sido registrada.',
     passos: [
+      'Se você é cuidador, escolha o paciente pelo menu do topo (passe o mouse ou clique em "Ciclos encerrados") ou pelo botão "Ver ciclos encerrados" nos detalhes do paciente.',
       'A lista mostra o período em que cada remédio foi usado (data de início até data de fim).',
-      'Use "‹ Voltar para a agenda" para retornar aos remédios ativos.',
+      'Para voltar aos remédios ativos, clique em "Agenda" no menu.',
+      'Se você é cuidador, use "‹ Voltar para os detalhes do paciente" no topo para voltar aos detalhes do paciente.',
     ],
   },
   {
@@ -87,24 +95,12 @@ export const GUIA_SECOES = [
     titulo: 'Histórico',
     paraQueServe: 'Mostra o registro de todas as doses já passadas: quais foram tomadas, atrasadas ou perdidas.',
     passos: [
+      'Se você é cuidador, escolha o paciente pelo menu do topo (passe o mouse ou clique em "Histórico") ou pelo botão "Ver histórico completo" nos detalhes do paciente.',
       'Escolha o período nos campos "De" e "Até" (começam no dia de hoje). Não dá para escolher datas futuras.',
       'Use o filtro "Medicamento" para ver o histórico de um remédio específico.',
       'Os três números no topo resumem quantas doses foram tomadas, atrasadas e perdidas no período escolhido.',
       'A lista abaixo mostra cada dose, organizada por dia, da mais recente para a mais antiga.',
-    ],
-  },
-  {
-    chave: 'farmacias',
-    publico: 'ambos',
-    titulo: 'Farmácias',
-    paraQueServe: 'Ajuda a encontrar farmácias próximas de um endereço, com mapa e distância até cada uma.',
-    passos: [
-      'Digite um endereço no campo "Endereço de origem" (pelo menos 3 letras): escolha uma das sugestões, ou clique em "Buscar" (ou tecle Enter) para buscar o texto digitado direto.',
-      'Ou clique em "Usar minha localização atual" para buscar a partir de onde você está.',
-      'Ou informe um CEP (e opcionalmente o número) e clique em "Buscar CEP".',
-      'Escolha o raio de busca (1, 3 ou 5 km) para ver mais ou menos farmácias.',
-      'Enquanto o sistema consulta o serviço de mapas, aparece um ícone de carregamento — a busca pode levar até 20 segundos.',
-      'Clique em uma farmácia da lista ou do mapa para destacá-la, e use "Como chegar" para abrir a rota no Google Maps.',
+      'Se você é cuidador, use "‹ Voltar para os detalhes do paciente" no topo para voltar aos detalhes do paciente.',
     ],
   },
   {
@@ -118,6 +114,7 @@ export const GUIA_SECOES = [
       'Ou digite sua pergunta no campo de texto e clique em "Enviar".',
       'O assistente só responde sobre os seus próprios medicamentos e histórico — ele não dá conselhos médicos nem opina sobre outros assuntos.',
       'Se a pergunta for sobre saúde em geral, ele vai pedir para você falar com seu médico ou cuidador.',
+      'Há um limite de perguntas por hora e por dia. Se aparecer o aviso de limite, espere um pouco e pergunte de novo.',
     ],
   },
   {
@@ -155,7 +152,6 @@ export function obterChaveAjuda(pathname, tipoUsuario) {
   if (pathname.startsWith('/ciclos-encerrados')) return 'ciclos-encerrados'
   if (pathname.startsWith('/historico')) return 'historico'
   if (pathname.startsWith('/perfil')) return 'perfil'
-  if (pathname.startsWith('/farmacias')) return 'farmacias'
   if (pathname.startsWith('/chat')) return 'chat'
   if (pathname.startsWith('/acessibilidade')) return 'acessibilidade'
   return null
