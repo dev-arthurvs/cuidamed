@@ -30,7 +30,7 @@ void main() {
     expect(rotaDoMenu('/agenda', 'cuidador'), '/agenda?escolher=1');
     expect(rotaDoMenu('/ciclos-encerrados', 'cuidador'), '/ciclos-encerrados?escolher=1');
     expect(rotaDoMenu('/historico', 'cuidador'), '/historico?escolher=1');
-    expect(rotaDoMenu('/farmacias', 'cuidador'), '/farmacias');
+    expect(rotaDoMenu('/perfil', 'cuidador'), '/perfil');
     expect(rotaDoMenu('/agenda', 'paciente'), '/agenda');
   });
 

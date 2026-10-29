@@ -45,6 +45,7 @@ const List<SecaoAjuda> guiaSecoes = [
       'Se aparecer "Solicitações pendentes", é porque um paciente pediu para se vincular a você — toque em "Aceitar" ou "Recusar".',
       'Toque em qualquer paciente da lista "Pacientes vinculados" para abrir os detalhes dele.',
       'Use o botão "+ Cadastrar paciente" para registrar um novo paciente que ainda não tem conta própria. Preencha o telefone dele se quiser poder mandar lembretes de dose pelo WhatsApp depois.',
+      'Depois de cadastrar, abra os detalhes do paciente para ver o código de ativação: é com ele (e o e-mail cadastrado) que o paciente cria a própria senha em "Ativar meu acesso".',
     ],
   ),
   SecaoAjuda(
@@ -60,6 +61,8 @@ const List<SecaoAjuda> guiaSecoes = [
       'Use "Ver ciclos encerrados" para ver remédios cujo tratamento já terminou.',
       'Ao lado do status de cada dose em "Doses de hoje", use o ícone verde de telefone para mandar um lembrete pelo WhatsApp direto pro paciente. Só aparece pra doses ainda não tomadas, e fica desabilitado se o paciente não tiver telefone cadastrado.',
       'Use "Painel do paciente ⚙️" para gerenciar permissões e desvincular o paciente, se precisar.',
+      'Se o paciente ainda não ativou o acesso ao app, o card "Acesso do paciente" mostra o código de ativação. Passe esse código para ele usar em "Ativar meu acesso", junto com o e-mail cadastrado. Depois de usado, o card some.',
+      'No card "Observações clínicas", escreva informações importantes (alergias, cuidados ao tomar os remédios) e toque em "Salvar observações". O assistente do chat também usa essas observações para responder o paciente.',
     ],
   ),
   SecaoAjuda(
@@ -80,10 +83,13 @@ const List<SecaoAjuda> guiaSecoes = [
     paraQueServe:
         'É onde os remédios são cadastrados, com nome, dosagem, forma, frequência e horários. Cuidadores veem a agenda do paciente selecionado; pacientes veem a própria.',
     passos: [
+      'Se você é cuidador e abriu a agenda pelo menu ou pela barra inferior, escolha primeiro o paciente na lista. Pelos detalhes do paciente ("Acessar agenda"), ela abre direto.',
       'Toque em "+ Inserir medicamento" para cadastrar um novo remédio: preencha nome, dosagem, forma (comprimido, gotas, etc.), frequência e os horários do dia.',
       'Em cada card já cadastrado, use "Editar" para mudar alguma informação ou "Excluir" para remover.',
       'Remédios saem daqui automaticamente assim que a última dose do ciclo é confirmada (mesmo no próprio dia em que o tratamento termina) e vão para "Ciclos encerrados".',
+      'Cada card mostra o estoque do remédio: suficiente até o fim do tratamento (verde), baixo (amarelo, hora de repor) ou esgotado (vermelho).',
       'Se você é paciente e não vê os botões de inserir/editar/excluir, é porque seu cuidador ainda não liberou essa permissão para você — fale com ele.',
+      'Se você é cuidador, use "‹ Voltar para os detalhes do paciente" no topo para voltar aos detalhes do paciente.',
     ],
   ),
   SecaoAjuda(
@@ -93,8 +99,10 @@ const List<SecaoAjuda> guiaSecoes = [
     paraQueServe:
         'Guarda os remédios cujo período de tratamento já terminou, para consulta futura. Um remédio entra aqui assim que a última dose do ciclo é confirmada, mesmo no próprio dia da data final — ou, o mais tardar, no dia seguinte, mesmo que a última dose não tenha sido registrada.',
     passos: [
+      'Se você é cuidador e abriu pelo menu ou pela barra inferior, escolha primeiro o paciente na lista. Pelos detalhes do paciente ("Ver ciclos encerrados"), abre direto.',
       'A lista mostra o período em que cada remédio foi usado (data de início até data de fim).',
-      'Use a seta de voltar no topo para retornar aos remédios ativos.',
+      'Para voltar aos remédios ativos, use o botão voltar do celular ou toque em "Agenda" na barra inferior.',
+      'Se você é cuidador, use "‹ Voltar para os detalhes do paciente" no topo para voltar aos detalhes do paciente.',
     ],
   ),
   SecaoAjuda(
@@ -103,24 +111,12 @@ const List<SecaoAjuda> guiaSecoes = [
     titulo: 'Histórico',
     paraQueServe: 'Mostra o registro de todas as doses já passadas: quais foram tomadas, atrasadas ou perdidas.',
     passos: [
+      'Se você é cuidador e abriu pelo menu, escolha primeiro o paciente na lista. Pelos detalhes do paciente ("Ver histórico completo"), abre direto.',
       'Escolha o período nos campos "De" e "Até" (começam no dia de hoje). Não dá para escolher datas futuras.',
       'Use o filtro "Medicamento" para ver o histórico de um remédio específico.',
       'Os três números no topo resumem quantas doses foram tomadas, atrasadas e perdidas no período escolhido.',
       'A lista abaixo mostra cada dose, organizada por dia, da mais recente para a mais antiga.',
-    ],
-  ),
-  SecaoAjuda(
-    chave: 'farmacias',
-    publico: 'ambos',
-    titulo: 'Farmácias',
-    paraQueServe: 'Ajuda a encontrar farmácias próximas de um endereço, com mapa e distância até cada uma.',
-    passos: [
-      'Digite um endereço no campo "Endereço de origem" (pelo menos 3 letras): escolha uma das sugestões, ou toque em "Buscar" para buscar o texto digitado direto.',
-      'Ou toque em "Usar minha localização atual" para buscar a partir de onde você está.',
-      'Ou informe um CEP (e opcionalmente o número) e toque em "Buscar CEP".',
-      'Escolha o raio de busca (1, 3 ou 5 km) para ver mais ou menos farmácias.',
-      'Enquanto o aplicativo consulta o serviço de mapas, aparece um ícone de carregamento — a busca pode levar até 20 segundos.',
-      'Toque em uma farmácia da lista ou do mapa para destacá-la, e use "Como chegar" para abrir a rota no Google Maps.',
+      'Se você é cuidador, use "‹ Voltar para os detalhes do paciente" no topo para voltar aos detalhes do paciente.',
     ],
   ),
   SecaoAjuda(
@@ -134,6 +130,7 @@ const List<SecaoAjuda> guiaSecoes = [
       'Ou digite sua pergunta no campo de texto e toque em "Enviar".',
       'O assistente só responde sobre os seus próprios medicamentos e histórico — ele não dá conselhos médicos nem opina sobre outros assuntos.',
       'Se a pergunta for sobre saúde em geral, ele vai pedir para você falar com seu médico ou cuidador.',
+      'Há um limite de perguntas por hora e por dia. Se aparecer o aviso de limite, espere um pouco e pergunte de novo.',
     ],
   ),
   SecaoAjuda(
@@ -171,7 +168,6 @@ String? obterChaveAjuda(String rota, String tipoUsuario) {
   if (rota.startsWith('/ciclos-encerrados')) return 'ciclos-encerrados';
   if (rota.startsWith('/historico')) return 'historico';
   if (rota.startsWith('/perfil')) return 'perfil';
-  if (rota.startsWith('/farmacias')) return 'farmacias';
   if (rota.startsWith('/chat')) return 'chat';
   if (rota.startsWith('/acessibilidade')) return 'acessibilidade';
   return null;

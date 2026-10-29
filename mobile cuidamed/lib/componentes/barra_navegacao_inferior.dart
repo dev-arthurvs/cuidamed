@@ -23,14 +23,12 @@ class BarraNavegacaoInferior extends StatelessWidget {
       return const [
         _ItemNav('/painel', Icons.home_outlined, 'Início'),
         _ItemNav('/agenda', Icons.calendar_month_outlined, 'Agenda'),
-        _ItemNav('/farmacias', Icons.local_pharmacy_outlined, 'Farmácias'),
         _ItemNav('/chat', Icons.chat_bubble_outline, 'Chat'),
       ];
     }
     return const [
       _ItemNav('/painel', Icons.home_outlined, 'Início'),
       _ItemNav('/agenda', Icons.calendar_month_outlined, 'Agenda'),
-      _ItemNav('/farmacias', Icons.local_pharmacy_outlined, 'Farmácias'),
       _ItemNav('/ciclos-encerrados', Icons.inventory_2_outlined, 'Ciclos'),
     ];
   }

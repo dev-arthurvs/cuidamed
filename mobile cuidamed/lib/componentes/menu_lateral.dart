@@ -19,7 +19,6 @@ const List<_ItemMenu> _itensComuns = [
   _ItemMenu('/agenda', Icons.calendar_month_outlined, 'Agenda de medicamentos'),
   _ItemMenu('/ciclos-encerrados', Icons.inventory_2_outlined, 'Ciclos encerrados'),
   _ItemMenu('/historico', Icons.history, 'Histórico'),
-  _ItemMenu('/farmacias', Icons.local_pharmacy_outlined, 'Farmácias'),
   _ItemMenu('/perfil', Icons.person_outline, 'Perfil'),
   _ItemMenu('/acessibilidade', Icons.accessibility_new, 'Ajuda e acessibilidade'),
 ];

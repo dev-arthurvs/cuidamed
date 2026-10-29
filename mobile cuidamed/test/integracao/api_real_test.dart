@@ -1,4 +1,4 @@
-// Teste de integração contra o back-end real (e Nominatim/ViaCEP).
+// Teste de integração contra o back-end real.
 // Só roda com a URL explícita, pra não quebrar o `flutter test` comum:
 //   flutter test test/integracao --dart-define=API_BASE_URL=http://localhost:8080
 // Usa `test()` puro (sem testWidgets) porque o binding de widget test bloqueia HTTP.
@@ -17,8 +17,6 @@ import 'package:cuidamed_mobile/servicos/api_cliente.dart';
 import 'package:cuidamed_mobile/servicos/auth_servico.dart';
 import 'package:cuidamed_mobile/servicos/chat_servico.dart';
 import 'package:cuidamed_mobile/servicos/cuidador_servico.dart';
-import 'package:cuidamed_mobile/servicos/farmacia_servico.dart';
-import 'package:cuidamed_mobile/servicos/geocodificacao_servico.dart';
 import 'package:cuidamed_mobile/servicos/paciente_servico.dart';
 
 const _url = String.fromEnvironment('API_BASE_URL');
@@ -343,22 +341,4 @@ void main() {
     print('Chat respondeu: ${resposta.length > 120 ? '${resposta.substring(0, 120)}…' : resposta}');
   }, skip: _url.isEmpty ? 'defina --dart-define=API_BASE_URL' : null, timeout: const Timeout(Duration(seconds: 60)));
 
-  test('Farmácias, Nominatim e ViaCEP', () async {
-    await _como(emailCuidador, 'senha1234');
-    final resposta = await FarmaciaServico().buscarPorCoordenadas(-10.911589, -37.0545059, 3000);
-    // ignore: avoid_print
-    print('Farmácias em 3 km de Aracaju: ${resposta.farmacias.length}');
-    expect(resposta.farmacias, isNotEmpty);
-    final distancias = resposta.farmacias.map((f) => f.distanciaMetros).toList();
-    expect(distancias.every((d) => d <= 3000), isTrue);
-
-    final geo = GeocodificacaoServico();
-    final sugestoes = await geo.sugerir('Rua Laranjeiras, Aracaju');
-    expect(sugestoes, isNotEmpty);
-
-    final cep = await geo.buscarCep('49010000', numero: '100');
-    expect(cep, isNotNull);
-    expect(cep!.enderecoCompleto, contains('Aracaju - SE'));
-    expect(await geo.buscarCep('00000000'), isNull);
-  }, skip: _url.isEmpty ? 'defina --dart-define=API_BASE_URL' : null, timeout: const Timeout(Duration(seconds: 60)));
 }

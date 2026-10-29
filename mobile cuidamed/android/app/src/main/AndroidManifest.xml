@@ -1,9 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- API do CuidaMed, mapas (tiles OSM), Nominatim e ViaCEP. -->
+    <!-- API do CuidaMed. -->
     <uses-permission android:name="android.permission.INTERNET"/>
-    <!-- "Usar minha localização atual" na tela de Farmácias. -->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <!-- Android 13+: notificação de "Hora do remédio" e "Lembrar agora" do cuidador. -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application

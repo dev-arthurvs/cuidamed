@@ -13,7 +13,6 @@ import 'paginas/ciclos_encerrados.dart';
 import 'paginas/definir_senha.dart';
 import 'paginas/detalhe_paciente.dart';
 import 'paginas/edicao_perfil.dart';
-import 'paginas/farmacias.dart';
 import 'paginas/historico.dart';
 import 'paginas/login.dart';
 import 'paginas/painel_cuidador.dart';
@@ -88,10 +87,6 @@ GoRouter _construirRouter(AppEstado estado) {
       GoRoute(
         path: '/perfil',
         builder: (context, state) => const EdicaoPerfil(),
-      ),
-      GoRoute(
-        path: '/farmacias',
-        builder: (context, state) => const Farmacias(),
       ),
       GoRoute(path: '/acessibilidade', builder: (context, state) => const Acessibilidade()),
       GoRoute(

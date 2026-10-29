@@ -108,7 +108,7 @@ Future<void> montarPagina(
     initialLocation: rota,
     routes: [
       GoRoute(path: rota.split('?').first, builder: (context, state) => pagina(state)),
-      for (final outra in ['/painel', '/login', '/cadastro', '/definir-senha', '/agenda', '/acessibilidade', '/ciclos-encerrados', '/historico', '/chat', '/farmacias', '/perfil'])
+      for (final outra in ['/painel', '/login', '/cadastro', '/definir-senha', '/agenda', '/acessibilidade', '/ciclos-encerrados', '/historico', '/chat', '/perfil'])
         if (outra != rota) GoRoute(path: outra, builder: (context, state) => Scaffold(body: Text('rota $outra'))),
     ],
   );
