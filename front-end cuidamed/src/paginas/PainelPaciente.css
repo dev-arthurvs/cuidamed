@@ -58,7 +58,7 @@
   height: 24px;
   margin: 3px;
   border-radius: 999px;
-  background: #fff;
+  background: var(--fundo-card);
   box-shadow: 0 2px 6px rgba(9, 38, 80, 0.25);
   transition: transform 0.15s ease;
 }

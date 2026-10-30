@@ -3,10 +3,12 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Botao from '../componentes/Botao'
 import Campo from '../componentes/Campo'
+import { ICONES_CAMPO } from '../componentes/iconesCampo'
 import LogoMarca from '../componentes/LogoMarca'
 import Toast from '../componentes/Toast'
 import { useApp } from '../contexto/useApp'
 import { OPCOES_SEXO } from '../dados/dadosMock'
+import { dataDeHojeISO } from '../utilitarios/mascaras'
 import '../estilos/autenticacao.css'
 
 const variantesCampos = {
@@ -131,12 +133,13 @@ export default function Cadastro() {
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
                 style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
               >
-                <Campo rotulo="Nome completo" placeholder="Maria Aparecida Souza" value={nome} onChange={(e) => setNome(e.target.value)} />
+                <Campo rotulo="Nome completo" icone={ICONES_CAMPO.pessoa} placeholder="Maria Aparecida Souza" value={nome} onChange={(e) => setNome(e.target.value)} />
                 <div className="autenticacao__grade-dupla">
                   <Campo
                     rotulo="Data de nascimento"
                     tipo="date"
                     value={dataNascimento}
+                    max={dataDeHojeISO()}
                     onChange={(e) => setDataNascimento(e.target.value)}
                   />
                   <Campo rotulo="Sexo" tipo="select" value={sexo} onChange={(e) => setSexo(e.target.value)}>
@@ -148,14 +151,17 @@ export default function Cadastro() {
                 <Campo
                   rotulo="Telefone"
                   tipo="tel"
+                  icone={ICONES_CAMPO.telefone}
                   placeholder="(11) 98765-4321"
                   value={telefone}
                   onChange={(e) => setTelefone(e.target.value)}
                 />
-                <Campo rotulo="E-mail" tipo="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Campo rotulo="E-mail" tipo="email" icone={ICONES_CAMPO.email} placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
                 <Campo
                   rotulo="Senha"
                   tipo="password"
+                  icone={ICONES_CAMPO.senha}
+                  alternarSenha
                   placeholder="Mínimo 8 caracteres"
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
@@ -171,18 +177,21 @@ export default function Cadastro() {
                 transition={{ duration: 0.2, ease: 'easeInOut' }}
                 style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
               >
-                <Campo rotulo="Nome completo" placeholder="Ana Lúcia Souza" value={nome} onChange={(e) => setNome(e.target.value)} />
+                <Campo rotulo="Nome completo" icone={ICONES_CAMPO.pessoa} placeholder="Ana Lúcia Souza" value={nome} onChange={(e) => setNome(e.target.value)} />
                 <Campo
                   rotulo="Telefone"
                   tipo="tel"
+                  icone={ICONES_CAMPO.telefone}
                   placeholder="(11) 98765-4321"
                   value={telefone}
                   onChange={(e) => setTelefone(e.target.value)}
                 />
-                <Campo rotulo="E-mail" tipo="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Campo rotulo="E-mail" tipo="email" icone={ICONES_CAMPO.email} placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
                 <Campo
                   rotulo="Senha"
                   tipo="password"
+                  icone={ICONES_CAMPO.senha}
+                  alternarSenha
                   placeholder="Mínimo 8 caracteres"
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
@@ -195,13 +204,13 @@ export default function Cadastro() {
             {enviando ? 'Criando conta...' : 'Criar conta e entrar'}
           </Botao>
 
-          <div className="autenticacao__links">
-            <div className="autenticacao__link-linha">
-              Já tem conta?<Link to="/login">Entrar</Link>
-            </div>
-            <div className="autenticacao__link-linha">
-              Cadastrado pelo seu cuidador?<Link to="/definir-senha">Ativar meu acesso</Link>
-            </div>
+          <div className="autenticacao__alternativas">
+            <Link className="autenticacao__alternativa" to="/login">
+              Entrar
+            </Link>
+            <Link className="autenticacao__alternativa" to="/definir-senha">
+              Ativar acesso
+            </Link>
           </div>
         </form>
       </div>

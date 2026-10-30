@@ -2,10 +2,11 @@
 // de paciente — os dados reais vêm da API, ver src/utilitarios/api.js).
 
 export const ESTILO_STATUS = {
-  tomado: { rotulo: 'Tomado', fundo: '#eaf7f0', texto: '#1b6f4e', ponto: '#1f8a5f' },
-  pendente: { rotulo: 'A tomar', fundo: '#eaf3fe', texto: '#0f4c9e', ponto: '#1560c4' },
-  atrasado: { rotulo: 'Atrasado', fundo: '#fff7ec', texto: '#8a6a33', ponto: '#d89b2a' },
-  perdido: { rotulo: 'Perdido', fundo: '#fdf3f1', texto: '#a9372a', ponto: '#c0392b' },
+  // Variáveis de cor (global.css): acompanham o modo claro/escuro.
+  tomado: { rotulo: 'Tomado', fundo: 'var(--verde-fundo)', texto: 'var(--verde-texto)', ponto: 'var(--verde)' },
+  pendente: { rotulo: 'A tomar', fundo: 'var(--azul-fundo)', texto: 'var(--azul-texto)', ponto: 'var(--azul)' },
+  atrasado: { rotulo: 'Atrasado', fundo: 'var(--amarelo-fundo)', texto: 'var(--amarelo-texto)', ponto: 'var(--amarelo)' },
+  perdido: { rotulo: 'Perdido', fundo: 'var(--vermelho-fundo)', texto: 'var(--vermelho-texto)', ponto: 'var(--vermelho)' },
 }
 
 export const FORMAS_MEDICAMENTO = ['Comprimido', 'Cápsula', 'Gota', 'Xarope', 'Injeção', 'Pomada']

@@ -76,6 +76,8 @@ class _LoginState extends State<Login> {
             const SizedBox(height: 22),
             CampoTexto(
               rotulo: 'E-mail',
+              icone: Icons.mail_outline,
+              fundoBranco: true,
               rotuloExterno: true,
               placeholder: 'seu@email.com',
               controller: _emailController,
@@ -85,6 +87,9 @@ class _LoginState extends State<Login> {
             const SizedBox(height: 18),
             CampoTexto(
               rotulo: 'Senha',
+              icone: Icons.lock_outline,
+              fundoBranco: true,
+              alternarSenha: true,
               rotuloExterno: true,
               placeholder: '••••••••',
               controller: _senhaController,
@@ -99,16 +104,12 @@ class _LoginState extends State<Login> {
               Text(_erro!, style: const TextStyle(color: CorApp.vermelho, fontWeight: FontWeight.w600)),
             ],
             const SizedBox(height: 16),
-            Botao(texto: 'Entrar', onPressed: _entrar, carregando: _carregando),
+            Botao(texto: 'Entrar', variante: VarianteBotao.solido, onPressed: _entrar, carregando: _carregando),
             const SizedBox(height: 22),
-            RodapeLinksAutenticacao(
-              linhas: [
-                LinhaConvite(pergunta: 'Não tem conta?', link: 'Cadastre-se', onTap: () => context.push('/cadastro')),
-                LinhaConvite(
-                  pergunta: 'Cadastrado pelo seu cuidador?',
-                  link: 'Ativar meu acesso',
-                  onTap: () => context.push('/definir-senha'),
-                ),
+            BotoesAlternativosAutenticacao(
+              opcoes: [
+                (texto: 'Criar conta', onTap: () => context.push('/cadastro')),
+                (texto: 'Ativar acesso', onTap: () => context.push('/definir-senha')),
               ],
             ),
           ],

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Botao from '../componentes/Botao'
 import Campo from '../componentes/Campo'
+import { ICONES_CAMPO } from '../componentes/iconesCampo'
 import LogoMarca from '../componentes/LogoMarca'
 import Toast from '../componentes/Toast'
 import { useApp } from '../contexto/useApp'
@@ -58,8 +59,23 @@ export default function Login() {
             <h1 className="autenticacao__titulo">Entrar na minha conta</h1>
           </div>
 
-          <Campo rotulo="E-mail" tipo="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <Campo rotulo="Senha" tipo="password" placeholder="••••••••" value={senha} onChange={(e) => setSenha(e.target.value)} />
+          <Campo
+            rotulo="E-mail"
+            tipo="email"
+            icone={ICONES_CAMPO.email}
+            placeholder="seu@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <Campo
+            rotulo="Senha"
+            tipo="password"
+            icone={ICONES_CAMPO.senha}
+            alternarSenha
+            placeholder="••••••••"
+            value={senha}
+            onChange={(e) => setSenha(e.target.value)}
+          />
           <button
             type="button"
             className="autenticacao__esqueci"
@@ -72,13 +88,13 @@ export default function Login() {
             {entrando ? 'Entrando...' : 'Entrar'}
           </Botao>
 
-          <div className="autenticacao__links">
-            <div className="autenticacao__link-linha">
-              Não tem conta?<Link to="/cadastro">Cadastre-se</Link>
-            </div>
-            <div className="autenticacao__link-linha">
-              Cadastrado pelo seu cuidador?<Link to="/definir-senha">Ativar meu acesso</Link>
-            </div>
+          <div className="autenticacao__alternativas">
+            <Link className="autenticacao__alternativa" to="/cadastro">
+              Criar conta
+            </Link>
+            <Link className="autenticacao__alternativa" to="/definir-senha">
+              Ativar acesso
+            </Link>
           </div>
         </form>
       </div>

@@ -5,7 +5,8 @@ import '../utilitarios/tema.dart';
 /// sólido com texto branco (botão de confirmar do ModalConfirmacao do web).
 /// sobreAzul = texto e contorno brancos, pra botões em cima de cards com o
 /// gradiente azul (ex.: "Registrar dose" no Início do paciente).
-enum VarianteBotao { primario, secundario, contorno, perigo, perigoCheio, sobreAzul }
+/// solido = azul sólido e escuro (sem degradê), mais sóbrio — telas de login/cadastro.
+enum VarianteBotao { primario, solido, secundario, contorno, perigo, perigoCheio, sobreAzul }
 
 class Botao extends StatelessWidget {
   final String texto;
@@ -66,11 +67,16 @@ class Botao extends StatelessWidget {
     Widget botao;
     switch (variante) {
       case VarianteBotao.primario:
+      case VarianteBotao.solido:
+        final solido = variante == VarianteBotao.solido;
         botao = Container(
           decoration: BoxDecoration(
-            gradient: desabilitado ? null : CorApp.gradienteAzul,
-            color: desabilitado ? CorApp.textoSuave.withValues(alpha: 0.35) : null,
+            gradient: desabilitado || solido ? null : CorApp.gradienteAzul,
+            color: desabilitado ? CorApp.textoSuave.withValues(alpha: 0.35) : (solido ? CorApp.azulSolido : null),
             borderRadius: BorderRadius.circular(RaioApp.medio),
+            boxShadow: solido && !desabilitado
+                ? const [BoxShadow(color: Color(0x470F3F80), blurRadius: 22, offset: Offset(0, 10))]
+                : null,
           ),
           child: Material(
             color: Colors.transparent,

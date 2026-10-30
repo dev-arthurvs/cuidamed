@@ -5,6 +5,7 @@ import VoltarDetalhesPaciente from '../componentes/VoltarDetalhesPaciente'
 import Rotulo from '../componentes/Rotulo'
 import { useApp } from '../contexto/useApp'
 import { ESTILO_STATUS } from '../dados/dadosMock'
+import { DATA_MINIMA } from '../utilitarios/mascaras'
 import './Historico.css'
 
 const UM_DIA_MS = 24 * 60 * 60 * 1000
@@ -118,6 +119,7 @@ export default function Historico() {
                     type="date"
                     className="historico__select"
                     value={dataInicio}
+                    min={DATA_MINIMA}
                     max={hojeIso}
                     onChange={(e) => alterarInicio(e.target.value)}
                   />
@@ -128,6 +130,7 @@ export default function Historico() {
                     type="date"
                     className="historico__select"
                     value={dataFim}
+                    min={DATA_MINIMA}
                     max={hojeIso}
                     onChange={(e) => alterarFim(e.target.value)}
                   />

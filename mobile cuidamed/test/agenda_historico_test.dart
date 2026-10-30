@@ -53,11 +53,18 @@ void main() {
     expect(b.right, greaterThan(1000));
   });
 
-  testWidgets('Agenda sem permissão esconde inserir para o paciente', (tester) async {
-    await montarPagina(tester, estadoPaciente(permiteAlteracoes: false), '/agenda', (_) => const AgendaMedicamentos());
+  testWidgets('Paciente com cuidador e sem permissão: não insere nem edita', (tester) async {
+    await montarPagina(
+        tester, estadoPaciente(cuidadorId: 5, permiteAlteracoes: false), '/agenda', (_) => const AgendaMedicamentos());
     expect(find.text('+ Inserir medicamento'), findsNothing);
     expect(find.textContaining('ainda não liberou alterações'), findsOneWidget);
     expect(find.text('Editar'), findsNothing);
+  });
+
+  testWidgets('Paciente sem cuidador (cadastro próprio) cuida da própria agenda', (tester) async {
+    await montarPagina(tester, estadoPaciente(permiteAlteracoes: false), '/agenda', (_) => const AgendaMedicamentos());
+    expect(find.text('+ Inserir medicamento'), findsOneWidget);
+    expect(find.textContaining('ainda não liberou alterações'), findsNothing);
   });
 
   testWidgets('Ciclos encerrados lista o medicamento vencido', (tester) async {
@@ -91,13 +98,14 @@ void main() {
     expect(find.text('08:00'), findsOneWidget);
     expect(find.text('06:00'), findsNothing); // registro de 10 dias atrás fora do padrão "hoje"
 
-    // "De" = 10 dias atrás (modo de digitação do calendário; testes rodam em en_US: MM/DD/AAAA).
+    // "De" = 10 dias atrás, digitada no calendário em português (dia/mês/ano).
     await tester.tap(find.text('De'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Switch to input'));
+    expect(find.text('Cancelar'), findsOneWidget); // calendário em português
+    await tester.tap(find.byIcon(Icons.edit_outlined)); // modo de digitação
     await tester.pumpAndSettle();
     String dd(int n) => n.toString().padLeft(2, '0');
-    await tester.enterText(find.byType(TextField).last, '${dd(antiga.month)}/${dd(antiga.day)}/${antiga.year}');
+    await tester.enterText(find.byType(TextField).last, '${dd(antiga.day)}/${dd(antiga.month)}/${antiga.year}');
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
     expect(find.text('06:00'), findsOneWidget);

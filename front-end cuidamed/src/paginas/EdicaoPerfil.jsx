@@ -9,6 +9,7 @@ import { OPCOES_SEXO } from '../dados/dadosMock'
 import { api } from '../utilitarios/api'
 import { obterIniciais } from '../utilitarios/horarios'
 import { OPCOES_TAMANHO_FONTE } from '../utilitarios/preferenciaFonte'
+import { dataDeHojeISO, formatarTelefone } from '../utilitarios/mascaras'
 import './EdicaoPerfil.css'
 
 export default function EdicaoPerfil() {
@@ -22,7 +23,8 @@ export default function EdicaoPerfil() {
   const [email, setEmail] = useState(usuario.email)
   const [dataNascimento, setDataNascimento] = useState(pacienteFoco?.dataNascimento || '')
   const [sexo, setSexo] = useState(pacienteFoco?.sexo || OPCOES_SEXO[0])
-  const [telefone, setTelefone] = useState((ehPaciente ? pacienteFoco?.telefone : usuario.telefone) || '')
+  // Telefones salvos antes da máscara aparecem já formatados.
+  const [telefone, setTelefone] = useState(() => formatarTelefone((ehPaciente ? pacienteFoco?.telefone : usuario.telefone) || ''))
   const [endereco, setEndereco] = useState(pacienteFoco?.endereco || '')
   const [profissao, setProfissao] = useState(usuario.profissao || '')
   const [senhaAtual, setSenhaAtual] = useState('')
@@ -145,6 +147,7 @@ export default function EdicaoPerfil() {
                         rotulo="Data de nascimento"
                         tipo="date"
                         value={dataNascimento}
+                        max={dataDeHojeISO()}
                         onChange={(e) => setDataNascimento(e.target.value)}
                       />
                       <Campo rotulo="Sexo" tipo="select" value={sexo} onChange={(e) => setSexo(e.target.value)}>

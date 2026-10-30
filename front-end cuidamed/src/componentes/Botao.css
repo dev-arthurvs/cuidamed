@@ -40,7 +40,7 @@
 }
 
 .botao--contorno {
-  background: #f7fafd;
+  background: var(--fundo-destaque);
   color: var(--texto-label);
   border: 1.5px solid var(--borda-destaque);
 }

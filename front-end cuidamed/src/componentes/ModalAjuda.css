@@ -15,7 +15,7 @@
   max-width: 520px;
   max-height: calc(85vh / var(--fator-zoom, 1));
   overflow-y: auto;
-  background: #fff;
+  background: var(--fundo-card);
   border-radius: var(--raio-grande);
   padding: 32px;
   box-shadow: 0 24px 60px rgba(12, 35, 66, 0.32);

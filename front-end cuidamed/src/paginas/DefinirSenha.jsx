@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Botao from '../componentes/Botao'
 import Campo from '../componentes/Campo'
+import { ICONES_CAMPO } from '../componentes/iconesCampo'
 import LogoMarca from '../componentes/LogoMarca'
 import Toast from '../componentes/Toast'
 import { useApp } from '../contexto/useApp'
@@ -77,12 +78,14 @@ export default function DefinirSenha() {
           <Campo
             rotulo="E-mail cadastrado"
             tipo="email"
+            icone={ICONES_CAMPO.email}
             placeholder="seu@email.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <Campo
             rotulo="Código de ativação"
+            icone={ICONES_CAMPO.codigo}
             placeholder="Código que seu cuidador passou"
             value={codigo}
             onChange={(e) => setCodigo(e.target.value.toUpperCase())}
@@ -92,6 +95,8 @@ export default function DefinirSenha() {
           <Campo
             rotulo="Criar senha"
             tipo="password"
+            icone={ICONES_CAMPO.senha}
+            alternarSenha
             placeholder="Mínimo 8 caracteres"
             value={novaSenha}
             onChange={(e) => setNovaSenha(e.target.value)}
@@ -99,6 +104,8 @@ export default function DefinirSenha() {
           <Campo
             rotulo="Confirmar senha"
             tipo="password"
+            icone={ICONES_CAMPO.senha}
+            alternarSenha
             placeholder="Repita a senha"
             value={confirmarSenha}
             onChange={(e) => setConfirmarSenha(e.target.value)}
@@ -108,13 +115,13 @@ export default function DefinirSenha() {
             {enviando ? 'Ativando...' : 'Ativar acesso'}
           </Botao>
 
-          <div className="autenticacao__links">
-            <div className="autenticacao__link-linha">
-              Já ativou seu acesso?<Link to="/login">Entrar</Link>
-            </div>
-            <div className="autenticacao__link-linha">
-              Não tem conta?<Link to="/cadastro">Cadastre-se</Link>
-            </div>
+          <div className="autenticacao__alternativas">
+            <Link className="autenticacao__alternativa" to="/login">
+              Entrar
+            </Link>
+            <Link className="autenticacao__alternativa" to="/cadastro">
+              Criar conta
+            </Link>
           </div>
         </form>
       </div>

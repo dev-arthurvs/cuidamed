@@ -283,41 +283,44 @@ class LinkEsqueciSenha extends StatelessWidget {
   }
 }
 
-/// "Pergunta? Link" numa linha centralizada que quebra se faltar espaço.
-class LinhaConvite extends StatelessWidget {
-  final String pergunta;
-  final String link;
-  final VoidCallback onTap;
-  const LinhaConvite({super.key, required this.pergunta, required this.link, required this.onTap});
+/// Rodapé do card: linha divisória e os outros caminhos (criar conta, ativar
+/// acesso, entrar) como dois botões de contorno lado a lado — como no web.
+/// Mais fáceis de achar e tocar que links no meio do texto.
+class BotoesAlternativosAutenticacao extends StatelessWidget {
+  final List<({String texto, VoidCallback onTap})> opcoes;
+  const BotoesAlternativosAutenticacao({super.key, required this.opcoes});
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      spacing: 6,
-      children: [
-        Text(pergunta, style: const TextStyle(color: CorApp.textoSuave, fontSize: 16, fontWeight: FontWeight.w500)),
-        LinkAutenticacao(texto: link, onTap: onTap),
-      ],
-    );
-  }
-}
-
-/// Rodapé do card: linha divisória e os outros caminhos (cadastro, ativação,
-/// voltar ao login), um por linha e centralizados — como no web.
-class RodapeLinksAutenticacao extends StatelessWidget {
-  final List<LinhaConvite> linhas;
-  const RodapeLinksAutenticacao({super.key, required this.linhas});
-
-  @override
-  Widget build(BuildContext context) {
+    final botoes = [
+      for (final opcao in opcoes)
+        OutlinedButton(
+          onPressed: opcao.onTap,
+          style: OutlinedButton.styleFrom(
+            minimumSize: const Size.fromHeight(52),
+            padding: const EdgeInsets.symmetric(horizontal: 10),
+            backgroundColor: Colors.white,
+            foregroundColor: CorApp.azul,
+            side: const BorderSide(color: Color(0xFFCFDCEC), width: 1.5),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RaioApp.medio)),
+            // A partir do estilo do tema, para manter a fonte do app (um TextStyle
+            // solto aqui trocaria a fonte pela padrão do sistema).
+            textStyle: Theme.of(context).textTheme.labelLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w700),
+          ),
+          child: Text(opcao.texto, textAlign: TextAlign.center),
+        ),
+    ];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const Divider(height: 1, color: CorApp.borda),
-        const SizedBox(height: 14),
-        for (final linha in linhas) Center(child: linha),
+        const SizedBox(height: 18),
+        LayoutBuilder(
+          // Tela muito estreita: um botão abaixo do outro.
+          builder: (context, restricoes) => restricoes.maxWidth < 240
+              ? Column(children: [for (final (i, b) in botoes.indexed) ...[if (i > 0) const SizedBox(height: 10), b]])
+              : Row(children: [for (final (i, b) in botoes.indexed) ...[if (i > 0) const SizedBox(width: 12), Expanded(child: b)]]),
+        ),
       ],
     );
   }

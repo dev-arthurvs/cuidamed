@@ -47,7 +47,8 @@ export default function AgendaMedicamentos() {
   )
   const totalEncerrados = pacienteFoco.medicamentos.length - medicamentosAtivos.length
   const kicker = usuario.tipo === 'cuidador' ? `Agenda de ${pacienteFoco.nome.split(' ')[0]}` : 'Agenda de medicamentos'
-  const podeEditar = usuario.tipo === 'cuidador' || pacienteFoco.permiteAlteracoes
+  // Paciente sem cuidador cuida da própria agenda; com cuidador, só se ele liberou.
+  const podeEditar = usuario.tipo === 'cuidador' || !pacienteFoco.cuidadorId || pacienteFoco.permiteAlteracoes
 
   async function confirmarExclusao() {
     try {

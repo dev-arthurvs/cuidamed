@@ -68,7 +68,7 @@
 
 .edicao-perfil__divisor {
   height: 1px;
-  background: #eef3f9;
+  background: var(--fundo-suave);
 }
 
 .edicao-perfil__cuidador-info {

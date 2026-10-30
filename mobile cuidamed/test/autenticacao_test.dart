@@ -22,14 +22,26 @@ Rect _cartao(WidgetTester tester, String textoDentro) => tester.getRect(find
 
 void main() {
   group('Login', () {
-    testWidgets('Tem título, "Esqueci minha senha" e os caminhos de cadastro e ativação', (tester) async {
+    testWidgets('Tem título, campos com ícone, olho na senha e os caminhos como botões', (tester) async {
       await montarPagina(tester, _deslogado(), '/login', (_) => const Login());
       expect(find.text('Entrar na minha conta'), findsOneWidget);
       expect(find.text('Esqueci minha senha'), findsOneWidget);
-      expect(find.text('Não tem conta?'), findsOneWidget);
-      expect(find.text('Cadastre-se'), findsOneWidget);
-      expect(find.text('Cadastrado pelo seu cuidador?'), findsOneWidget);
-      expect(find.text('Ativar meu acesso'), findsOneWidget);
+      expect(find.byIcon(Icons.mail_outline), findsOneWidget);
+      expect(find.byIcon(Icons.lock_outline), findsOneWidget);
+      expect(find.widgetWithText(OutlinedButton, 'Criar conta'), findsOneWidget);
+      expect(find.widgetWithText(OutlinedButton, 'Ativar acesso'), findsOneWidget);
+    });
+
+    testWidgets('Olho da senha mostra e esconde o que foi digitado', (tester) async {
+      await montarPagina(tester, _deslogado(), '/login', (_) => const Login());
+      final senha = find.widgetWithText(TextField, '••••••••');
+      expect(tester.widget<TextField>(senha).obscureText, isTrue);
+      await tester.tap(find.byTooltip('Mostrar senha'));
+      await tester.pump();
+      expect(tester.widget<TextField>(senha).obscureText, isFalse);
+      await tester.tap(find.byTooltip('Esconder senha'));
+      await tester.pump();
+      expect(tester.widget<TextField>(senha).obscureText, isTrue);
     });
 
     testWidgets('"Esqueci" à direita, abaixo da senha; rodapé centralizado, um por linha', (tester) async {
@@ -42,22 +54,16 @@ void main() {
       expect(esqueci.right, closeTo(form.right, 6)); // alinhado à direita
       expect(entrar.top, greaterThan(esqueci.bottom)); // botão depois do "Esqueci"
 
-      final cadastre = tester.getRect(find.text('Cadastre-se'));
-      final ativar = tester.getRect(find.text('Ativar meu acesso'));
-      expect(cadastre.top, greaterThan(entrar.bottom)); // caminhos no rodapé
-      expect(ativar.top, greaterThan(cadastre.bottom)); // um por linha
-      final pergunta = tester.getRect(find.text('Não tem conta?'));
-      if ((cadastre.top - pergunta.top).abs() < 4) {
-        // cabe numa linha: o conjunto fica centralizado
-        expect((pergunta.left + cadastre.right) / 2, closeTo(form.center.dx, 6));
-      } else {
-        // quebrou em duas linhas (a fonte de teste é larga): cada uma centralizada
-        expect(pergunta.center.dx, closeTo(form.center.dx, 4));
-        expect(cadastre.center.dx, closeTo(form.center.dx, 4));
-      }
-      for (final texto in ['Esqueci minha senha', 'Cadastre-se', 'Ativar meu acesso', 'Não tem conta?']) {
-        expect(tester.widget<Text>(find.text(texto)).style!.fontSize, 16, reason: texto);
-      }
+      final criar = tester.getRect(find.widgetWithText(OutlinedButton, 'Criar conta'));
+      final ativar = tester.getRect(find.widgetWithText(OutlinedButton, 'Ativar acesso'));
+      expect(criar.top, greaterThan(entrar.bottom)); // caminhos no rodapé
+      expect(criar.top, closeTo(ativar.top, 1)); // lado a lado
+      expect(ativar.left, greaterThan(criar.right));
+      expect(criar.width, closeTo(ativar.width, 1)); // mesma largura
+      expect(criar.left, closeTo(form.left, 1));
+      expect(ativar.right, closeTo(form.right, 1));
+      expect(criar.height, greaterThanOrEqualTo(52)); // fácil de tocar
+      expect(tester.widget<Text>(find.text('Esqueci minha senha')).style!.fontSize, 16);
     });
 
     testWidgets('"Esqueci minha senha" só avisa (simulação) e não navega', (tester) async {
@@ -69,10 +75,10 @@ void main() {
       expect(find.text('rota /definir-senha'), findsNothing);
     });
 
-    testWidgets('"Ativar meu acesso" abre a tela de ativação', (tester) async {
+    testWidgets('"Ativar acesso" abre a tela de ativação', (tester) async {
       await montarPagina(tester, _deslogado(), '/login', (_) => const Login());
-      await rolarAte(tester, find.text('Ativar meu acesso'));
-      await tester.tap(find.text('Ativar meu acesso'));
+      await rolarAte(tester, find.text('Ativar acesso'));
+      await tester.tap(find.text('Ativar acesso'));
       await tester.pumpAndSettle();
       expect(find.text('rota /definir-senha'), findsOneWidget);
     });
@@ -88,6 +94,12 @@ void main() {
   });
 
   group('Layout', () {
+    testWidgets('Fonte "Grande" escolhida no sistema não aumenta o login', (tester) async {
+      await montarPagina(tester, _deslogado()..tamanhoFonte = 'grande', '/login', (_) => const Login());
+      final contexto = tester.element(find.text('Entrar na minha conta'));
+      expect(MediaQuery.textScalerOf(contexto).scale(10), 10); // escala 1,0
+    });
+
     testWidgets('O gradiente azul escuro cobre a tela inteira', (tester) async {
       await montarPagina(tester, _deslogado(), '/login', (_) => const Login(), tamanho: _celular);
       final fundo = find.byWidgetPredicate(
@@ -157,7 +169,7 @@ void main() {
       expect(find.textContaining('Protótipo'), findsNothing);
     });
 
-    testWidgets('Rodapé: "Já tem conta? Entrar" vai ao login', (tester) async {
+    testWidgets('Rodapé: botão "Entrar" vai ao login', (tester) async {
       await montarPagina(tester, _deslogado(), '/cadastro', (_) => const Cadastro());
       expect(find.text('‹ Voltar para entrar'), findsNothing);
       await rolarAte(tester, find.text('Entrar'));
@@ -168,12 +180,12 @@ void main() {
   });
 
   group('Ativar acesso', () {
-    testWidgets('Rodapé: "Já ativou seu acesso? Entrar" e "Não tem conta? Cadastre-se"', (tester) async {
+    testWidgets('Rodapé: botões "Entrar" e "Criar conta"', (tester) async {
       await montarPagina(tester, _deslogado(), '/definir-senha', (_) => const DefinirSenha());
       expect(find.text('‹ Voltar para entrar'), findsNothing);
-      expect(find.text('Já ativou seu acesso?'), findsOneWidget);
-      await rolarAte(tester, find.text('Cadastre-se'));
-      await tester.tap(find.text('Cadastre-se'));
+      expect(find.widgetWithText(OutlinedButton, 'Entrar'), findsOneWidget);
+      await rolarAte(tester, find.text('Criar conta'));
+      await tester.tap(find.text('Criar conta'));
       await tester.pumpAndSettle();
       expect(find.text('rota /cadastro'), findsOneWidget);
     });

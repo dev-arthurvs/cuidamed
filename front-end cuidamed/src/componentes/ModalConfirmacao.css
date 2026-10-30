@@ -13,7 +13,7 @@
 .modal-confirmacao__caixa {
   width: 100%;
   max-width: 480px;
-  background: #fff;
+  background: var(--fundo-card);
   border-radius: var(--raio-grande);
   padding: 32px;
   box-shadow: 0 24px 60px rgba(12, 35, 66, 0.32);

@@ -8,7 +8,7 @@
   gap: 10px 18px;
   min-height: var(--altura-barra-superior);
   padding: 10px 24px;
-  background: #fff;
+  background: var(--fundo-card);
   border-bottom: 1px solid var(--borda);
 }
 
@@ -108,7 +108,7 @@
   top: 100%;
   left: 0;
   margin-top: 8px;
-  background: #fff;
+  background: var(--fundo-card);
   border: 1px solid var(--borda);
   border-radius: 16px;
   box-shadow: var(--sombra-grande);

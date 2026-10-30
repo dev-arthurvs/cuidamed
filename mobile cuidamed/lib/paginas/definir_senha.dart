@@ -85,6 +85,8 @@ class _DefinirSenhaState extends State<DefinirSenha> {
           const SizedBox(height: 22),
           CampoTexto(
             rotulo: 'E-mail cadastrado',
+            icone: Icons.mail_outline,
+            fundoBranco: true,
             rotuloExterno: true,
             placeholder: 'seu@email.com',
             controller: _emailController,
@@ -93,6 +95,8 @@ class _DefinirSenhaState extends State<DefinirSenha> {
           const SizedBox(height: 18),
           CampoTexto(
             rotulo: 'Código de ativação',
+            icone: Icons.key_outlined,
+            fundoBranco: true,
             rotuloExterno: true,
             placeholder: 'Código que seu cuidador passou',
             controller: _codigoController,
@@ -100,6 +104,9 @@ class _DefinirSenhaState extends State<DefinirSenha> {
           const SizedBox(height: 18),
           CampoTexto(
             rotulo: 'Criar senha',
+            icone: Icons.lock_outline,
+            fundoBranco: true,
+            alternarSenha: true,
             rotuloExterno: true,
             controller: _novaSenhaController,
             senha: true,
@@ -108,6 +115,9 @@ class _DefinirSenhaState extends State<DefinirSenha> {
           const SizedBox(height: 18),
           CampoTexto(
             rotulo: 'Confirmar senha',
+            icone: Icons.lock_outline,
+            fundoBranco: true,
+            alternarSenha: true,
             rotuloExterno: true,
             controller: _confirmarController,
             senha: true,
@@ -119,12 +129,12 @@ class _DefinirSenhaState extends State<DefinirSenha> {
             Text(_erro!, style: const TextStyle(color: CorApp.vermelho, fontWeight: FontWeight.w600)),
           ],
           const SizedBox(height: 22),
-          Botao(texto: 'Ativar acesso', onPressed: _ativarAcesso, carregando: _carregando),
+          Botao(texto: 'Ativar acesso', variante: VarianteBotao.solido, onPressed: _ativarAcesso, carregando: _carregando),
           const SizedBox(height: 22),
-          RodapeLinksAutenticacao(
-            linhas: [
-              LinhaConvite(pergunta: 'Já ativou seu acesso?', link: 'Entrar', onTap: () => context.go('/login')),
-              LinhaConvite(pergunta: 'Não tem conta?', link: 'Cadastre-se', onTap: () => context.go('/cadastro')),
+          BotoesAlternativosAutenticacao(
+            opcoes: [
+              (texto: 'Entrar', onTap: () => context.go('/login')),
+              (texto: 'Criar conta', onTap: () => context.go('/cadastro')),
             ],
           ),
         ],

@@ -14,6 +14,7 @@ import {
 } from '../utilitarios/horarios'
 import { notificarDose } from '../utilitarios/notificacoes'
 import { ZOOM_POR_TAMANHO, obterTamanhoFonteSalvo, salvarTamanhoFonte } from '../utilitarios/preferenciaFonte'
+import { obterTemaSalvo, salvarTema } from '../utilitarios/preferenciaTema'
 import {
   FORMA_DA_API,
   FORMA_PARA_API,
@@ -97,6 +98,7 @@ export function ProvedorApp({ children }) {
   const [toast, setToast] = useState('')
   const [tick, setTick] = useState(0)
   const [tamanhoFonte, setTamanhoFonte] = useState(obterTamanhoFonteSalvo)
+  const [tema, setTema] = useState(obterTemaSalvo)
   const timeoutToast = useRef(null)
   const avisados = useRef(new Set())
 
@@ -108,14 +110,28 @@ export function ProvedorApp({ children }) {
     timeoutToast.current = setTimeout(() => setToast(''), 2600)
   }, [])
 
+  // Tamanho da fonte e tema escolhidos valem só dentro do sistema: login,
+  // cadastro e ativação ficam sempre no tamanho e no visual padrão.
   useEffect(() => {
-    const fator = ZOOM_POR_TAMANHO[tamanhoFonte]
+    const fator = autenticado ? ZOOM_POR_TAMANHO[tamanhoFonte] : 1
     document.documentElement.style.zoom = fator
     // O zoom escala a renderização, mas não o valor de "100vh" — sem essa
     // variável, layouts de tela cheia (login, modais) estouram a viewport
     // visível e ficam com um vão vazio embaixo. Ver autenticacao.css.
     document.documentElement.style.setProperty('--fator-zoom', fator)
-  }, [tamanhoFonte])
+  }, [tamanhoFonte, autenticado])
+
+  useEffect(() => {
+    document.documentElement.dataset.tema = autenticado ? tema : 'claro'
+  }, [tema, autenticado])
+
+  const alternarTema = useCallback(() => {
+    setTema((atual) => {
+      const novo = atual === 'escuro' ? 'claro' : 'escuro'
+      salvarTema(novo)
+      return novo
+    })
+  }, [])
 
   const definirTamanhoFonte = useCallback((tamanho) => {
     if (!ZOOM_POR_TAMANHO[tamanho]) return
@@ -580,6 +596,8 @@ export function ProvedorApp({ children }) {
       mostrarToast,
       tamanhoFonte,
       definirTamanhoFonte,
+      tema,
+      alternarTema,
     }),
     [
       autenticado,
@@ -610,6 +628,8 @@ export function ProvedorApp({ children }) {
       mostrarToast,
       tamanhoFonte,
       definirTamanhoFonte,
+      tema,
+      alternarTema,
     ],
   )
 
