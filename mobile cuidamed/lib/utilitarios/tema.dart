@@ -24,6 +24,15 @@ class CorApp {
     stops: [0, 0.6, 1],
   );
 
+  /// Mesmo --gradiente-autenticacao do web: fundo das telas de login, cadastro
+  /// e ativação (mais escuro que o hero).
+  static const gradienteAutenticacao = LinearGradient(
+    begin: Alignment(-0.6, -1),
+    end: Alignment(0.6, 1),
+    colors: [Color(0xFF1B62C0), Color(0xFF0F4594), Color(0xFF0A2A5C)],
+    stops: [0, 0.48, 1],
+  );
+
   static const fundo = Color(0xFFEEF4FB);
   static const fundoDestaque = Color(0xFFF4F9FF);
   static const fundoCard = Color(0xFFFFFFFF);
@@ -89,7 +98,9 @@ TextTheme _escalarTextTheme(TextTheme tema, double fator, Color cor) {
 ThemeData construirTema() {
   final base = ThemeData(
     useMaterial3: true,
-    fontFamily: 'Nunito', // mesma fonte do web (assets/fonts, declarada no pubspec.yaml)
+    // Mesma fonte do web: Source Sans 3 (sem serifa, formal, feita para leitura
+    // longa). Arquivos em assets/fonts, declarados no pubspec.yaml.
+    fontFamily: 'Source Sans 3',
     scaffoldBackgroundColor: CorApp.fundo,
     colorScheme: ColorScheme.fromSeed(
       seedColor: CorApp.azul,

@@ -38,8 +38,6 @@ class _CadastroState extends State<Cadastro> {
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
   final _telefoneController = TextEditingController();
-  final _enderecoController = TextEditingController();
-  final _profissaoController = TextEditingController();
   DateTime? _dataNascimento;
   String _sexo = _opcoesSexo[0];
   bool _carregando = false;
@@ -52,8 +50,6 @@ class _CadastroState extends State<Cadastro> {
       _emailController,
       _senhaController,
       _telefoneController,
-      _enderecoController,
-      _profissaoController,
     ]) {
       c.dispose();
     }
@@ -84,8 +80,6 @@ class _CadastroState extends State<Cadastro> {
                 : null,
             sexo: _tipo == 'paciente' ? sexoParaApi[_sexo] : null,
             telefone: _telefoneController.text.trim(),
-            endereco: _tipo == 'paciente' ? _enderecoController.text.trim() : null,
-            profissao: _tipo == 'cuidador' ? _profissaoController.text.trim() : null,
           );
       if (mounted) context.go('/painel');
     } catch (erro) {
@@ -113,23 +107,11 @@ class _CadastroState extends State<Cadastro> {
     final ehPaciente = _tipo == 'paciente';
 
     return LayoutAutenticacao(
-      soLogoNoCelular: true, // igual ao login: no celular, só a logo no painel azul
       heroTitulo: frase.titulo,
       heroSubtitulo: frase.subtitulo,
-      rodape: '© 2026 CuidaMed · Protótipo de demonstração',
       cartao: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: LinkAutenticacao(
-              texto: '‹ Voltar para entrar',
-              destaque: false,
-              tamanhoFonte: 14,
-              onTap: () => context.go('/login'),
-            ),
-          ),
-          const SizedBox(height: 10),
           const TituloAutenticacao(titulo: 'Criar cadastro'),
           const SizedBox(height: 18),
           _seletorPapel(),
@@ -158,21 +140,7 @@ class _CadastroState extends State<Cadastro> {
                     tipoTeclado: TextInputType.phone,
                     placeholder: '(11) 98765-4321',
                   ),
-                  const SizedBox(height: 18),
-                  CampoTexto(
-                    rotulo: 'Endereço',
-                    rotuloExterno: true,
-                    controller: _enderecoController,
-                    placeholder: 'Rua, número, bairro - cidade/UF',
-                  ),
                 ] else ...[
-                  CampoTexto(
-                    rotulo: 'Profissão',
-                    rotuloExterno: true,
-                    controller: _profissaoController,
-                    placeholder: 'Ex.: Médica, Enfermeira, Cuidadora',
-                  ),
-                  const SizedBox(height: 18),
                   CampoTexto(
                     rotulo: 'Telefone',
                     rotuloExterno: true,
@@ -207,6 +175,17 @@ class _CadastroState extends State<Cadastro> {
           ],
           const SizedBox(height: 24),
           Botao(texto: 'Criar conta e entrar', onPressed: _criarConta, carregando: _carregando),
+          const SizedBox(height: 22),
+          RodapeLinksAutenticacao(
+            linhas: [
+              LinhaConvite(pergunta: 'Já tem conta?', link: 'Entrar', onTap: () => context.go('/login')),
+              LinhaConvite(
+                pergunta: 'Cadastrado pelo seu cuidador?',
+                link: 'Ativar meu acesso',
+                onTap: () => context.go('/definir-senha'),
+              ),
+            ],
+          ),
         ],
       ),
     );

@@ -66,7 +66,7 @@ void main() {
   });
 
   testWidgets('Texto do botão cabe inteiro, sem encolher', (tester) async {
-    await carregarNunito(tester);
+    await carregarFonteDoApp(tester);
     for (final tamanho in [_celular, _desktop]) {
       await montarPagina(tester, estadoCuidador(), '/painel', (_) => const PainelCuidador(), tamanho: tamanho);
       await rolarAte(tester, find.text('+ Cadastrar paciente'));

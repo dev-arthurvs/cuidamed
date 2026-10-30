@@ -1,6 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import Botao from '../componentes/Botao'
 import Campo from '../componentes/Campo'
 import LogoMarca from '../componentes/LogoMarca'
@@ -37,8 +37,6 @@ export default function Cadastro() {
   const [dataNascimento, setDataNascimento] = useState('')
   const [sexo, setSexo] = useState(OPCOES_SEXO[0])
   const [telefone, setTelefone] = useState('')
-  const [endereco, setEndereco] = useState('')
-  const [profissao, setProfissao] = useState('')
   const [enviando, setEnviando] = useState(false)
 
   async function criarConta(evento) {
@@ -61,8 +59,6 @@ export default function Cadastro() {
         dataNascimento,
         sexo,
         telefone: telefone.trim(),
-        endereco: endereco.trim(),
-        profissao: profissao.trim(),
       })
       navegar('/painel')
     } catch (erro) {
@@ -80,33 +76,28 @@ export default function Cadastro() {
       transition={{ duration: 0.25, ease: 'easeOut' }}
     >
       <div className="autenticacao__hero">
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 60 }}>
-          <LogoMarca tamanho={68} tamanhoTexto={38} corTexto="claro" fundo="transparente" />
+        <LogoMarca tamanho={84} tamanhoTexto={48} corTexto="claro" fundo="transparente" />
 
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.div
-              key={tipo}
-              className="autenticacao__hero-texto"
-              variants={variantesCampos}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              transition={{ duration: 0.2, ease: 'easeInOut' }}
-            >
-              <p className="autenticacao__hero-titulo">{FRASES_IMPACTO[tipo].titulo}</p>
-              <p className="autenticacao__hero-subtitulo">{FRASES_IMPACTO[tipo].subtitulo}</p>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={tipo}
+            className="autenticacao__hero-texto"
+            variants={variantesCampos}
+            initial="initial"
+            animate="animate"
+            exit="exit"
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+          >
+            <p className="autenticacao__hero-titulo">{FRASES_IMPACTO[tipo].titulo}</p>
+            <p className="autenticacao__hero-subtitulo">{FRASES_IMPACTO[tipo].subtitulo}</p>
+          </motion.div>
+        </AnimatePresence>
 
-        <div className="autenticacao__hero-rodape">© 2026 CuidaMed · Protótipo de demonstração</div>
+        <div className="autenticacao__hero-rodape">© 2026 CuidaMed</div>
       </div>
 
       <div className="autenticacao__painel">
         <form className="autenticacao__caixa" onSubmit={criarConta}>
-          <Botao variante="texto" type="button" onClick={() => navegar('/login')} style={{ alignSelf: 'flex-start' }}>
-            ‹ Voltar para entrar
-          </Botao>
           <h1 className="autenticacao__titulo">Criar cadastro</h1>
 
           <div className="autenticacao__papel">
@@ -161,12 +152,6 @@ export default function Cadastro() {
                   value={telefone}
                   onChange={(e) => setTelefone(e.target.value)}
                 />
-                <Campo
-                  rotulo="Endereço"
-                  placeholder="Rua, número, bairro - cidade/UF"
-                  value={endereco}
-                  onChange={(e) => setEndereco(e.target.value)}
-                />
                 <Campo rotulo="E-mail" tipo="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
                 <Campo
                   rotulo="Senha"
@@ -187,12 +172,6 @@ export default function Cadastro() {
                 style={{ display: 'flex', flexDirection: 'column', gap: 20 }}
               >
                 <Campo rotulo="Nome completo" placeholder="Ana Lúcia Souza" value={nome} onChange={(e) => setNome(e.target.value)} />
-                <Campo
-                  rotulo="Profissão"
-                  placeholder="Ex.: Médica, Enfermeira, Cuidadora"
-                  value={profissao}
-                  onChange={(e) => setProfissao(e.target.value)}
-                />
                 <Campo
                   rotulo="Telefone"
                   tipo="tel"
@@ -215,6 +194,15 @@ export default function Cadastro() {
           <Botao type="submit" larguraTotal style={{ marginTop: 6 }} disabled={enviando}>
             {enviando ? 'Criando conta...' : 'Criar conta e entrar'}
           </Botao>
+
+          <div className="autenticacao__links">
+            <div className="autenticacao__link-linha">
+              Já tem conta?<Link to="/login">Entrar</Link>
+            </div>
+            <div className="autenticacao__link-linha">
+              Cadastrado pelo seu cuidador?<Link to="/definir-senha">Ativar meu acesso</Link>
+            </div>
+          </div>
         </form>
       </div>
       <Toast />

@@ -40,7 +40,7 @@ export default function Login() {
       transition={{ duration: 0.25, ease: 'easeOut' }}
     >
       <div className="autenticacao__hero">
-        <LogoMarca tamanho={68} tamanhoTexto={38} corTexto="claro" fundo="transparente" />
+        <LogoMarca tamanho={84} tamanhoTexto={48} corTexto="claro" fundo="transparente" />
 
         <div className="autenticacao__hero-texto">
           <p className="autenticacao__hero-titulo">O remédio certo, na hora certa, todos os dias.</p>
@@ -60,30 +60,24 @@ export default function Login() {
 
           <Campo rotulo="E-mail" tipo="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
           <Campo rotulo="Senha" tipo="password" placeholder="••••••••" value={senha} onChange={(e) => setSenha(e.target.value)} />
+          <button
+            type="button"
+            className="autenticacao__esqueci"
+            onClick={() => mostrarToast('Enviamos as instruções de recuperação para o seu e-mail (simulação).')}
+          >
+            Esqueci minha senha
+          </button>
 
           <Botao type="submit" larguraTotal disabled={entrando}>
             {entrando ? 'Entrando...' : 'Entrar'}
           </Botao>
 
-          <div className="autenticacao__rodape-acoes">
-            <Botao
-              variante="texto"
-              type="button"
-              onClick={() => mostrarToast('Enviamos as instruções de recuperação para o seu e-mail (simulação).')}
-            >
-              Esqueci minha senha
-            </Botao>
-            <div className="autenticacao__conta">
-              Não tem conta?
-              <Link to="/cadastro">
-                <strong>Cadastre-se</strong>
-              </Link>
+          <div className="autenticacao__links">
+            <div className="autenticacao__link-linha">
+              Não tem conta?<Link to="/cadastro">Cadastre-se</Link>
             </div>
-            <div className="autenticacao__conta">
-              Cadastrado pelo seu cuidador?
-              <Link to="/definir-senha">
-                <strong>Ativar meu acesso</strong>
-              </Link>
+            <div className="autenticacao__link-linha">
+              Cadastrado pelo seu cuidador?<Link to="/definir-senha">Ativar meu acesso</Link>
             </div>
           </div>
         </form>

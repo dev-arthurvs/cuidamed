@@ -18,7 +18,6 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  static const double _fonteLinks = 14;
 
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -66,7 +65,6 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     return LayoutAutenticacao(
-      soLogoNoCelular: true,
       heroTitulo: 'O remédio certo, na hora certa, todos os dias.',
       heroSubtitulo: 'Agenda de medicamentos, com acompanhamento em tempo real por médicos e cuidadores.',
       cartao: Form(
@@ -94,28 +92,21 @@ class _LoginState extends State<Login> {
               onSubmitted: (_) => _entrar(),
               validador: (valor) => (valor == null || valor.isEmpty) ? 'Informe a senha.' : null,
             ),
+            const SizedBox(height: 4),
+            LinkEsqueciSenha(onTap: _esqueciSenha),
             if (_erro != null) ...[
               const SizedBox(height: 14),
               Text(_erro!, style: const TextStyle(color: CorApp.vermelho, fontWeight: FontWeight.w600)),
             ],
-            const SizedBox(height: 22),
+            const SizedBox(height: 16),
             Botao(texto: 'Entrar', onPressed: _entrar, carregando: _carregando),
-            const SizedBox(height: 18),
-            // Links centralizados, um abaixo do outro, com texto um pouco menor.
-            Column(
-              children: [
-                LinkAutenticacao(
-                  texto: 'Esqueci minha senha',
-                  destaque: false,
-                  tamanhoFonte: _fonteLinks,
-                  onTap: _esqueciSenha,
-                ),
-                LinkAutenticacao(texto: 'Cadastre-se', tamanhoFonte: _fonteLinks, onTap: () => context.push('/cadastro')),
+            const SizedBox(height: 22),
+            RodapeLinksAutenticacao(
+              linhas: [
+                LinhaConvite(pergunta: 'Não tem conta?', link: 'Cadastre-se', onTap: () => context.push('/cadastro')),
                 LinhaConvite(
                   pergunta: 'Cadastrado pelo seu cuidador?',
                   link: 'Ativar meu acesso',
-                  tamanhoFonte: _fonteLinks,
-                  alinhamento: WrapAlignment.center,
                   onTap: () => context.push('/definir-senha'),
                 ),
               ],
