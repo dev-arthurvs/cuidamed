@@ -76,22 +76,11 @@ class _DefinirSenhaState extends State<DefinirSenha> {
   @override
   Widget build(BuildContext context) {
     return LayoutAutenticacao(
-      soLogoNoCelular: true, // igual ao login: no celular, só a logo no painel azul
       heroTitulo: 'Seu cuidador já cadastrou você.',
       heroSubtitulo: 'Agora é só criar uma senha para acessar sua própria agenda de medicamentos.',
       cartao: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: LinkAutenticacao(
-              texto: '‹ Voltar para entrar',
-              destaque: false,
-              tamanhoFonte: 14,
-              onTap: () => context.go('/login'),
-            ),
-          ),
-          const SizedBox(height: 10),
           const TituloAutenticacao(titulo: 'Ativar meu acesso'),
           const SizedBox(height: 22),
           CampoTexto(
@@ -131,10 +120,12 @@ class _DefinirSenhaState extends State<DefinirSenha> {
           ],
           const SizedBox(height: 22),
           Botao(texto: 'Ativar acesso', onPressed: _ativarAcesso, carregando: _carregando),
-          const SizedBox(height: 16),
-          // Como no login: só "Cadastre-se", centralizado e com fonte menor.
-          Center(
-            child: LinkAutenticacao(texto: 'Cadastre-se', tamanhoFonte: 14, onTap: () => context.go('/cadastro')),
+          const SizedBox(height: 22),
+          RodapeLinksAutenticacao(
+            linhas: [
+              LinhaConvite(pergunta: 'Já ativou seu acesso?', link: 'Entrar', onTap: () => context.go('/login')),
+              LinhaConvite(pergunta: 'Não tem conta?', link: 'Cadastre-se', onTap: () => context.go('/cadastro')),
+            ],
           ),
         ],
       ),

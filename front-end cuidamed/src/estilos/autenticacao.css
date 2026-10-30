@@ -1,15 +1,28 @@
+/* Telas de Login, Cadastro e Ativar acesso.
+   O gradiente azul ocupa a tela inteira; a marca fica à esquerda e o card
+   branco do formulário "flutua" sobre o fundo à direita (sombra profunda). */
 .autenticacao {
   min-height: calc(100vh / var(--fator-zoom, 1));
   display: flex;
   flex-wrap: wrap;
+  align-items: stretch;
+  color: #fff;
+  /* Duas luzes suaves sobre o gradiente dão profundidade ao fundo. */
+  background:
+    radial-gradient(circle at 12% 18%, rgba(74, 168, 240, 0.32), transparent 42%),
+    radial-gradient(circle at 88% 92%, rgba(4, 22, 52, 0.55), transparent 48%),
+    var(--gradiente-autenticacao);
 }
 
 .autenticacao__hero {
   flex: 1 1 420px;
   min-width: 0;
-  background: var(--gradiente-hero);
-  color: #fff;
-  padding: 56px 60px;
+  /* Fica parado enquanto um formulário longo (cadastro) rola ao lado. */
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+  min-height: calc(100vh / var(--fator-zoom, 1));
+  padding: 56px clamp(32px, 5vw, 72px);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -17,57 +30,29 @@
 }
 
 .autenticacao__hero-texto {
-  max-width: 520px;
+  max-width: 480px;
 }
 
 .autenticacao__hero-titulo {
-  font-size: 44px;
-  font-weight: 800;
-  line-height: 1.15;
-  letter-spacing: -1px;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
   margin: 0;
 }
 
 .autenticacao__hero-subtitulo {
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1.5;
-  margin-top: 18px;
-  opacity: 0.92;
-}
-
-.autenticacao__hero-lista {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-top: 34px;
-  list-style: none;
-  padding: 0;
-}
-
-.autenticacao__hero-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 18px;
-  font-weight: 700;
-}
-
-.autenticacao__hero-marca {
-  width: 26px;
-  height: 26px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.22);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.55;
+  margin-top: 14px;
+  opacity: 0.88;
 }
 
 .autenticacao__hero-rodape {
-  font-size: 15px;
-  font-weight: 600;
-  opacity: 0.75;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.7;
 }
 
 .autenticacao__painel {
@@ -76,34 +61,87 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 48px 40px;
+  padding: 48px clamp(24px, 5vw, 72px);
 }
 
 .autenticacao__caixa {
   width: 100%;
-  max-width: 520px;
+  max-width: 500px;
   background: #fff;
-  border: 1px solid var(--borda);
-  border-radius: 26px;
-  padding: 40px;
-  box-shadow: var(--sombra-grande);
+  color: var(--texto);
+  border-radius: 22px;
+  padding: 40px 40px 32px;
+  /* Sombra longa e escura: o card parece sair do fundo azul. */
+  box-shadow:
+    0 32px 70px rgba(3, 16, 42, 0.45),
+    0 4px 14px rgba(3, 16, 42, 0.18);
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
 .autenticacao__titulo {
-  font-size: 30px;
-  font-weight: 800;
-  letter-spacing: -0.4px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
   margin: 0;
 }
 
 .autenticacao__subtitulo {
-  font-size: 17px;
-  font-weight: 600;
+  font-size: 16px;
+  font-weight: 500;
   color: var(--texto-suave);
   margin: 6px 0 0;
+}
+
+/* "Esqueci minha senha": discreto, alinhado à direita logo abaixo da senha. */
+.autenticacao__esqueci {
+  align-self: flex-end;
+  margin-top: -10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--azul);
+  background: none;
+  border: none;
+  padding: 2px 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.autenticacao__esqueci:hover {
+  color: var(--azul-escuro);
+  text-decoration: underline;
+}
+
+/* Rodapé do card: linha divisória e os outros caminhos (cadastro, ativação,
+   voltar ao login), um por linha e centralizados. */
+.autenticacao__links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 20px;
+  margin-top: 4px;
+  border-top: 1px solid var(--borda);
+}
+
+.autenticacao__link-linha {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--texto-suave);
+  text-align: center;
+}
+
+.autenticacao__link-linha a {
+  margin-left: 6px;
+  font-weight: 700;
+  color: var(--azul);
+  text-decoration: none;
+}
+
+.autenticacao__link-linha a:hover {
+  color: var(--azul-escuro);
+  text-decoration: underline;
 }
 
 .autenticacao__grade-dupla {
@@ -124,7 +162,7 @@
 
 .autenticacao__papel-titulo {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--texto-label);
 }
 
@@ -139,7 +177,8 @@
   border-radius: 12px;
   border: 1.5px solid var(--borda-input);
   font-size: 17px;
-  font-weight: 800;
+  font-weight: 700;
+  font-family: inherit;
   cursor: pointer;
   color: var(--texto-label);
   background: #fff;
@@ -148,60 +187,41 @@
 .autenticacao__opcao--ativa {
   color: #fff;
   background: var(--azul);
-}
-
-.autenticacao__cartao-papel {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  text-align: left;
-  padding: 18px;
-  border-radius: 18px;
-  border: 2px solid var(--borda-input);
-  cursor: pointer;
-  background: #fff;
-}
-
-.autenticacao__cartao-papel--ativo {
-  background: var(--fundo-destaque);
   border-color: var(--azul);
 }
 
-.autenticacao__cartao-papel-icone {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  background: var(--gradiente-azul);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* Celular / tela estreita: marca centralizada em cima, card logo abaixo. */
+@media (max-width: 900px) {
+  .autenticacao {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
 
-.autenticacao__cartao-papel-titulo {
-  font-size: 19px;
-  font-weight: 800;
-}
+  .autenticacao__hero {
+    position: static;
+    min-height: 0;
+    flex: none;
+    align-items: center;
+    padding: 40px 24px 8px;
+    gap: 0;
+  }
 
-.autenticacao__cartao-papel-descricao {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--texto-suave);
-}
+  .autenticacao__hero-texto,
+  .autenticacao__hero-rodape {
+    display: none;
+  }
 
-.autenticacao__rodape-acoes {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 12px;
-}
+  .autenticacao__painel {
+    flex: 1 0 auto;
+    align-items: flex-start;
+    padding: 24px 16px 40px;
+  }
 
-.autenticacao__conta {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--texto-suave);
+  .autenticacao__caixa {
+    padding: 28px 22px 24px;
+  }
+
+  .autenticacao__titulo {
+    font-size: 24px;
+  }
 }

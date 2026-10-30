@@ -56,7 +56,7 @@ export default function DefinirSenha() {
       transition={{ duration: 0.25, ease: 'easeOut' }}
     >
       <div className="autenticacao__hero">
-        <LogoMarca tamanho={68} tamanhoTexto={38} corTexto="claro" fundo="transparente" />
+        <LogoMarca tamanho={84} tamanhoTexto={48} corTexto="claro" fundo="transparente" />
 
         <div className="autenticacao__hero-texto">
           <p className="autenticacao__hero-titulo">Seu cuidador já cadastrou você.</p>
@@ -70,9 +70,6 @@ export default function DefinirSenha() {
 
       <div className="autenticacao__painel">
         <form className="autenticacao__caixa" onSubmit={ativarAcesso}>
-          <Botao variante="texto" type="button" onClick={() => navegar('/login')} style={{ alignSelf: 'flex-start' }}>
-            ‹ Voltar para entrar
-          </Botao>
           <div>
             <h1 className="autenticacao__titulo">Ativar meu acesso</h1>
           </div>
@@ -111,12 +108,12 @@ export default function DefinirSenha() {
             {enviando ? 'Ativando...' : 'Ativar acesso'}
           </Botao>
 
-          <div className="autenticacao__rodape-acoes">
-            <div className="autenticacao__conta">
-              Ainda não tem cadastro?
-              <Link to="/cadastro">
-                <strong>Cadastre-se</strong>
-              </Link>
+          <div className="autenticacao__links">
+            <div className="autenticacao__link-linha">
+              Já ativou seu acesso?<Link to="/login">Entrar</Link>
+            </div>
+            <div className="autenticacao__link-linha">
+              Não tem conta?<Link to="/cadastro">Cadastre-se</Link>
             </div>
           </div>
         </form>

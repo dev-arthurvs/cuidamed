@@ -106,7 +106,7 @@ class FaixaDataHora extends StatelessWidget {
   }
 }
 
-/// Círculo com as iniciais (Nunito extra-negrito sobre o gradiente azul do web).
+/// Círculo com as iniciais (fonte do app em extra-negrito sobre o gradiente azul do web).
 /// Usado para o usuário logado no cabeçalho e para os pacientes nas listas,
 /// para que todos os círculos de iniciais do app tenham a mesma fonte.
 class AvatarUsuario extends StatelessWidget {

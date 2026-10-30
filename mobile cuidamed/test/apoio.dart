@@ -130,12 +130,12 @@ Future<void> rolarAte(WidgetTester tester, Finder alvo) async {
   await tester.pumpAndSettle();
 }
 
-/// Carrega a Nunito de verdade (por padrão os testes desenham texto com uma
-/// fonte de blocos, mais larga) — pra medir larguras de texto realistas.
-Future<void> carregarNunito(WidgetTester tester) => tester.runAsync(() async {
-      final loader = FontLoader('Nunito');
+/// Carrega a fonte do app de verdade (por padrão os testes desenham texto com
+/// uma fonte de blocos, mais larga) — pra medir larguras de texto realistas.
+Future<void> carregarFonteDoApp(WidgetTester tester) => tester.runAsync(() async {
+      final loader = FontLoader('Source Sans 3');
       for (final peso in ['Regular', 'Medium', 'SemiBold', 'Bold', 'ExtraBold']) {
-        loader.addFont(Future.value(ByteData.view(File('assets/fonts/Nunito-$peso.ttf').readAsBytesSync().buffer)));
+        loader.addFont(Future.value(ByteData.view(File('assets/fonts/SourceSans3-$peso.ttf').readAsBytesSync().buffer)));
       }
       await loader.load();
     });
