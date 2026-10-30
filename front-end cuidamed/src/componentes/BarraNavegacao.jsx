@@ -10,7 +10,8 @@ import './BarraNavegacao.css'
 const ROTAS_POR_PACIENTE = new Set(['/agenda', '/ciclos-encerrados', '/historico'])
 
 export default function BarraNavegacao({ aberta, aoFechar }) {
-  const { usuario, pacientes, pacienteFoco, selecionarPaciente, sair } = useApp()
+  const { usuario, pacientes, pacienteFoco, selecionarPaciente, sair, tema, alternarTema } = useApp()
+  const escuro = tema === 'escuro'
   const navegar = useNavigate()
   const [itemExpandido, setItemExpandido] = useState(null)
   const ehCuidador = usuario?.tipo === 'cuidador'
@@ -119,6 +120,28 @@ export default function BarraNavegacao({ aberta, aoFechar }) {
         </div>
 
         <div className="barra-navegacao__rodape">
+          <button
+            type="button"
+            role="switch"
+            aria-checked={escuro}
+            className="barra-navegacao__tema"
+            onClick={alternarTema}
+          >
+            <span className="barra-navegacao__icone" aria-hidden="true">
+              {escuro ? (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z" />
+                </svg>
+              ) : (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="4" />
+                  <path d="M12 2.5v2M12 19.5v2M4.6 4.6l1.4 1.4M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4" />
+                </svg>
+              )}
+            </span>
+            <span className="barra-navegacao__rotulo">{escuro ? 'Modo escuro' : 'Modo claro'}</span>
+            <span className={`barra-navegacao__chave${escuro ? ' barra-navegacao__chave--ligada' : ''}`} />
+          </button>
           <div className="barra-navegacao__usuario">
             <div className="barra-navegacao__avatar">{usuario ? obterIniciais(usuario.nome) : ''}</div>
             <div className="barra-navegacao__usuario-info">

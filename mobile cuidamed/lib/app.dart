@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +26,9 @@ import 'utilitarios/tema.dart';
 
 /// Multiplica a escala de texto do sistema pela preferência do usuário.
 Widget aplicarEscalaFonte(BuildContext context, Widget? child) {
-  final escala = context.select<AppEstado, double>((e) => e.escalaFonte);
+  // O tamanho escolhido vale só dentro do sistema: deslogado (login, cadastro
+  // e ativação), as telas ficam sempre no tamanho padrão.
+  final escala = context.select<AppEstado, double>((e) => e.autenticado ? e.escalaFonte : 1.0);
   final midia = MediaQuery.of(context);
   return MediaQuery(
     data: midia.copyWith(textScaler: TextScaler.linear(midia.textScaler.scale(1) * escala)),
@@ -150,6 +153,11 @@ class _CuidaMedAppState extends State<CuidaMedApp> {
         scaffoldMessengerKey: chaveMensageiroGlobal,
         theme: construirTema(),
         routerConfig: _router,
+        // Português do Brasil: calendários em dia/mês/ano e botões do sistema
+        // ("Cancelar", "OK"...) em português.
+        locale: const Locale('pt', 'BR'),
+        supportedLocales: const [Locale('pt', 'BR')],
+        localizationsDelegates: GlobalMaterialLocalizations.delegates,
         // Tamanho da fonte escolhido no Perfil/Acessibilidade escala o texto
         // do app inteiro, por cima da preferência de acessibilidade do sistema.
         builder: aplicarEscalaFonte,

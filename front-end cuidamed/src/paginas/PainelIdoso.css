@@ -87,7 +87,7 @@
 .painel-idoso__proximo-botao {
   margin-top: 22px;
   align-self: flex-start;
-  background: #fff;
+  background: var(--fundo-card);
   color: var(--azul-texto);
   box-shadow: 0 8px 18px rgba(9, 38, 80, 0.18);
 }
@@ -159,7 +159,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background: #fff;
+  background: var(--fundo-card);
   border: 1px solid var(--borda);
   border-radius: 20px;
   padding: 20px 14px;

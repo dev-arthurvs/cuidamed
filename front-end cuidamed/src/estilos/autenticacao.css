@@ -113,35 +113,64 @@
   text-decoration: underline;
 }
 
-/* Rodapé do card: linha divisória e os outros caminhos (cadastro, ativação,
-   voltar ao login), um por linha e centralizados. */
-.autenticacao__links {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
+/* Campos do card: brancos, com borda fina e realce azul ao focar. */
+.autenticacao__caixa .campo__entrada {
+  background: #fff;
+  border-color: #cfdcec;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.autenticacao__caixa .campo__entrada:focus {
+  outline: none;
+  border-color: var(--azul);
+  box-shadow: 0 0 0 4px rgba(21, 96, 196, 0.14);
+}
+
+.autenticacao__caixa .campo__controle:focus-within .campo__icone {
+  color: var(--azul);
+}
+
+/* Botão principal sóbrio: azul sólido e escuro, em vez do degradê. */
+.autenticacao__caixa .botao--primario {
+  background: var(--azul-solido);
+  box-shadow: 0 10px 22px rgba(15, 63, 128, 0.28);
+}
+
+.autenticacao__caixa .botao--primario:hover:not(:disabled) {
+  background: var(--azul-escuro);
+}
+
+/* Rodapé do card: linha divisória e os outros caminhos como dois botões de
+   contorno lado a lado (mais fáceis de achar e tocar que links no texto). */
+.autenticacao__alternativas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
   padding-top: 20px;
   margin-top: 4px;
   border-top: 1px solid var(--borda);
 }
 
-.autenticacao__link-linha {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--texto-suave);
-  text-align: center;
-}
-
-.autenticacao__link-linha a {
-  margin-left: 6px;
-  font-weight: 700;
+.autenticacao__alternativa {
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border-radius: var(--raio-medio);
+  border: 1.5px solid #cfdcec;
+  background: #fff;
   color: var(--azul);
+  font-size: 16px;
+  font-weight: 700;
+  text-align: center;
   text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
 }
 
-.autenticacao__link-linha a:hover {
-  color: var(--azul-escuro);
-  text-decoration: underline;
+.autenticacao__alternativa:hover {
+  background: var(--fundo-destaque);
+  border-color: var(--azul);
 }
 
 .autenticacao__grade-dupla {
@@ -223,5 +252,12 @@
 
   .autenticacao__titulo {
     font-size: 24px;
+  }
+}
+
+/* Celular muito estreito: os dois botões do rodapé um abaixo do outro. */
+@media (max-width: 380px) {
+  .autenticacao__alternativas {
+    grid-template-columns: 1fr;
   }
 }

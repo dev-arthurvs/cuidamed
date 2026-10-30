@@ -20,6 +20,49 @@
   width: 100%;
 }
 
+/* Campo com ícone à esquerda e/ou "olho" de senha à direita. */
+.campo__controle {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.campo__icone {
+  position: absolute;
+  left: 16px;
+  display: flex;
+  color: var(--texto-suave);
+  pointer-events: none;
+}
+
+.campo__entrada--com-icone {
+  padding-left: 48px;
+}
+
+.campo__entrada--com-olho {
+  padding-right: 52px;
+}
+
+.campo__olho {
+  position: absolute;
+  right: 6px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--texto-suave);
+  cursor: pointer;
+}
+
+.campo__olho:hover {
+  color: var(--azul);
+  background: var(--fundo-destaque);
+}
+
 .campo__entrada--area {
   min-height: 96px;
   padding: 14px 16px;

@@ -3,7 +3,7 @@
 }
 
 .ciclos-encerrados__icone {
-  background: #eef1f6;
+  background: var(--fundo-suave);
 }
 
 .ciclos-encerrados__periodo {

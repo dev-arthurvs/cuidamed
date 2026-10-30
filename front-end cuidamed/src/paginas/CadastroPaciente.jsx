@@ -3,6 +3,7 @@ import Botao from '../componentes/Botao'
 import Campo from '../componentes/Campo'
 import { useApp } from '../contexto/useApp'
 import { OPCOES_SEXO } from '../dados/dadosMock'
+import { dataDeHojeISO } from '../utilitarios/mascaras'
 import './CadastroPaciente.css'
 
 const FORMULARIO_VAZIO = {
@@ -70,6 +71,7 @@ export default function CadastroPaciente({ aoFechar }) {
               rotulo="Data de nascimento"
               tipo="date"
               value={form.dataNascimento}
+              max={dataDeHojeISO()}
               onChange={(e) => definirCampo('dataNascimento', e.target.value)}
             />
             <Campo rotulo="Sexo" tipo="select" value={form.sexo} onChange={(e) => definirCampo('sexo', e.target.value)}>

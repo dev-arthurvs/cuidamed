@@ -11,6 +11,7 @@ import '../componentes/linha_dupla.dart';
 import '../estado/app_estado.dart';
 import '../modelos/cuidador.dart';
 import '../servicos/api_cliente.dart';
+import '../utilitarios/mascaras.dart';
 import '../utilitarios/tema.dart';
 
 const _opcoesSexo = ['Feminino', 'Masculino', 'Outro'];
@@ -67,11 +68,11 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
       _dataNascimento = paciente?.dataNascimento;
       final sexoApi = paciente?.sexo;
       _sexo = sexoParaApi.entries.firstWhere((e) => e.value == sexoApi, orElse: () => sexoParaApi.entries.first).key;
-      _telefoneController.text = paciente?.telefone ?? '';
+      _telefoneController.text = formatarTelefone(paciente?.telefone ?? '');
       _enderecoController.text = paciente?.endereco ?? '';
     } else {
       _profissaoController.text = usuario.profissao ?? '';
-      _telefoneController.text = usuario.telefone ?? '';
+      _telefoneController.text = formatarTelefone(usuario.telefone ?? '');
     }
   }
 

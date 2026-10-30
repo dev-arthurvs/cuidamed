@@ -49,7 +49,7 @@
   border: 1px solid var(--borda);
   border-radius: 22px;
   padding: 22px;
-  background: #fff;
+  background: var(--fundo-card);
   box-shadow: var(--sombra-card);
   display: flex;
   flex-direction: column;
@@ -110,7 +110,7 @@
 
 .agenda__pilula--frequencia {
   color: var(--texto-suave);
-  background: #f4f6f9;
+  background: var(--fundo-suave);
 }
 
 .agenda__pilula--inicio {
@@ -122,7 +122,7 @@
   font-size: 14px;
   font-weight: 700;
   color: var(--texto-suave);
-  background: #f4f6f9;
+  background: var(--fundo-suave);
   border-radius: 12px;
   padding: 10px 14px;
 }

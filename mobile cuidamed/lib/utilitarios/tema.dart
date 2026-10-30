@@ -7,6 +7,8 @@ import 'animacoes.dart';
 class CorApp {
   static const azulClaro = Color(0xFF4AA8F0);
   static const azul = Color(0xFF1560C4);
+  /// Mesmo --azul-solido do web: botão principal das telas de login/cadastro.
+  static const azulSolido = Color(0xFF14509F);
   static const azulEscuro = Color(0xFF0F3F80);
   static const azulTexto = Color(0xFF0F4C9E);
   static const gradienteAzul = LinearGradient(

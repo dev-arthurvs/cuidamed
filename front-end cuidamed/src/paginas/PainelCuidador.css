@@ -11,7 +11,7 @@
 }
 
 .painel-cuidador__estatistica {
-  background: #fff;
+  background: var(--fundo-card);
   border: 1px solid var(--borda);
   border-radius: 20px;
   padding: 22px;
@@ -19,7 +19,7 @@
 }
 
 .painel-cuidador__estatistica--alerta {
-  border-color: #f2e0c2;
+  border-color: var(--amarelo-borda);
 }
 
 .painel-cuidador__estatistica-numero {
@@ -126,7 +126,7 @@
   margin-top: 10px;
   height: 9px;
   border-radius: 999px;
-  background: #eaf0f8;
+  background: var(--fundo-suave);
   overflow: hidden;
 }
 
@@ -154,7 +154,7 @@
 .painel-cuidador__paciente-pct {
   font-size: 18px;
   font-weight: 800;
-  color: #3c5c80;
+  color: var(--texto-label);
 }
 
 /* Detalhe do paciente */
@@ -273,11 +273,11 @@
   padding: 12px 14px;
   border-radius: 12px;
   border: 1.5px solid var(--borda-input);
-  background: #fff;
+  background: var(--fundo-card);
   font: inherit;
   font-size: 16px;
   font-weight: 600;
-  color: #3c5c80;
+  color: var(--texto-label);
   line-height: 1.5;
 }
 

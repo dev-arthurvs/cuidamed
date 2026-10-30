@@ -2,6 +2,7 @@
   --azul-claro: #4aa8f0;
   --azul: #1560c4;
   --azul-escuro: #0f3f80;
+  --azul-solido: #14509f;
   --azul-texto: #0f4c9e;
   --gradiente-azul: linear-gradient(135deg, var(--azul-claro), var(--azul));
   --gradiente-hero: linear-gradient(150deg, #4aa8f0 0%, #1560c4 60%, #0f3f80 100%);
@@ -12,6 +13,9 @@
   --fundo-input: #fbfdff;
   --fundo-destaque: #f4f9ff;
   --fundo-card: #fff;
+  /* Cinza-azulado bem claro (pílulas, divisões, áreas neutras). */
+  --fundo-suave: #eef3f9;
+  --borda-suave: #eef3f9;
 
   --texto: #12283f;
   --texto-suave: #5a7392;
@@ -30,6 +34,7 @@
   --amarelo-fundo: #fff7ec;
   --amarelo-texto: #8a6a33;
   --amarelo: #d89b2a;
+  --amarelo-borda: #f2e0c2;
 
   --vermelho-fundo: #fdf3f1;
   --vermelho-texto: #a9372a;
@@ -51,6 +56,53 @@
   --fonte: 'Source Sans 3', 'Segoe UI', Helvetica, Arial, sans-serif;
 
   color-scheme: light;
+}
+
+/* Modo escuro (chave no menu). Só os tons mudam; os nomes das variáveis são os
+   mesmos, então as telas acompanham sozinhas. */
+:root[data-tema='escuro'] {
+  --azul-claro: #5fb3f5;
+  --azul: #3d8ef0;
+  --azul-escuro: #2a72cf;
+  --azul-solido: #2f7de0;
+  --azul-texto: #8cc4ff;
+
+  --fundo: #0d1624;
+  --fundo-input: #1a2739;
+  --fundo-destaque: #18263a;
+  --fundo-card: #142033;
+  --fundo-suave: #1c2a3f;
+  --borda-suave: #213149;
+
+  --texto: #e6edf6;
+  --texto-suave: #9fb2c8;
+  --texto-label: #c3d3e6;
+
+  --borda: #24344b;
+  --borda-input: #33465f;
+  --borda-destaque: #2b3e58;
+
+  --verde-fundo: #12342a;
+  --verde-texto: #7fd6a9;
+  --verde: #3fb37f;
+
+  --azul-fundo: #17304d;
+
+  --amarelo-fundo: #382c15;
+  --amarelo-texto: #f0c87a;
+  --amarelo: #e8b04a;
+  --amarelo-borda: #5a4622;
+
+  --vermelho-fundo: #3a1c19;
+  --vermelho-texto: #f19b90;
+  --vermelho: #e5574a;
+  --vermelho-borda: #6a2f29;
+
+  --sombra-card: 0 4px 16px rgba(0, 0, 0, 0.35);
+  --sombra-grande: 0 18px 40px rgba(0, 0, 0, 0.45);
+  --sombra-botao: 0 10px 22px rgba(0, 0, 0, 0.35);
+
+  color-scheme: dark;
 }
 
 * {

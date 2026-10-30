@@ -5,7 +5,7 @@
 }
 
 .historico__filtros {
-  background: #fff;
+  background: var(--fundo-card);
   border: 1px solid var(--borda);
   border-radius: 22px;
   padding: 22px;
@@ -93,7 +93,7 @@
 }
 
 .historico__lista {
-  background: #fff;
+  background: var(--fundo-card);
   border: 1px solid var(--borda);
   border-radius: var(--raio-grande);
   padding: 24px;
@@ -115,7 +115,7 @@
   align-items: center;
   gap: 18px;
   padding: 16px 18px;
-  border: 1.5px solid #eef3f9;
+  border: 1.5px solid var(--borda-suave);
   border-radius: 16px;
   background: var(--fundo-input);
   flex-wrap: wrap;
@@ -155,6 +155,6 @@
   font-size: 17px;
   font-weight: 700;
   color: var(--texto-suave);
-  background: #f7fafd;
+  background: var(--fundo-destaque);
   border-radius: 16px;
 }

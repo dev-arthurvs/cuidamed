@@ -37,7 +37,9 @@ class AgendaMedicamentos extends StatelessWidget {
 
     final medicamentosAtivos = dados.medicamentosAtivos();
     final totalEncerrados = dados.medicamentos.length - medicamentosAtivos.length;
-    final podeEditar = estado.usuario!.tipo == 'cuidador' || dados.paciente.permiteAlteracoes;
+    // Paciente sem cuidador cuida da própria agenda; com cuidador, só se ele liberou.
+    final podeEditar =
+        estado.usuario!.tipo == 'cuidador' || dados.paciente.cuidadorId == null || dados.paciente.permiteAlteracoes;
 
     final kicker = estado.usuario!.tipo == 'cuidador'
         ? 'Agenda de ${dados.paciente.nome.split(' ').first}'

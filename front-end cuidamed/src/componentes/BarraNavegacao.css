@@ -12,7 +12,7 @@
   bottom: 0;
   width: 268px;
   max-width: 86vw;
-  background: #fff;
+  background: var(--fundo-card);
   border-right: 1px solid var(--borda);
   padding: 24px 18px;
   display: flex;
@@ -211,4 +211,62 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--texto-suave);
+}
+
+/* Chave claro/escuro do menu. */
+.barra-navegacao__tema {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border-radius: var(--raio-medio);
+  border: 1.5px solid var(--borda);
+  background: var(--fundo-card);
+  color: var(--texto);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+
+.barra-navegacao__tema:hover {
+  background: var(--fundo-destaque);
+}
+
+.barra-navegacao__tema .barra-navegacao__rotulo {
+  flex: 1;
+}
+
+.barra-navegacao__chave {
+  position: relative;
+  flex: none;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--borda-input);
+  transition: background 0.2s;
+}
+
+.barra-navegacao__chave::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--fundo-card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s;
+}
+
+.barra-navegacao__chave--ligada {
+  background: var(--azul);
+}
+
+.barra-navegacao__chave--ligada::after {
+  transform: translateX(20px);
 }

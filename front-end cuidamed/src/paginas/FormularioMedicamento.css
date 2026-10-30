@@ -17,7 +17,7 @@
   max-width: 780px;
   max-height: calc((100vh - 48px) / var(--fator-zoom, 1));
   overflow-y: auto;
-  background: #fff;
+  background: var(--fundo-card);
   border-radius: var(--raio-grande);
   padding: 32px;
   box-shadow: 0 24px 60px rgba(12, 35, 66, 0.32);
@@ -99,7 +99,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: #fff;
+  background: var(--fundo-card);
   border: 1.5px solid var(--borda-input);
   border-radius: var(--raio-pilula);
   padding: 8px 10px 8px 16px;
@@ -113,7 +113,7 @@
   height: 28px;
   border-radius: 999px;
   border: none;
-  background: #eaf0f8;
+  background: var(--fundo-suave);
   color: var(--texto-suave);
   font-size: 16px;
   font-weight: 800;
@@ -134,7 +134,7 @@
   border: 1.5px solid var(--borda-input);
   border-radius: var(--raio-medio);
   padding: 0 14px;
-  background: #fff;
+  background: var(--fundo-card);
 }
 
 .formulario-medicamento__rodape {
@@ -142,6 +142,6 @@
   gap: 12px;
   flex-wrap: wrap;
   justify-content: flex-end;
-  border-top: 1px solid #eef3f9;
+  border-top: 1px solid var(--borda-suave);
   padding-top: 20px;
 }

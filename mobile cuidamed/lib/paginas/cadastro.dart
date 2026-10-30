@@ -125,6 +125,8 @@ class _CadastroState extends State<Cadastro> {
               children: [
                 CampoTexto(
                   rotulo: 'Nome completo',
+                  icone: Icons.person_outline,
+                  fundoBranco: true,
                   rotuloExterno: true,
                   placeholder: ehPaciente ? 'Maria Aparecida Souza' : 'Ana Lúcia Souza',
                   controller: _nomeController,
@@ -135,6 +137,8 @@ class _CadastroState extends State<Cadastro> {
                   const SizedBox(height: 18),
                   CampoTexto(
                     rotulo: 'Telefone',
+                    icone: Icons.phone_outlined,
+                    fundoBranco: true,
                     rotuloExterno: true,
                     controller: _telefoneController,
                     tipoTeclado: TextInputType.phone,
@@ -143,6 +147,8 @@ class _CadastroState extends State<Cadastro> {
                 ] else ...[
                   CampoTexto(
                     rotulo: 'Telefone',
+                    icone: Icons.phone_outlined,
+                    fundoBranco: true,
                     rotuloExterno: true,
                     controller: _telefoneController,
                     tipoTeclado: TextInputType.phone,
@@ -152,6 +158,8 @@ class _CadastroState extends State<Cadastro> {
                 const SizedBox(height: 18),
                 CampoTexto(
                   rotulo: 'E-mail',
+                  icone: Icons.mail_outline,
+                  fundoBranco: true,
                   rotuloExterno: true,
                   controller: _emailController,
                   tipoTeclado: TextInputType.emailAddress,
@@ -160,6 +168,9 @@ class _CadastroState extends State<Cadastro> {
                 const SizedBox(height: 18),
                 CampoTexto(
                   rotulo: 'Senha',
+                  icone: Icons.lock_outline,
+                  fundoBranco: true,
+                  alternarSenha: true,
                   rotuloExterno: true,
                   controller: _senhaController,
                   senha: true,
@@ -174,16 +185,12 @@ class _CadastroState extends State<Cadastro> {
             Text(_erro!, style: const TextStyle(color: CorApp.vermelho, fontWeight: FontWeight.w600)),
           ],
           const SizedBox(height: 24),
-          Botao(texto: 'Criar conta e entrar', onPressed: _criarConta, carregando: _carregando),
+          Botao(texto: 'Criar conta e entrar', variante: VarianteBotao.solido, onPressed: _criarConta, carregando: _carregando),
           const SizedBox(height: 22),
-          RodapeLinksAutenticacao(
-            linhas: [
-              LinhaConvite(pergunta: 'Já tem conta?', link: 'Entrar', onTap: () => context.go('/login')),
-              LinhaConvite(
-                pergunta: 'Cadastrado pelo seu cuidador?',
-                link: 'Ativar meu acesso',
-                onTap: () => context.go('/definir-senha'),
-              ),
+          BotoesAlternativosAutenticacao(
+            opcoes: [
+              (texto: 'Entrar', onTap: () => context.go('/login')),
+              (texto: 'Ativar acesso', onTap: () => context.go('/definir-senha')),
             ],
           ),
         ],
