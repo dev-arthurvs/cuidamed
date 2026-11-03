@@ -11,7 +11,7 @@ export const GUIA_SECOES = [
     passos: [
       'Se aparecer a faixa azul no topo, clique em "Ativar" para receber som e notificação na hora de cada remédio.',
       'O card "Doses de hoje" mostra no meio, em letra grande, a dose da vez. Quando tomar, clique em "Registrar dose".',
-      'Registrou sem querer? Clique em "Desfazer" logo depois, ou volte até a dose tomada e clique em "Desfazer". Dá para desfazer as doses de hoje.',
+      'Registrou sem querer? Clique em "Desfazer" no aviso que aparece por alguns segundos, ou volte até a dose tomada e clique em "Desfazer". Dá para desfazer as doses de hoje.',
       'Se algum remédio estiver acabando, o card "Estoque acabando" aparece nesta tela.',
       'Em cima fica a dose anterior: verde com ✓ se foi tomada, vermelha e riscada com ✕ se foi perdida. Embaixo fica a próxima dose.',
       'Para ver as outras doses do dia, use as setas do card: ↑ no canto de cima e ↓ no canto de baixo.',
