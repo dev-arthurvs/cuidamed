@@ -8,6 +8,7 @@ import '../componentes/cabecalho.dart';
 import '../componentes/campo_texto.dart';
 import '../componentes/cartao.dart';
 import '../componentes/linha_dupla.dart';
+import '../componentes/opcao_sem_email.dart';
 import '../estado/app_estado.dart';
 import '../modelos/cuidador.dart';
 import '../servicos/api_cliente.dart';
@@ -27,8 +28,9 @@ String _iniciais(String nome) {
 String _formatarData(DateTime data) =>
     '${data.day.toString().padLeft(2, '0')}/${data.month.toString().padLeft(2, '0')}/${data.year}';
 
-/// Equivalente a paginas/EdicaoPerfil.jsx do web: dados pessoais, troca de
-/// senha, ajuda/tamanho da fonte e (paciente) cuidador responsável/vínculo.
+/// Tela de Configurações — equivalente a paginas/EdicaoPerfil.jsx do web: dados
+/// pessoais, senha, aparência (tamanho da fonte; o tema entra com o modo escuro
+/// do mobile) e (paciente) cuidador responsável/vínculo.
 class EdicaoPerfil extends StatefulWidget {
   const EdicaoPerfil({super.key});
 
@@ -40,7 +42,6 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
   final _nomeController = TextEditingController();
   final _emailController = TextEditingController();
   final _telefoneController = TextEditingController();
-  final _enderecoController = TextEditingController();
   final _profissaoController = TextEditingController();
   final _senhaAtualController = TextEditingController();
   final _novaSenhaController = TextEditingController();
@@ -49,6 +50,7 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
 
   DateTime? _dataNascimento;
   String _sexo = _opcoesSexo[0];
+  bool _semEmail = false;
   bool _salvandoDados = false;
   bool _salvandoSenha = false;
   bool _enviandoSolicitacao = false;
@@ -63,13 +65,13 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
     final usuario = estado.usuario!;
     _nomeController.text = usuario.nome;
     _emailController.text = usuario.email;
+    _semEmail = usuario.email.isEmpty;
     if (usuario.tipo == 'paciente') {
       final paciente = estado.pacienteFoco?.paciente;
       _dataNascimento = paciente?.dataNascimento;
       final sexoApi = paciente?.sexo;
       _sexo = sexoParaApi.entries.firstWhere((e) => e.value == sexoApi, orElse: () => sexoParaApi.entries.first).key;
       _telefoneController.text = formatarTelefone(paciente?.telefone ?? '');
-      _enderecoController.text = paciente?.endereco ?? '';
     } else {
       _profissaoController.text = usuario.profissao ?? '';
       _telefoneController.text = formatarTelefone(usuario.telefone ?? '');
@@ -101,7 +103,6 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
       _nomeController,
       _emailController,
       _telefoneController,
-      _enderecoController,
       _profissaoController,
       _senhaAtualController,
       _novaSenhaController,
@@ -123,9 +124,13 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
 
   Future<void> _salvarDados() async {
     final nome = _nomeController.text.trim();
-    final email = _emailController.text.trim();
-    if (nome.isEmpty || email.isEmpty) {
-      _avisar('Preencha nome e e-mail.');
+    final email = _semEmail ? '' : _emailController.text.trim();
+    if (nome.isEmpty) {
+      _avisar('Preencha o nome.');
+      return;
+    }
+    if (_semEmail ? !telefoneCompleto(_telefoneController.text) : email.isEmpty) {
+      _avisar(_semEmail ? 'Sem e-mail, informe o telefone com DDD.' : 'Preencha o e-mail ou marque "Não tenho e-mail".');
       return;
     }
     final estado = context.read<AppEstado>();
@@ -138,12 +143,11 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
         dataNascimento: ehPaciente ? _dataNascimento : null,
         sexo: ehPaciente ? _sexo : null,
         telefone: _telefoneController.text.trim(),
-        endereco: ehPaciente ? _enderecoController.text.trim() : null,
         profissao: ehPaciente ? null : _profissaoController.text.trim(),
       );
-      _avisar('Perfil atualizado.');
+      _avisar('Dados atualizados.');
     } catch (erro) {
-      _avisar(_mensagemErro(erro, 'Não foi possível atualizar o perfil.'));
+      _avisar(_mensagemErro(erro, 'Não foi possível atualizar os dados.'));
     } finally {
       if (mounted) setState(() => _salvandoDados = false);
     }
@@ -176,7 +180,7 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
   Future<void> _enviarSolicitacaoVinculo() async {
     final email = _emailCuidadorController.text.trim();
     if (email.isEmpty) {
-      _avisar('Informe o e-mail do cuidador.');
+      _avisar('Informe o e-mail ou telefone do cuidador.');
       return;
     }
     setState(() => _enviandoSolicitacao = true);
@@ -214,32 +218,36 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
     final ehPaciente = usuario.tipo == 'paciente';
     final paciente = estado.pacienteFoco?.paciente;
 
-    final cartoesCuidador = <Widget>[];
+    // Paciente: card do cuidador (vinculado, pedido pendente ou formulário de
+    // vínculo), ao lado da Aparência.
+    Widget? cartaoCuidador;
     if (ehPaciente) {
       if (_cuidadorResponsavel != null && paciente?.cuidadorId != null) {
-        cartoesCuidador.add(_cartaoCuidadorResponsavel(_cuidadorResponsavel!));
+        cartaoCuidador = _cartaoCuidadorResponsavel(_cuidadorResponsavel!);
       } else if (paciente?.cuidadorSolicitadoId != null) {
-        cartoesCuidador.add(const Cartao(
+        cartaoCuidador = Cartao(
           titulo: 'Cuidador(a) responsável',
           child: Text(
             'Solicitação enviada — aguardando confirmação do cuidador. Assim que ele aceitar, os dados aparecem aqui.',
             style: TextStyle(color: CorApp.textoSuave),
           ),
-        ));
+        );
       } else if (paciente?.cuidadorId == null) {
-        cartoesCuidador.add(_cartaoVincularCuidador());
+        cartaoCuidador = _cartaoVincularCuidador();
       }
     }
 
     return AndaimeApp(
-      appBar: const Cabecalho(kicker: 'Configurações', titulo: 'Edição de perfil'),
+      appBar: const Cabecalho(kicker: 'Minha conta', titulo: 'Configurações'),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
           LinhaDupla(esquerda: _cartaoDados(usuario, ehPaciente), direita: _cartaoSenha()),
           const SizedBox(height: 16),
-          LinhaDupla(esquerda: _cartaoAjuda(), direita: _cartaoTamanhoFonte(estado)),
-          for (final cartao in cartoesCuidador) ...[const SizedBox(height: 16), cartao],
+          if (cartaoCuidador != null)
+            LinhaDupla(esquerda: _cartaoAparencia(estado), direita: cartaoCuidador)
+          else
+            _cartaoAparencia(estado),
         ],
       ),
     );
@@ -250,8 +258,8 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
       width: 56,
       height: 56,
       alignment: Alignment.center,
-      decoration: const BoxDecoration(gradient: CorApp.gradienteAzul, shape: BoxShape.circle),
-      child: Text(_iniciais(nome), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 20)),
+      decoration: BoxDecoration(gradient: CorApp.gradienteAzul, shape: BoxShape.circle),
+      child: Text(_iniciais(nome), style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 20)),
     );
   }
 
@@ -264,8 +272,8 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(nome, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
-              Text(papel, style: const TextStyle(color: CorApp.textoSuave, fontWeight: FontWeight.w600)),
+              Text(nome, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+              Text(papel, style: TextStyle(color: CorApp.textoSuave, fontWeight: FontWeight.w600)),
             ],
           ),
         ),
@@ -275,6 +283,7 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
 
   Widget _cartaoDados(UsuarioLogado usuario, bool ehPaciente) {
     return Cartao(
+      titulo: 'Dados pessoais',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -313,8 +322,6 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
               tipoTeclado: TextInputType.phone,
               placeholder: '(11) 98765-4321',
             ),
-            const SizedBox(height: 14),
-            CampoTexto(rotulo: 'Endereço', controller: _enderecoController, placeholder: 'Rua, número, bairro - cidade/UF'),
           ] else ...[
             CampoTexto(
               rotulo: 'Profissão',
@@ -330,7 +337,11 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
             ),
           ],
           const SizedBox(height: 14),
-          CampoTexto(rotulo: 'E-mail', controller: _emailController, tipoTeclado: TextInputType.emailAddress),
+          if (!_semEmail) ...[
+            CampoTexto(rotulo: 'E-mail', controller: _emailController, tipoTeclado: TextInputType.emailAddress),
+            const SizedBox(height: 6),
+          ],
+          OpcaoSemEmail(marcado: _semEmail, aoMudar: (valor) => setState(() => _semEmail = valor)),
           const SizedBox(height: 18),
           Botao(texto: 'Salvar alterações', carregando: _salvandoDados, onPressed: _salvarDados),
         ],
@@ -340,7 +351,7 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
 
   Widget _cartaoSenha() {
     return Cartao(
-      titulo: 'Alterar senha',
+      titulo: 'Senha',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -368,36 +379,25 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
     );
   }
 
-  Widget _cartaoAjuda() {
+  Widget _cartaoAparencia(AppEstado estado) {
     return Cartao(
-      titulo: 'Ajuda e acessibilidade',
+      titulo: 'Aparência',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Não sabe como usar alguma parte do sistema? Veja o guia completo com explicações e passo a passo de cada tela.',
-            style: TextStyle(color: CorApp.textoSuave),
-          ),
+          Text('Tamanho da fonte', style: TextStyle(fontWeight: FontWeight.w700, color: CorApp.textoLabel)),
+          const SizedBox(height: 10),
+          SeletorTamanhoFonte(estado: estado),
           const SizedBox(height: 16),
+          Text('Tema', style: TextStyle(fontWeight: FontWeight.w700, color: CorApp.textoLabel)),
+          const SizedBox(height: 10),
+          _SeletorTema(estado: estado),
+          const SizedBox(height: 18),
           Botao(
             texto: 'Ajuda e acessibilidade',
             variante: VarianteBotao.secundario,
             onPressed: () => context.push('/acessibilidade'),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _cartaoTamanhoFonte(AppEstado estado) {
-    return Cartao(
-      titulo: 'Tamanho da fonte',
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text('Ajusta o tamanho do texto em todo o aplicativo.', style: TextStyle(color: CorApp.textoSuave)),
-          const SizedBox(height: 16),
-          SeletorTamanhoFonte(estado: estado),
         ],
       ),
     );
@@ -411,7 +411,7 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
             children: [
               SizedBox(
                 width: 80,
-                child: Text(rotulo, style: const TextStyle(fontWeight: FontWeight.w800, color: CorApp.textoLabel)),
+                child: Text(rotulo, style: TextStyle(fontWeight: FontWeight.w700, color: CorApp.textoLabel)),
               ),
               Expanded(child: Text(valor)),
             ],
@@ -425,11 +425,11 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
         children: [
           _cabecalhoPessoa(cuidador.nome, cuidador.profissao ?? 'Cuidador(a) / Médico(a)'),
           const SizedBox(height: 16),
-          linha('E-mail', cuidador.email),
+          linha('E-mail', cuidador.email.isEmpty ? '—' : cuidador.email),
           linha('Telefone', (cuidador.telefone ?? '').isEmpty ? '—' : cuidador.telefone!),
           const SizedBox(height: 6),
-          const Text(
-            'Seu cuidador(a) recebe alertas quando uma dose fica atrasada ou é perdida.',
+          Text(
+            'Seu cuidador(a) vê no painel e recebe um aviso, com o app aberto, quando uma dose fica atrasada.',
             style: TextStyle(color: CorApp.textoSuave),
           ),
         ],
@@ -443,16 +443,16 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Informe o e-mail do seu cuidador(a) já cadastrado — ele(a) precisa confirmar antes do vínculo valer.',
+          Text(
+            'Informe o e-mail ou telefone do seu cuidador(a) já cadastrado — ele(a) precisa confirmar antes do vínculo valer.',
             style: TextStyle(color: CorApp.textoSuave),
           ),
           const SizedBox(height: 14),
           CampoTexto(
-            rotulo: 'E-mail do cuidador',
+            rotulo: 'E-mail ou telefone do cuidador',
             controller: _emailCuidadorController,
             tipoTeclado: TextInputType.emailAddress,
-            placeholder: 'cuidador@email.com',
+            placeholder: 'cuidador@email.com ou (79) 99999-9999',
           ),
           const SizedBox(height: 16),
           Botao(
@@ -491,5 +491,26 @@ class SeletorTamanhoFonte extends StatelessWidget {
         ],
       ],
     );
+  }
+}
+
+/// Botões Claro / Escuro — mesma escolha da chave do menu (como no web).
+class _SeletorTema extends StatelessWidget {
+  final AppEstado estado;
+  const _SeletorTema({required this.estado});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget opcao(String valor, String rotulo) => Expanded(
+          child: Semantics(
+            selected: estado.tema == valor,
+            child: Botao(
+              texto: rotulo,
+              variante: estado.tema == valor ? VarianteBotao.primario : VarianteBotao.secundario,
+              onPressed: () => estado.definirTema(valor),
+            ),
+          ),
+        );
+    return Row(children: [opcao('claro', 'Claro'), const SizedBox(width: 8), opcao('escuro', 'Escuro')]);
   }
 }

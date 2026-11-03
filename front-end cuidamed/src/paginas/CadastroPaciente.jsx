@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import Botao from '../componentes/Botao'
 import Campo from '../componentes/Campo'
+import OpcaoSemEmail from '../componentes/OpcaoSemEmail'
 import { useApp } from '../contexto/useApp'
 import { OPCOES_SEXO } from '../dados/dadosMock'
-import { dataDeHojeISO } from '../utilitarios/mascaras'
+import { dataDeHojeISO, telefoneCompleto } from '../utilitarios/mascaras'
 import './CadastroPaciente.css'
 
 const FORMULARIO_VAZIO = {
@@ -13,12 +14,12 @@ const FORMULARIO_VAZIO = {
   enfermidade: '',
   email: '',
   telefone: '',
-  endereco: '',
 }
 
 export default function CadastroPaciente({ aoFechar }) {
   const { cadastrarPaciente, mostrarToast } = useApp()
   const [form, setForm] = useState(FORMULARIO_VAZIO)
+  const [semEmail, setSemEmail] = useState(false)
 
   function definirCampo(chave, valor) {
     setForm((atual) => ({ ...atual, [chave]: valor }))
@@ -30,12 +31,12 @@ export default function CadastroPaciente({ aoFechar }) {
       mostrarToast('Informe o nome do paciente.')
       return
     }
-    if (!form.email.trim()) {
-      mostrarToast('Informe o e-mail do paciente.')
+    if (semEmail ? !telefoneCompleto(form.telefone) : !form.email.trim()) {
+      mostrarToast(semEmail ? 'Sem e-mail, informe o telefone com DDD.' : 'Informe o e-mail ou marque "Não tenho e-mail".')
       return
     }
     try {
-      await cadastrarPaciente(form)
+      await cadastrarPaciente({ ...form, email: semEmail ? '' : form.email })
       mostrarToast('Paciente cadastrado e vinculado com sucesso.')
       aoFechar()
     } catch (erro) {
@@ -86,26 +87,24 @@ export default function CadastroPaciente({ aoFechar }) {
               value={form.enfermidade}
               onChange={(e) => definirCampo('enfermidade', e.target.value)}
             />
-            <Campo
-              rotulo="E-mail"
-              tipo="email"
-              placeholder="paciente@email.com"
-              value={form.email}
-              onChange={(e) => definirCampo('email', e.target.value)}
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {!semEmail && (
+                <Campo
+                  rotulo="E-mail"
+                  tipo="email"
+                  placeholder="paciente@email.com"
+                  value={form.email}
+                  onChange={(e) => definirCampo('email', e.target.value)}
+                />
+              )}
+              <OpcaoSemEmail marcado={semEmail} aoMudar={setSemEmail} />
+            </div>
             <Campo
               rotulo="Telefone"
               tipo="tel"
               placeholder="(11) 98765-4321"
               value={form.telefone}
               onChange={(e) => definirCampo('telefone', e.target.value)}
-            />
-            <Campo
-              className="cadastro-paciente__campo-largo"
-              rotulo="Endereço"
-              placeholder="Rua, número, bairro - cidade/UF"
-              value={form.endereco}
-              onChange={(e) => definirCampo('endereco', e.target.value)}
             />
           </div>
 

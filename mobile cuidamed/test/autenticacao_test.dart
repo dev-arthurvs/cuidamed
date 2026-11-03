@@ -26,7 +26,7 @@ void main() {
       await montarPagina(tester, _deslogado(), '/login', (_) => const Login());
       expect(find.text('Entrar na minha conta'), findsOneWidget);
       expect(find.text('Esqueci minha senha'), findsOneWidget);
-      expect(find.byIcon(Icons.mail_outline), findsOneWidget);
+      expect(find.byIcon(Icons.person_outline), findsOneWidget); // e-mail ou telefone
       expect(find.byIcon(Icons.lock_outline), findsOneWidget);
       expect(find.widgetWithText(OutlinedButton, 'Criar conta'), findsOneWidget);
       expect(find.widgetWithText(OutlinedButton, 'Ativar acesso'), findsOneWidget);
@@ -66,13 +66,12 @@ void main() {
       expect(tester.widget<Text>(find.text('Esqueci minha senha')).style!.fontSize, 16);
     });
 
-    testWidgets('"Esqueci minha senha" só avisa (simulação) e não navega', (tester) async {
+    testWidgets('"Esqueci minha senha" abre a tela de nova senha', (tester) async {
       await montarPagina(tester, _deslogado(), '/login', (_) => const Login());
       await rolarAte(tester, find.text('Esqueci minha senha'));
       await tester.tap(find.text('Esqueci minha senha'));
-      await tester.pump();
-      expect(find.textContaining('instruções de recuperação'), findsOneWidget);
-      expect(find.text('rota /definir-senha'), findsNothing);
+      await tester.pumpAndSettle();
+      expect(find.text('rota /definir-senha'), findsOneWidget);
     });
 
     testWidgets('"Ativar acesso" abre a tela de ativação', (tester) async {
@@ -88,7 +87,7 @@ void main() {
       await rolarAte(tester, find.text('Entrar'));
       await tester.tap(find.text('Entrar'));
       await tester.pump();
-      expect(find.text('Informe o e-mail.'), findsOneWidget);
+      expect(find.text('Informe o e-mail ou telefone.'), findsOneWidget);
       expect(find.text('Informe a senha.'), findsOneWidget);
     });
   });
@@ -197,7 +196,7 @@ void main() {
       await rolarAte(tester, botao);
       await tester.tap(botao);
       await tester.pump();
-      expect(find.text('Informe o e-mail cadastrado pelo seu cuidador.'), findsOneWidget);
+      expect(find.text('Informe o e-mail ou telefone cadastrado pelo seu cuidador.'), findsOneWidget);
 
       final campos = find.byType(TextFormField);
       await tester.enterText(campos.at(0), 'maria@email.com');

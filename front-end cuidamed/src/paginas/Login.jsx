@@ -7,27 +7,30 @@ import { ICONES_CAMPO } from '../componentes/iconesCampo'
 import LogoMarca from '../componentes/LogoMarca'
 import Toast from '../componentes/Toast'
 import { useApp } from '../contexto/useApp'
+import { lerLoginLembrado } from '../utilitarios/sessao'
 import '../estilos/autenticacao.css'
 
 export default function Login() {
   const { entrar, mostrarToast } = useApp()
   const navegar = useNavigate()
-  const [email, setEmail] = useState('')
+  const [login, setLogin] = useState(lerLoginLembrado)
   const [senha, setSenha] = useState('')
+  // Marcado por padrão quando a pessoa já tinha pedido para ser lembrada.
+  const [lembrar, setLembrar] = useState(() => lerLoginLembrado() !== '')
   const [entrando, setEntrando] = useState(false)
 
   async function entrarNaConta(evento) {
     evento.preventDefault()
-    if (!email.trim() || !senha.trim()) {
-      mostrarToast('Preencha e-mail e senha para entrar.')
+    if (!login.trim() || !senha.trim()) {
+      mostrarToast('Preencha o e-mail ou telefone e a senha para entrar.')
       return
     }
     setEntrando(true)
     try {
-      await entrar(email.trim(), senha)
+      await entrar(login.trim(), senha, lembrar)
       navegar('/painel')
     } catch (erro) {
-      mostrarToast(erro.message || 'E-mail ou senha inválidos.')
+      mostrarToast(erro.message || 'E-mail, telefone ou senha inválidos.')
     } finally {
       setEntrando(false)
     }
@@ -60,12 +63,12 @@ export default function Login() {
           </div>
 
           <Campo
-            rotulo="E-mail"
-            tipo="email"
-            icone={ICONES_CAMPO.email}
-            placeholder="seu@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            rotulo="E-mail ou telefone"
+            icone={ICONES_CAMPO.pessoa}
+            autoComplete="username"
+            placeholder="seu@email.com ou (79) 99999-9999"
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
           />
           <Campo
             rotulo="Senha"
@@ -76,13 +79,19 @@ export default function Login() {
             value={senha}
             onChange={(e) => setSenha(e.target.value)}
           />
-          <button
-            type="button"
-            className="autenticacao__esqueci"
-            onClick={() => mostrarToast('Enviamos as instruções de recuperação para o seu e-mail (simulação).')}
-          >
-            Esqueci minha senha
-          </button>
+          <div className="autenticacao__opcoes">
+            <label className="autenticacao__lembrar">
+              <input type="checkbox" checked={lembrar} onChange={(e) => setLembrar(e.target.checked)} />
+              <span>Lembrar de mim</span>
+            </label>
+            <button
+              type="button"
+              className="autenticacao__esqueci"
+              onClick={() => navegar('/definir-senha?novaSenha=1')}
+            >
+              Esqueci minha senha
+            </button>
+          </div>
 
           <Botao type="submit" larguraTotal disabled={entrando}>
             {entrando ? 'Entrando...' : 'Entrar'}

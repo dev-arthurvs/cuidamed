@@ -23,7 +23,7 @@ public class Cuidador {
     @Column(name = "nome_cui", nullable = false, length = 150)
     private String nome;
 
-    @Column(name = "email_cui", nullable = false, length = 150, unique = true)
+    @Column(name = "email_cui", length = 150, unique = true) // opcional: pode entrar pelo telefone
     private String email;
 
     @Column(name = "senha_cui", nullable = false, length = 255)

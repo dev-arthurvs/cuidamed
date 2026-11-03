@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 import '../estado/app_estado.dart';
 import '../servicos/api_cliente.dart';
 import '../utilitarios/animacoes.dart';
+import 'opcao_sem_email.dart';
+import '../utilitarios/mascaras.dart';
 import '../utilitarios/tema.dart';
 import 'botao.dart';
 import 'campo_texto.dart';
@@ -68,17 +70,17 @@ class _FormularioCadastroPacienteState extends State<_FormularioCadastroPaciente
   final _enfermidade = TextEditingController();
   final _email = TextEditingController();
   final _telefone = TextEditingController();
-  final _endereco = TextEditingController();
+  bool _semEmail = false;
   DateTime? _dataNascimento;
   String _sexo = _opcoesSexo[0];
   bool _salvando = false;
   String? _erro;
 
-  static const _estiloRotulo = TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: CorApp.textoLabel);
+  static final _estiloRotulo = TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: CorApp.textoLabel);
 
   @override
   void dispose() {
-    for (final c in [_nome, _enfermidade, _email, _telefone, _endereco]) {
+    for (final c in [_nome, _enfermidade, _email, _telefone]) {
       c.dispose();
     }
     super.dispose();
@@ -89,8 +91,8 @@ class _FormularioCadastroPacienteState extends State<_FormularioCadastroPaciente
       setState(() => _erro = 'Informe o nome do paciente.');
       return;
     }
-    if (_email.text.trim().isEmpty) {
-      setState(() => _erro = 'Informe o e-mail do paciente.');
+    if (_semEmail ? !telefoneCompleto(_telefone.text) : _email.text.trim().isEmpty) {
+      setState(() => _erro = _semEmail ? 'Sem e-mail, informe o telefone com DDD.' : 'Informe o e-mail ou marque "Não tenho e-mail".');
       return;
     }
     setState(() {
@@ -100,12 +102,11 @@ class _FormularioCadastroPacienteState extends State<_FormularioCadastroPaciente
     try {
       await context.read<AppEstado>().cadastrarPacienteDoCuidador(
             nome: _nome.text.trim(),
-            email: _email.text.trim(),
+            email: _semEmail ? '' : _email.text.trim(),
             dataNascimento: _dataNascimento,
             sexo: _sexo,
             enfermidade: _enfermidade.text,
             telefone: _telefone.text,
-            endereco: _endereco.text,
           );
       if (mounted) Navigator.of(context).pop(true);
     } catch (erro) {
@@ -156,15 +157,15 @@ class _FormularioCadastroPacienteState extends State<_FormularioCadastroPaciente
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text('PACIENTES',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: CorApp.azul, letterSpacing: 0.6)),
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: CorApp.azul, letterSpacing: 0.6)),
                 SizedBox(height: 4),
                 Text('Cadastrar novo paciente',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: -0.4, color: CorApp.texto)),
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, letterSpacing: -0.4, color: CorApp.texto)),
               ],
             ),
           ),
@@ -174,7 +175,7 @@ class _FormularioCadastroPacienteState extends State<_FormularioCadastroPaciente
             child: InkWell(
               borderRadius: BorderRadius.circular(12),
               onTap: _salvando ? null : () => Navigator.of(context).pop(false),
-              child: const SizedBox(
+              child: SizedBox(
                 width: 40,
                 height: 40,
                 child: Icon(Icons.close, size: 22, color: CorApp.textoSuave, semanticLabel: 'Fechar'),
@@ -187,9 +188,9 @@ class _FormularioCadastroPacienteState extends State<_FormularioCadastroPaciente
   }
 
   Widget _campos({required bool duasColunas}) {
-    Widget par(Widget a, Widget b) => duasColunas
+    Widget par(Widget a, Widget b, {CrossAxisAlignment alinhar = CrossAxisAlignment.end}) => duasColunas
         ? Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: alinhar,
             children: [Expanded(child: a), const SizedBox(width: 16), Expanded(child: b)],
           )
         : Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [a, const SizedBox(height: 16), b]);
@@ -198,7 +199,7 @@ class _FormularioCadastroPacienteState extends State<_FormularioCadastroPaciente
     final campoData = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text('Data de nascimento', style: _estiloRotulo),
+        Text('Data de nascimento', style: _estiloRotulo),
         const SizedBox(height: 8),
         InkWell(
           onTap: _escolherData,
@@ -218,7 +219,7 @@ class _FormularioCadastroPacienteState extends State<_FormularioCadastroPaciente
     final campoSexo = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text('Sexo', style: _estiloRotulo),
+        Text('Sexo', style: _estiloRotulo),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           isExpanded: true,
@@ -256,12 +257,22 @@ class _FormularioCadastroPacienteState extends State<_FormularioCadastroPaciente
         ),
         const SizedBox(height: 16),
         par(
-          CampoTexto(
-            rotulo: 'E-mail',
-            rotuloExterno: true,
-            placeholder: 'paciente@email.com',
-            controller: _email,
-            tipoTeclado: TextInputType.emailAddress,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (!_semEmail) ...[
+                CampoTexto(
+                  rotulo: 'E-mail',
+                  rotuloExterno: true,
+                  placeholder: 'paciente@email.com',
+                  controller: _email,
+                  tipoTeclado: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 6),
+              ],
+              OpcaoSemEmail(marcado: _semEmail, aoMudar: (valor) => setState(() => _semEmail = valor)),
+            ],
           ),
           CampoTexto(
             rotulo: 'Telefone',
@@ -269,15 +280,10 @@ class _FormularioCadastroPacienteState extends State<_FormularioCadastroPaciente
             placeholder: '(11) 98765-4321',
             controller: _telefone,
             tipoTeclado: TextInputType.phone,
+            onSubmitted: (_) => _salvar(),
           ),
-        ),
-        const SizedBox(height: 16),
-        CampoTexto(
-          rotulo: 'Endereço',
-          rotuloExterno: true,
-          placeholder: 'Rua, número, bairro - cidade/UF',
-          controller: _endereco,
-          onSubmitted: (_) => _salvar(),
+          // Pelo topo: a caixa "Não tenho e-mail" deixa a coluna do e-mail mais alta.
+          alinhar: CrossAxisAlignment.start,
         ),
       ],
     );
@@ -286,13 +292,13 @@ class _FormularioCadastroPacienteState extends State<_FormularioCadastroPaciente
   Widget _rodape() {
     return Container(
       padding: const EdgeInsets.fromLTRB(24, 14, 24, 18),
-      decoration: const BoxDecoration(border: Border(top: BorderSide(color: CorApp.borda))),
+      decoration: BoxDecoration(border: Border(top: BorderSide(color: CorApp.borda))),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
           if (_erro != null) ...[
-            Text(_erro!, style: const TextStyle(color: CorApp.vermelho, fontWeight: FontWeight.w700)),
+            Text(_erro!, style: TextStyle(color: CorApp.vermelho, fontWeight: FontWeight.w700)),
             const SizedBox(height: 10),
           ],
           Row(

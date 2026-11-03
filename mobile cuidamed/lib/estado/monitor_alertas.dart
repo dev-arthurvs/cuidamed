@@ -8,7 +8,12 @@ import 'app_estado.dart';
 class AlertaPaciente {
   final String titulo;
   final String mensagem;
-  const AlertaPaciente(this.titulo, this.mensagem);
+
+  /// O celular já agendou esta notificação (lembretes agendados): com o app
+  /// aberto, só mostra na tela e toca o som, para não notificar duas vezes.
+  final bool notificacaoAgendada;
+
+  const AlertaPaciente(this.titulo, this.mensagem, {this.notificacaoAgendada = false});
 }
 
 /// Equivalente aos dois useEffect de alerta do ContextoApp.jsx do web. Enquanto
@@ -17,7 +22,9 @@ class AlertaPaciente {
 ///    pendente, avisa e confirma o recebimento (o servidor limpa o pendente);
 /// 2. "Hora do remédio": se alguma dose não tomada chegou ao horário (janela de
 ///    1 minuto), avisa — uma única vez por dose.
-/// Ouve o [AppEstado] pra ligar ao entrar como paciente e desligar ao sair.
+/// Com um CUIDADOR logado, a cada [intervalo] avisa uma vez quando a dose de um
+/// paciente fica atrasada (só com o app aberto; o status também fica no painel).
+/// Ouve o [AppEstado] pra ligar ao entrar e desligar ao sair.
 class MonitorAlertas {
   final AppEstado estado;
   final Future<Paciente> Function(int pacienteId) buscarPaciente;
@@ -30,6 +37,7 @@ class MonitorAlertas {
 
   Timer? _timer;
   int? _pacienteMonitorado;
+  int? _cuidadorMonitorado;
   bool _verificandoManual = false;
   final Set<String> _dosesAvisadas = {};
 
@@ -50,10 +58,12 @@ class MonitorAlertas {
   void _sincronizar() {
     final usuario = estado.usuario;
     final pacienteId = usuario?.tipo == 'paciente' ? usuario!.id : null;
-    if (pacienteId == _pacienteMonitorado) return;
+    final cuidadorId = usuario?.tipo == 'cuidador' ? usuario!.id : null;
+    if (pacienteId == _pacienteMonitorado && cuidadorId == _cuidadorMonitorado) return;
     _parar();
-    if (pacienteId == null) return;
+    if (pacienteId == null && cuidadorId == null) return;
     _pacienteMonitorado = pacienteId;
+    _cuidadorMonitorado = cuidadorId;
     _timer = Timer.periodic(intervalo, (_) => verificarAgora());
     verificarAgora(); // igual ao web: verifica já ao entrar, sem esperar 30 s
   }
@@ -62,15 +72,42 @@ class MonitorAlertas {
     _timer?.cancel();
     _timer = null;
     _pacienteMonitorado = null;
+    _cuidadorMonitorado = null;
     _dosesAvisadas.clear();
   }
 
   /// Uma rodada de verificação (público pra teste).
   Future<void> verificarAgora() async {
+    if (_cuidadorMonitorado != null) {
+      _verificarAtrasosDosPacientes();
+      return;
+    }
     final pacienteId = _pacienteMonitorado;
     if (pacienteId == null) return;
     _verificarHorarioDasDoses();
     await _verificarAlertaManual(pacienteId);
+  }
+
+  void _verificarAtrasosDosPacientes() {
+    final momento = agora();
+    final hojeIso = dataAtualISO(momento);
+    final minutos = momento.hour * 60 + momento.minute;
+    final novos = <({String paciente, String horario, String remedio})>[];
+    for (final dados in estado.pacientes) {
+      final historicoHoje = dados.historico.where((h) => dataAtualISO(h.data) == hojeIso).toList();
+      for (final dose in construirDosesHoje(dados.medicamentosAtivos(), historicoHoje, hojeIso: hojeIso)) {
+        final chave = '$hojeIso-${dados.paciente.id}-${dose.id}';
+        if (dose.status == 'tomado' || _dosesAvisadas.contains(chave)) continue;
+        if (calcularStatusAtual(dose.horario, null, agoraEmMinutos: minutos) != 'atrasado') continue;
+        _dosesAvisadas.add(chave);
+        novos.add((paciente: dados.paciente.nome.split(' ').first, horario: dose.horario, remedio: dose.nome));
+      }
+    }
+    if (novos.isEmpty) return;
+    final mensagem = novos.length == 1
+        ? '${novos.first.paciente}: a dose das ${novos.first.horario} (${novos.first.remedio}) está atrasada.'
+        : '${novos.length} doses atrasadas: ${novos.map((n) => n.paciente).toSet().join(', ')}.';
+    aoAlertar(AlertaPaciente('Dose atrasada ⏰', mensagem));
   }
 
   void _verificarHorarioDasDoses() {
@@ -87,7 +124,10 @@ class MonitorAlertas {
       final diferenca = minutosAtuais - paraMinutos(dose.horario);
       if (diferenca >= 0 && diferenca < 1) {
         _dosesAvisadas.add(chave);
-        aoAlertar(AlertaPaciente('Hora do remédio 💊', 'Está na hora de tomar ${dose.nome} (${dose.dosagem}).'));
+        final mensagem = dose.dosagem.isEmpty
+            ? 'Está na hora de tomar ${dose.nome}.'
+            : 'Está na hora de tomar ${dose.nome} (${dose.dosagem}).';
+        aoAlertar(AlertaPaciente('Hora do remédio 💊', mensagem, notificacaoAgendada: true));
       }
     }
   }

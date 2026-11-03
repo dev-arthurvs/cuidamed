@@ -19,6 +19,18 @@ export function formatarTelefone(valor, anterior = '') {
   return `(${ddd}) ${numero.slice(0, tamanhoInicio)}-${numero.slice(tamanhoInicio)}`
 }
 
+// Tem DDD + número? (10 dígitos no fixo, 11 no celular.)
+export function telefoneCompleto(valor) {
+  const tamanho = apenasDigitos(valor).length
+  return tamanho === 10 || tamanho === 11
+}
+
+// Nº do cartão do paciente = id do vínculo ativo com o cuidador: 12 → "0000 0012".
+export function formatarNumeroCartao(codigo) {
+  const digitos = String(codigo).padStart(8, '0')
+  return `${digitos.slice(0, 4)} ${digitos.slice(4)}`
+}
+
 // Limites das datas: o ano fica com 4 dígitos (sem eles, o navegador aceita
 // anos como 202611) e as datas ficam num intervalo que faz sentido.
 export const DATA_MINIMA = '1900-01-01'

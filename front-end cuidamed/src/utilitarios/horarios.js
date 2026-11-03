@@ -172,15 +172,56 @@ export function construirDosesHoje(medicamentosAtivos, historicoHoje, hojeIso = 
   return doses.sort((a, b) => a.horario.localeCompare(b.horario))
 }
 
+// Doses que já passaram do horário e não têm registro no histórico (ninguém
+// marcou "tomada" nem "perdida"). O Início já as mostra como atrasadas ou
+// perdidas, calculando na hora; o Histórico usa isto para mostrar o mesmo.
+// Dias anteriores: perdida. Hoje: atrasada ou perdida, pela mesma regra do
+// Início (dose ainda no horário não entra). Nada é gravado no banco.
+export function dosesSemRegistro(medicamentos, historico, deIso, ateIso, agora = new Date()) {
+  const hojeIso = dataAtualISO(agora)
+  const fim = ateIso > hojeIso ? hojeIso : ateIso
+  // Não precisa varrer dias antes do primeiro tratamento.
+  const inicios = medicamentos.map((medicamento) => medicamento.inicio).filter(Boolean).sort()
+  let dia = inicios.length && inicios[0] > deIso ? inicios[0] : deIso
+  const registrados = new Set(historico.map((item) => `${item.medicamentoId}|${item.data}|${item.horario}`))
+  const agoraEmMinutos = minutosAgora(agora)
+  const doses = []
+  for (; dia <= fim; dia = somarDias(dia, 1)) {
+    for (const medicamento of medicamentos) {
+      if (!temDoseNoDia(medicamento, dia)) continue
+      for (const horario of medicamento.horarios) {
+        if (registrados.has(`${medicamento.id}|${dia}|${horario}`)) continue
+        const status = dia < hojeIso ? 'perdido' : calcularStatusAtual({ status: 'pendente', horario }, agoraEmMinutos)
+        if (status === 'pendente') continue
+        doses.push({
+          medicamentoId: medicamento.id,
+          data: dia,
+          horario,
+          medicamento: medicamento.nome,
+          dosagem: medicamento.dosagem,
+          status,
+          semRegistro: true,
+        })
+      }
+    }
+  }
+  return doses
+}
+
 export const DIAS_JANELA_ADESAO = 30
 
 // Adesão dos últimos 30 dias (hoje incluso) — é o período que as telas anunciam
-// ("Adesão média (30 dias)"). Antes considerava o histórico inteiro.
-export function calcularAdesao(historico, hojeIso = dataAtualISO()) {
+// ("Adesão média (30 dias)"). Dose que passou do limite sem registro conta como
+// perdida, a mesma regra do Início e do Histórico; a atrasada ainda não conta,
+// porque a pessoa ainda pode tomar.
+export function calcularAdesao(historico, medicamentos = [], hojeIso = dataAtualISO()) {
   const inicioJanela = new Date(`${hojeIso}T00:00:00Z`)
   inicioJanela.setUTCDate(inicioJanela.getUTCDate() - (DIAS_JANELA_ADESAO - 1))
   const inicioIso = inicioJanela.toISOString().slice(0, 10)
-  const recentes = historico.filter((item) => item.data >= inicioIso && item.data <= hojeIso)
+  const perdidasSemRegistro = dosesSemRegistro(medicamentos, historico, inicioIso, hojeIso).filter(
+    (dose) => dose.status === 'perdido',
+  )
+  const recentes = [...historico.filter((item) => item.data >= inicioIso && item.data <= hojeIso), ...perdidasSemRegistro]
   if (!recentes.length) return 100
   const tomados = recentes.filter((item) => item.status === 'tomado').length
   return Math.round((tomados / recentes.length) * 100)
@@ -224,4 +265,20 @@ export function calcularEstoque(medicamento, historico = [], hojeIso = dataAtual
     duraAteOFim,
     baixo: !duraAteOFim && diasRestantes <= LIMIAR_DIAS_ESTOQUE_BAIXO,
   }
+}
+
+// Remédios com estoque baixo ou esgotado, para o Início e o painel do cuidador.
+export function avisosEstoque(medicamentosAtivos, historico = [], hojeIso = dataAtualISO()) {
+  const avisos = []
+  for (const medicamento of medicamentosAtivos) {
+    const estoque = calcularEstoque(medicamento, historico, hojeIso)
+    if (!estoque) continue
+    if (estoque.esgotado) {
+      avisos.push({ id: medicamento.id, nome: medicamento.nome, esgotado: true, texto: 'Estoque esgotado. Reponha o quanto antes.' })
+    } else if (estoque.baixo) {
+      const duracao = estoque.diasRestantes <= 0 ? 'não dá para o dia todo' : `dura ${estoque.diasRestantes} dia${estoque.diasRestantes === 1 ? '' : 's'}`
+      avisos.push({ id: medicamento.id, nome: medicamento.nome, esgotado: false, texto: `Restam ${estoque.quantidade} ${estoque.unidade} (${duracao}).` })
+    }
+  }
+  return avisos
 }

@@ -29,7 +29,7 @@ class LogoCuidaMed extends StatelessWidget {
           height: tamanho,
           decoration: claro
               ? BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(tamanho * 0.22))
-              : const BoxDecoration(gradient: CorApp.gradienteAzul, shape: BoxShape.circle),
+              : BoxDecoration(gradient: CorApp.gradienteAzul, shape: BoxShape.circle),
           child: Center(
             // Mesmo comprimido do web (.logo-marca__capsula): pílula branca girada
             // 45°, com a metade esquerda em azul-claro recortada pelas bordas
@@ -61,7 +61,7 @@ class LogoCuidaMed extends StatelessWidget {
         Text.rich(
           textScaler: TextScaler.noScaling,
           TextSpan(
-            style: TextStyle(fontSize: tamanhoTexto, fontWeight: FontWeight.w800),
+            style: TextStyle(fontSize: tamanhoTexto, fontWeight: FontWeight.w700),
             children: [
               TextSpan(text: 'Cuida', style: TextStyle(color: claro ? Colors.white : CorApp.texto)),
               TextSpan(text: 'Med', style: TextStyle(color: claro ? Colors.white : CorApp.azul)),
@@ -100,12 +100,12 @@ class Cabecalho extends StatelessWidget implements PreferredSizeWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(kicker.toUpperCase(),
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: CorApp.azulTexto, letterSpacing: 0.4)),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: CorApp.azulTexto, letterSpacing: 0.4)),
           Text(
             titulo,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: CorApp.texto, height: 1.15),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: CorApp.texto, height: 1.15),
           ),
         ],
       ),

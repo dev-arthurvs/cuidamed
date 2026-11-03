@@ -28,10 +28,10 @@ void main() {
       'Enfermidade / condição principal',
       'E-mail',
       'Telefone',
-      'Endereço',
     ]) {
       expect(find.text(rotulo), findsWidgets, reason: rotulo);
     }
+    expect(find.text('Endereço'), findsNothing); // endereço não é pedido
     expect(find.textContaining('Senha'), findsNothing);
     expect(find.text('Cancelar'), findsOneWidget);
     expect(find.text('Cadastrar paciente'), findsOneWidget);
@@ -60,7 +60,7 @@ void main() {
     await tester.enterText(find.byType(TextFormField).first, 'João Teste');
     await tester.tap(find.text('Cadastrar paciente'));
     await tester.pump();
-    expect(find.text('Informe o e-mail do paciente.'), findsOneWidget);
+    expect(find.text('Informe o e-mail ou marque "Não tenho e-mail".'), findsOneWidget);
   });
 
   testWidgets('Cancelar e o X fecham sem cadastrar', (tester) async {
@@ -82,7 +82,7 @@ void main() {
     await tester.drag(find.text('Cadastrar novo paciente'), const Offset(0, 0)); // garante foco no sheet
     await tester.drag(find.byType(SingleChildScrollView).last, const Offset(0, -1500));
     await tester.pumpAndSettle();
-    expect(find.text('Endereço'), findsOneWidget);
+    expect(find.text('Telefone'), findsOneWidget); // último campo
     expect(tester.takeException(), isNull);
   });
 }

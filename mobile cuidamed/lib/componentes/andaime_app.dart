@@ -5,10 +5,9 @@ import 'package:provider/provider.dart';
 import '../estado/app_estado.dart';
 import 'barra_logo.dart';
 import 'barra_navegacao_inferior.dart';
-import 'menu_lateral.dart';
 
 /// Andaime comum de toda tela autenticada: AppBar (via [appBar]) + bottom
-/// nav fixa + drawer lateral — equivalente a componentes/LayoutApp.jsx do web.
+/// nav fixa — equivalente a componentes/LayoutApp.jsx do web.
 class AndaimeApp extends StatelessWidget {
   final PreferredSizeWidget appBar;
   final Widget body;
@@ -24,16 +23,9 @@ class AndaimeApp extends StatelessWidget {
 
     return Scaffold(
       appBar: BarraComLogo(abaixo: appBar),
-      drawer: const MenuLateral(),
       body: SafeArea(child: body),
       floatingActionButton: botaoFlutuante,
-      bottomNavigationBar: Builder(
-        builder: (context) => BarraNavegacaoInferior(
-          tipoUsuario: tipoUsuario,
-          rotaAtual: rotaAtual,
-          aoAbrirMenu: () => Scaffold.of(context).openDrawer(),
-        ),
-      ),
+      bottomNavigationBar: BarraNavegacaoInferior(tipoUsuario: tipoUsuario, rotaAtual: rotaAtual),
     );
   }
 }

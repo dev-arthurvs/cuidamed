@@ -28,7 +28,7 @@ class Historico {
       data: DateTime.parse(json['data']),
       hora: json['hora'] as String,
       nomeMedicamento: json['nomeMedicamento'] as String,
-      dosagem: json['dosagem'] as String,
+      dosagem: json['dosagem'] as String? ?? '', // opcional: saiu do formulário
       status: json['status'] as String,
     );
   }

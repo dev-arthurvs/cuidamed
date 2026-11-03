@@ -10,8 +10,7 @@ import '../estado/app_estado.dart';
 const rotaDetalhesPaciente = '/cuidador/paciente/:pacienteId';
 
 /// "‹ Voltar para os detalhes do paciente" — no topo das telas abertas a partir
-/// dos detalhes do paciente (agenda, histórico, ciclos encerrados e painel do
-/// paciente), como no VoltarDetalhesPaciente.jsx do web. Só para o cuidador: o
+/// dos detalhes do paciente (agenda e histórico de doses), como no VoltarDetalhesPaciente.jsx do web. Só para o cuidador: o
 /// paciente não tem a tela de detalhes.
 class VoltarDetalhesPaciente extends StatelessWidget {
   final int? pacienteId;
@@ -37,8 +36,8 @@ class VoltarDetalhesPaciente extends StatelessWidget {
   }
 
   /// Se os detalhes já estão na pilha (caminho normal: detalhes → agenda →
-  /// ciclos encerrados), volta até eles, mantendo o painel embaixo. Se a tela
-  /// foi aberta por outro caminho (ex.: menu lateral), abre os detalhes por cima.
+  /// aba de encerrados), volta até eles, mantendo o painel embaixo. Se a tela
+  /// foi aberta por outro caminho (ex.: barra inferior), abre os detalhes por cima.
   static void voltar(BuildContext context, int pacienteId) {
     final roteador = GoRouter.of(context);
     var encontrouDetalhes = false;

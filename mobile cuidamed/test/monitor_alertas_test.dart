@@ -48,10 +48,12 @@ void main() {
         agora: agora ?? () => DateTime(2000, 1, 1, 3, 0), // madrugada: nenhuma dose no horário
       );
 
-  testWidgets('Liga só para paciente e desliga ao sair', (tester) async {
+  testWidgets('Liga ao entrar e desliga ao sair; o cuidador não busca alerta manual', (tester) async {
     final cuidador = estadoCuidador();
     final monitorCuidador = criar(cuidador);
-    expect(monitorCuidador.ativo, isFalse);
+    expect(monitorCuidador.ativo, isTrue); // vigia as doses atrasadas dos pacientes
+    await tester.pump();
+    expect(api.buscas, 0);
     monitorCuidador.dispose();
 
     final paciente = estadoPaciente();

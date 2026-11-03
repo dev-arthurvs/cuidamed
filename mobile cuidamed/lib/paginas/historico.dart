@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
 import '../componentes/andaime_app.dart';
+import '../componentes/botao.dart';
 import '../componentes/cabecalho.dart';
 import '../componentes/rotulo_status.dart';
 import '../componentes/voltar_detalhes_paciente.dart';
 import '../componentes/escolha_paciente.dart';
 import '../estado/app_estado.dart';
 import '../modelos/historico.dart';
+import '../servicos/relatorio_pdf.dart';
+import '../utilitarios/horarios.dart';
 import '../utilitarios/tema.dart';
 
 class HistoricoPagina extends StatefulWidget {
@@ -84,16 +88,20 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
 
     if (dados == null) {
       return const AndaimeApp(
-        appBar: Cabecalho(kicker: 'Registro de doses', titulo: 'Histórico'),
+        appBar: Cabecalho(kicker: 'Registro de doses', titulo: 'Histórico de doses'),
         body: Padding(padding: EdgeInsets.all(20), child: Text('Nenhum paciente selecionado.')),
       );
     }
 
-    final nomesMedicamentos = dados.historico.map((h) => h.nomeMedicamento).toSet().toList()..sort();
+    final nomesMedicamentos =
+        {...dados.historico.map((h) => h.nomeMedicamento), ...dados.medicamentos.map((m) => m.nome)}.toList()..sort();
     final hoje = DateTime.now();
     final hojeSemHora = DateTime(hoje.year, hoje.month, hoje.day);
 
-    final entradas = dados.historico
+    // Registros do banco + doses que passaram do horário sem registro (as
+    // mesmas que o Início mostra como atrasadas/perdidas).
+    final semRegistro = dosesSemRegistro(dados.paciente.id, dados.medicamentos, dados.historico, _inicio, _fim);
+    final entradas = [...dados.historico, ...semRegistro]
         .map((item) => (item: item, diferenca: hojeSemHora.difference(DateTime(item.data.year, item.data.month, item.data.day)).inDays))
         .where((e) {
           final dia = _semHora(e.item.data);
@@ -111,7 +119,8 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
     final atrasadas = entradas.where((e) => e.item.status == 'ATRASADO').length;
     final perdidas = entradas.where((e) => e.item.status == 'PERDIDO').length;
 
-    final titulo = estado.usuario!.tipo == 'cuidador' ? 'Histórico de ${dados.paciente.nome}' : 'Histórico';
+    final titulo =
+        estado.usuario!.tipo == 'cuidador' ? 'Histórico de doses de ${dados.paciente.nome}' : 'Histórico de doses';
 
     return AndaimeApp(
       appBar: Cabecalho(kicker: 'Registro de doses', titulo: titulo),
@@ -119,7 +128,7 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
         padding: const EdgeInsets.all(20),
         children: [
           VoltarDetalhesPaciente(pacienteId: dados.paciente.id),
-          const Text('Período', style: TextStyle(fontWeight: FontWeight.w800)),
+          const Text('Período', style: TextStyle(fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -129,7 +138,7 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
             ],
           ),
           const SizedBox(height: 16),
-          const Text('Medicamento', style: TextStyle(fontWeight: FontWeight.w800)),
+          const Text('Medicamento', style: TextStyle(fontWeight: FontWeight.w700)),
           const SizedBox(height: 8),
           DropdownButtonFormField<String>(
             isExpanded: true,
@@ -150,9 +159,15 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
               Expanded(child: _cartaoResumo('Perdidas', perdidas, CorApp.vermelhoFundo, CorApp.vermelhoTexto)),
             ],
           ),
+          const SizedBox(height: 14),
+          Botao(
+            texto: 'Gerar relatório (PDF)',
+            variante: VarianteBotao.secundario,
+            onPressed: () => _gerarRelatorio(dados!, entradas.map((e) => e.item).toList()),
+          ),
           const SizedBox(height: 20),
           if (entradas.isEmpty)
-            const Padding(
+            Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
               child: Text('Nenhum registro para este filtro.', style: TextStyle(color: CorApp.textoSuave)),
             ),
@@ -162,7 +177,7 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
                 padding: const EdgeInsets.only(top: 12, bottom: 8),
                 child: Text(
                   _rotuloDoDia(entradas[indice].item.data, entradas[indice].diferenca),
-                  style: const TextStyle(fontWeight: FontWeight.w800, color: CorApp.textoSuave, fontSize: 13),
+                  style: TextStyle(fontWeight: FontWeight.w700, color: CorApp.textoSuave, fontSize: 13),
                 ),
               ),
             _linhaHistorico(entradas[indice].item),
@@ -170,6 +185,26 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
         ],
       ),
     );
+  }
+
+  Future<void> _gerarRelatorio(PacienteComDados dados, List<Historico> entradas) async {
+    final mensageiro = ScaffoldMessenger.of(context);
+    try {
+      final tema = await carregarTemaRelatorio();
+      await Printing.layoutPdf(
+        name: 'Relatorio-CuidaMed.pdf',
+        onLayout: (_) => gerarRelatorioPdf(
+          paciente: dados.paciente,
+          medicamentosAtivos: dados.medicamentosAtivos(),
+          entradas: entradas,
+          inicio: _inicio,
+          fim: _fim,
+          tema: tema,
+        ),
+      );
+    } catch (_) {
+      mensageiro.showSnackBar(const SnackBar(content: Text('Não foi possível gerar o relatório.')));
+    }
   }
 
   Widget _campoData(String rotulo, DateTime valor, {required bool inicio}) {
@@ -192,7 +227,7 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
       decoration: BoxDecoration(color: fundo, borderRadius: BorderRadius.circular(RaioApp.medio)),
       child: Column(
         children: [
-          Text('$valor', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: cor)),
+          Text('$valor', style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: cor)),
           Text(rotulo, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: cor)),
         ],
       ),
@@ -206,13 +241,13 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
       decoration: BoxDecoration(color: CorApp.fundoCard, borderRadius: BorderRadius.circular(RaioApp.pequeno), border: Border.all(color: CorApp.borda)),
       child: Row(
         children: [
-          SizedBox(width: 52, child: Text(item.hora, style: const TextStyle(fontWeight: FontWeight.w800))),
+          SizedBox(width: 52, child: Text(item.hora, style: const TextStyle(fontWeight: FontWeight.w700))),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(item.nomeMedicamento, style: const TextStyle(fontWeight: FontWeight.w700)),
-                Text(item.dosagem, style: const TextStyle(color: CorApp.textoSuave, fontSize: 12)),
+                if (item.dosagem.isNotEmpty) Text(item.dosagem, style: TextStyle(color: CorApp.textoSuave, fontSize: 12)),
               ],
             ),
           ),

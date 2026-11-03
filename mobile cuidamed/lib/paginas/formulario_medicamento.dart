@@ -21,7 +21,6 @@ class FormularioMedicamento extends StatefulWidget {
 
 class _FormularioMedicamentoState extends State<FormularioMedicamento> {
   final _nomeController = TextEditingController();
-  final _dosagemController = TextEditingController();
   final _estoqueController = TextEditingController();
   final _porDoseController = TextEditingController();
   final _observacoesController = TextEditingController();
@@ -43,7 +42,6 @@ class _FormularioMedicamentoState extends State<FormularioMedicamento> {
     final existente = widget.medicamentoExistente;
     if (existente != null) {
       _nomeController.text = existente.nome;
-      _dosagemController.text = existente.dosagem;
       _forma = existente.forma;
       _frequencia = existente.frequencia;
       _horarios = List.of(existente.horarios);
@@ -116,7 +114,8 @@ class _FormularioMedicamentoState extends State<FormularioMedicamento> {
       id: widget.medicamentoExistente?.id ?? 0,
       pacienteId: pacienteId,
       nome: _nomeController.text.trim(),
-      dosagem: _dosagemController.text.trim(),
+      // Dosagem saiu do formulário: remédio antigo mantém a que tinha.
+      dosagem: widget.medicamentoExistente?.dosagem ?? '',
       forma: _forma,
       frequencia: _frequencia,
       dataInicio: _inicio,
@@ -163,12 +162,6 @@ class _FormularioMedicamentoState extends State<FormularioMedicamento> {
             children: [
               CampoTexto(rotulo: 'Nome do medicamento', controller: _nomeController, placeholder: 'Ex.: Losartana'),
               const SizedBox(height: 14),
-              CampoTexto(
-                rotulo: 'Dosagem',
-                controller: _dosagemController,
-                placeholder: _ehPomada ? 'Ex.: 1% (concentração)' : '50 mg',
-              ),
-              const SizedBox(height: 14),
               DropdownButtonFormField<String>(
                 isExpanded: true,
                 initialValue: _forma,
@@ -201,7 +194,7 @@ class _FormularioMedicamentoState extends State<FormularioMedicamento> {
                 ),
               ],
               const SizedBox(height: 22),
-              const Text('Horários das doses', style: TextStyle(fontWeight: FontWeight.w800)),
+              const Text('Horários das doses', style: TextStyle(fontWeight: FontWeight.w700)),
               const SizedBox(height: 10),
               Wrap(
                 spacing: 8,
@@ -248,7 +241,7 @@ class _FormularioMedicamentoState extends State<FormularioMedicamento> {
               ),
               if (_erro != null) ...[
                 const SizedBox(height: 14),
-                Text(_erro!, style: const TextStyle(color: CorApp.vermelho, fontWeight: FontWeight.w600)),
+                Text(_erro!, style: TextStyle(color: CorApp.vermelho, fontWeight: FontWeight.w600)),
               ],
               const SizedBox(height: 24),
               Botao(

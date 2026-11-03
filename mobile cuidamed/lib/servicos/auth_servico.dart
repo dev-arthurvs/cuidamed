@@ -10,8 +10,9 @@ class ResultadoLogin {
 class AuthServico {
   final ApiCliente _api = ApiCliente.instancia;
 
-  Future<ResultadoLogin> login(String email, String senha) async {
-    final resposta = await _api.post('/api/auth/login', {'email': email, 'senha': senha});
+  /// [identificador]: e-mail ou telefone.
+  Future<ResultadoLogin> login(String identificador, String senha) async {
+    final resposta = await _api.post('/api/auth/login', {'login': identificador, 'senha': senha});
     return ResultadoLogin(
       tipo: resposta['tipo'] as String,
       id: resposta['id'] as int,

@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
 import Botao from '../componentes/Botao'
 import Cabecalho from '../componentes/Cabecalho'
 import Cartao from '../componentes/Cartao'
@@ -12,7 +11,7 @@ import './Chat.css'
 const MENSAGEM_BOAS_VINDAS = {
   id: 'boas-vindas',
   autor: 'ia',
-  texto: 'Olá! Eu sou o assistente do CuidaMed. Pode me perguntar sobre seus remédios e horários.',
+  texto: 'Olá! Eu sou o assistente do CuidaMed. Pode me perguntar sobre seus remédios e como usar o sistema.',
 }
 
 const MENSAGEM_ERRO_CONEXAO = 'Não consegui me conectar ao servidor agora. Tente novamente em instantes.'
@@ -20,12 +19,11 @@ const MENSAGEM_ERRO_CONEXAO = 'Não consegui me conectar ao servidor agora. Tent
 const PERGUNTAS_SUGERIDAS = [
   'Quais remédios eu preciso tomar?',
   'Que horas eu tomo cada remédio?',
-  'Tem alguma observação sobre como tomar meus remédios?',
+  'Como eu troco minha senha?',
   'Eu tomei todos os remédios nos últimos dias?',
 ]
 
 export default function Chat() {
-  const { abrirMenu } = useOutletContext()
   const { usuario } = useApp()
 
   const [mensagens, setMensagens] = useState([MENSAGEM_BOAS_VINDAS])
@@ -65,7 +63,7 @@ export default function Chat() {
     setEnviando(true)
 
     try {
-      const json = await api.post(`/api/chat/${usuario.id}`, { mensagem: texto })
+      const json = await api.post(`/api/chat/${usuario.id}`, { mensagem: texto, plataforma: 'site' })
       setMensagens((atual) =>
         atual.map((item) => (item.id === idResposta ? { ...item, texto: json.resposta, digitando: false } : item)),
       )
@@ -83,7 +81,7 @@ export default function Chat() {
 
   return (
     <>
-      <Cabecalho kicker="Assistente" titulo="Chat" aoAbrirMenu={abrirMenu} />
+      <Cabecalho kicker="Assistente" titulo="Chat" />
       <div className="pagina-corpo">
         <div className="pagina-corpo__miolo chat">
           <Cartao className="chat__cartao">

@@ -29,9 +29,9 @@ Future<bool> confirmarAcao(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(titulo, style: const TextStyle(fontSize: 21, fontWeight: FontWeight.w800, color: CorApp.texto)),
+              Text(titulo, style: TextStyle(fontSize: 21, fontWeight: FontWeight.w700, color: CorApp.texto)),
               const SizedBox(height: 10),
-              Text(mensagem, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: CorApp.textoSuave, height: 1.45)),
+              Text(mensagem, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: CorApp.textoSuave, height: 1.45)),
               const SizedBox(height: 22),
               Row(
                 children: [

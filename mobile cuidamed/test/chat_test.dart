@@ -95,7 +95,7 @@ void main() {
       for (final pergunta in [
         'Quais remédios eu preciso tomar?',
         'Que horas eu tomo cada remédio?',
-        'Tem alguma observação sobre como tomar meus remédios?',
+        'Como eu troco minha senha?',
         'Eu tomei todos os remédios nos últimos dias?',
       ]) {
         final r = tester.getRect(find.text(pergunta));

@@ -1,0 +1,182 @@
+/* Cartão do paciente: visual de cartão de plano de saúde (azul-marinho, com
+   brilho e círculos decorativos, chip dourado e dados em caixa alta). */
+.cartao-paciente {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: 300px;
+  padding: 26px 28px 24px;
+  border-radius: 22px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 105% -10%, rgba(255, 255, 255, 0.16) 0 30%, transparent 31%),
+    radial-gradient(circle at 92% 115%, rgba(74, 168, 240, 0.28) 0 34%, transparent 35%),
+    var(--fundo-cartao-paciente);
+  box-shadow:
+    0 18px 40px rgba(11, 47, 99, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.cartao-paciente__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cartao-paciente__tipo {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.cartao-paciente__identificacao {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Chip dourado, como nos cartões de verdade. */
+.cartao-paciente__chip {
+  width: 46px;
+  height: 34px;
+  border-radius: 7px;
+  background:
+    linear-gradient(90deg, transparent 47%, rgba(120, 86, 20, 0.35) 47% 53%, transparent 53%),
+    linear-gradient(0deg, transparent 30%, rgba(120, 86, 20, 0.35) 30% 36%, transparent 36% 64%, rgba(120, 86, 20, 0.35) 64% 70%, transparent 70%),
+    linear-gradient(135deg, #f6dd96, #d8a945 60%, #b98a2a);
+  box-shadow: inset 0 0 0 1px rgba(90, 64, 14, 0.25);
+}
+
+.cartao-paciente__nome {
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  line-height: 1.2;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+.cartao-paciente__dados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  margin: 0;
+}
+
+.cartao-paciente__dados dt {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  opacity: 0.75;
+}
+
+.cartao-paciente__dados dd {
+  margin: 2px 0 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.cartao-paciente__numero {
+  letter-spacing: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+.cartao-paciente__rodape {
+  margin-top: auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.cartao-paciente__doses {
+  display: flex;
+  gap: 24px;
+}
+
+.cartao-paciente__dose {
+  display: flex;
+  flex-direction: column;
+}
+
+.cartao-paciente__dose strong {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+/* Bolinha colorida identifica cada contador (verde, azul, amarelo). */
+.cartao-paciente__dose span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.cartao-paciente__dose span::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.cartao-paciente__dose--tomado span::before {
+  background: #5fd39b;
+}
+
+.cartao-paciente__dose--a-tomar span::before {
+  background: #7cc2ff;
+}
+
+.cartao-paciente__dose--atrasado span::before {
+  background: #f2c25b;
+}
+
+.cartao-paciente__agenda {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.cartao-paciente__agenda:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+@media (max-width: 640px) {
+  .cartao-paciente {
+    padding: 22px 20px 20px;
+  }
+
+  .cartao-paciente__nome {
+    font-size: 20px;
+  }
+
+  .cartao-paciente__dados {
+    gap: 10px 22px;
+  }
+
+  .cartao-paciente__agenda {
+    width: 100%;
+    justify-content: center;
+  }
+}

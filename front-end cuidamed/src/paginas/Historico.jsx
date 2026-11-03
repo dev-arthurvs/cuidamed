@@ -1,10 +1,13 @@
 import { useMemo, useState } from 'react'
-import { useOutletContext, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
+import Botao from '../componentes/Botao'
 import Cabecalho from '../componentes/Cabecalho'
+import RelatorioDoses from '../componentes/RelatorioDoses'
 import VoltarDetalhesPaciente from '../componentes/VoltarDetalhesPaciente'
 import Rotulo from '../componentes/Rotulo'
 import { useApp } from '../contexto/useApp'
 import { ESTILO_STATUS } from '../dados/dadosMock'
+import { dosesSemRegistro } from '../utilitarios/horarios'
 import { DATA_MINIMA } from '../utilitarios/mascaras'
 import './Historico.css'
 
@@ -36,14 +39,15 @@ function formatarDiaMes(dataIso) {
 export default function Historico() {
   const { pacientes, pacienteFoco, usuario } = useApp()
   const { pacienteId } = useParams()
-  const { abrirMenu } = useOutletContext()
   const [filtroMedicamento, setFiltroMedicamento] = useState('todos')
 
   const paciente = pacienteId ? pacientes.find((item) => String(item.id) === pacienteId) : pacienteFoco
 
   const nomesMedicamentos = useMemo(() => {
     if (!paciente) return []
-    return [...new Set(paciente.historico.map((item) => item.medicamento))].sort()
+    return [
+      ...new Set([...paciente.historico.map((item) => item.medicamento), ...paciente.medicamentos.map((item) => item.nome)]),
+    ].sort()
   }, [paciente])
 
   const hoje = useMemo(() => {
@@ -75,7 +79,10 @@ export default function Historico() {
 
   const entradasFiltradas = useMemo(() => {
     if (!paciente) return []
-    return paciente.historico
+    // Registros do banco + doses que passaram do horário sem registro (as
+    // mesmas que o Início mostra como atrasadas/perdidas).
+    const semRegistro = dosesSemRegistro(paciente.medicamentos, paciente.historico, dataInicio, dataFim)
+    return [...paciente.historico, ...semRegistro]
       .map((item) => ({ ...item, diferenca: diasDeDiferenca(item.data, hoje) }))
       .filter((item) => item.data >= dataInicio && item.data <= dataFim)
       .filter((item) => filtroMedicamento === 'todos' || item.medicamento === filtroMedicamento)
@@ -85,7 +92,7 @@ export default function Historico() {
   if (!paciente) {
     return (
       <>
-        <Cabecalho kicker="Registro de doses" titulo="Histórico" aoAbrirMenu={abrirMenu} />
+        <Cabecalho kicker="Registro de doses" titulo="Histórico de doses" />
         <div className="pagina-corpo">
           <p>Nenhum paciente selecionado.</p>
         </div>
@@ -103,8 +110,7 @@ export default function Historico() {
     <>
       <Cabecalho
         kicker="Registro de doses"
-        titulo={usuario.tipo === 'cuidador' ? `Histórico de ${paciente.nome}` : 'Histórico'}
-        aoAbrirMenu={abrirMenu}
+        titulo={usuario.tipo === 'cuidador' ? `Histórico de doses de ${paciente.nome}` : 'Histórico de doses'}
       />
       <div className="pagina-corpo">
         <div className="pagina-corpo__miolo historico">
@@ -174,6 +180,10 @@ export default function Historico() {
                 <div className="historico__resumo-rotulo">Perdidas</div>
               </div>
             </div>
+
+            <Botao variante="secundario" larguraTotal onClick={() => window.print()}>
+              Gerar relatório (PDF)
+            </Botao>
           </div>
 
           <div className="historico__lista">
@@ -186,7 +196,7 @@ export default function Historico() {
                     <span className="historico__ponto" style={{ background: ESTILO_STATUS[item.status].ponto }} />
                     <div className="historico__item-hora">{item.horario}</div>
                     <div className="historico__item-nome">{item.medicamento}</div>
-                    <div className="historico__item-dose">{item.dosagem}</div>
+                    {item.dosagem && <div className="historico__item-dose">{item.dosagem}</div>}
                     <Rotulo status={item.status} />
                   </div>
                 </div>
@@ -198,6 +208,7 @@ export default function Historico() {
           </div>
         </div>
       </div>
+      <RelatorioDoses paciente={paciente} entradas={entradasFiltradas} dataInicio={dataInicio} dataFim={dataFim} />
     </>
   )
 }

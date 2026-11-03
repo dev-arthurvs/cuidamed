@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes, useParams } from 'react-router-dom'
 import LayoutApp from './componentes/LayoutApp'
 import RotaProtegida from './componentes/RotaProtegida'
 import { useApp } from './contexto/useApp'
@@ -13,11 +13,15 @@ import PainelIdoso from './paginas/PainelIdoso'
 const Acessibilidade = lazy(() => import('./paginas/Acessibilidade'))
 const Cadastro = lazy(() => import('./paginas/Cadastro'))
 const Chat = lazy(() => import('./paginas/Chat'))
-const CiclosEncerrados = lazy(() => import('./paginas/CiclosEncerrados'))
 const DefinirSenha = lazy(() => import('./paginas/DefinirSenha'))
 const EdicaoPerfil = lazy(() => import('./paginas/EdicaoPerfil'))
 const Historico = lazy(() => import('./paginas/Historico'))
-const PainelPaciente = lazy(() => import('./paginas/PainelPaciente'))
+
+// O antigo "Painel do paciente" agora faz parte dos detalhes do paciente.
+function RedirecionarParaDetalhes() {
+  const { pacienteId } = useParams()
+  return <Navigate to={`/cuidador/paciente/${pacienteId}`} replace />
+}
 
 function PainelPrincipal() {
   const { usuario } = useApp()
@@ -41,14 +45,14 @@ export default function App() {
         <Route element={<LayoutApp />}>
           <Route path="/painel" element={<PainelPrincipal />} />
           <Route path="/cuidador/paciente/:pacienteId" element={<PainelCuidador />} />
-          <Route element={<RotaProtegida tiposPermitidos={['cuidador']} />}>
-            <Route path="/cuidador/paciente/:pacienteId/painel" element={<PainelPaciente />} />
-          </Route>
+          <Route path="/cuidador/paciente/:pacienteId/painel" element={<RedirecionarParaDetalhes />} />
           <Route path="/agenda" element={<AgendaMedicamentos />} />
-          <Route path="/ciclos-encerrados" element={<CiclosEncerrados />} />
+          {/* Tratamentos encerrados viraram a aba "Encerrados" da Agenda. */}
+          <Route path="/ciclos-encerrados" element={<Navigate to="/agenda?aba=encerrados" replace />} />
           <Route path="/historico" element={<Historico />} />
           <Route path="/historico/:pacienteId" element={<Historico />} />
-          <Route path="/perfil" element={<EdicaoPerfil />} />
+          <Route path="/configuracoes" element={<EdicaoPerfil />} />
+          <Route path="/perfil" element={<Navigate to="/configuracoes" replace />} />
           <Route path="/chat" element={<Chat />} />
           <Route path="/acessibilidade" element={<Acessibilidade />} />
         </Route>

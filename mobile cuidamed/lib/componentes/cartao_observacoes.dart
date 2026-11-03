@@ -81,7 +81,7 @@ class _CartaoObservacoesState extends State<CartaoObservacoes> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text('Observações clínicas', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+          const Text('Observações clínicas', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
           const SizedBox(height: 10),
           TextField(
             controller: _controller,
@@ -89,8 +89,8 @@ class _CartaoObservacoesState extends State<CartaoObservacoes> {
             maxLines: 8,
             keyboardType: TextInputType.multiline,
             textCapitalization: TextCapitalization.sentences,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Color(0xFF3C5C80), height: 1.5),
-            decoration: const InputDecoration(
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: CorApp.textoLabel, height: 1.5),
+            decoration: InputDecoration(
               fillColor: CorApp.fundoCard,
               hintText: 'Ex.: alergia a dipirona, toma os remédios em jejum, dificuldade para engolir comprimidos...',
               hintMaxLines: 3,

@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:cuidamed_mobile/componentes/data_hora_atual.dart';
 import 'package:cuidamed_mobile/paginas/painel_cuidador.dart';
+import 'package:cuidamed_mobile/utilitarios/horarios.dart';
 
 import 'apoio.dart';
 
@@ -19,6 +20,10 @@ void main() {
   testWidgets('Indicadores com as contas do web', (tester) async {
     await montarPagina(tester, estadoCuidador(), '/painel', (_) => const PainelCuidador(), tamanho: _desktop);
     // estadoCuidador: 1 paciente, 2 medicamentos (1 ativo + 1 encerrado), 1 dose tomada.
+    final estado = estadoCuidador();
+    final dados = estado.pacientes.first;
+    final adesao = calcularAdesao(dados.historico, medicamentos: dados.medicamentos);
+    expect(adesao, lessThan(100)); // doses passadas sem registro contam como perdidas
     String valorDo(String rotulo) {
       final coluna = find.ancestor(of: find.text(rotulo).first, matching: find.byType(Column)).first;
       return tester.widgetList<Text>(find.descendant(of: coluna, matching: find.byType(Text))).first.data!;
@@ -26,7 +31,7 @@ void main() {
 
     expect(valorDo('Pacientes vinculados'), '1');
     expect(valorDo('Precisam de atenção'), isIn(['0', '1'])); // depende do horário em que o teste roda
-    expect(valorDo('Adesão média (30 dias)'), '100%');
+    expect(valorDo('Adesão média (30 dias)'), '$adesao%');
     expect(valorDo('Medicamentos monitorados'), '1'); // o encerrado não conta
     expect(find.textContaining('· 1 medicamentos'), findsOneWidget);
     expect(find.text('Acompanhe seus pacientes'), findsOneWidget);

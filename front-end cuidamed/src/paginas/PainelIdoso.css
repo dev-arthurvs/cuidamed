@@ -1,6 +1,7 @@
 .painel-idoso {
   display: grid;
-  grid-template-columns: 1.6fr 1fr;
+  /* Cartão do paciente e "Próximo medicamento" lado a lado, mesma altura. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 22px;
   align-items: stretch;
 }
@@ -43,67 +44,12 @@
 .painel-idoso__proximo {
   border-radius: var(--raio-grande);
   padding: 28px;
-  background: var(--gradiente-azul);
+  /* Cor oposta ao fundo da tela (escura no modo claro, clara no escuro). */
+  background: var(--fundo-card-dose);
   color: #fff;
-  box-shadow: 0 14px 32px rgba(21, 96, 196, 0.22);
+  box-shadow: 0 14px 32px rgba(11, 47, 99, 0.3);
   display: flex;
   flex-direction: column;
-}
-
-.painel-idoso__proximo-kicker {
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  opacity: 0.9;
-}
-
-.painel-idoso__proximo-linha {
-  display: flex;
-  align-items: flex-end;
-  gap: 16px;
-  margin: 12px 0 6px;
-  flex-wrap: wrap;
-}
-
-.painel-idoso__proximo-hora {
-  font-size: 56px;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -2px;
-}
-
-.painel-idoso__proximo-nome {
-  font-size: 28px;
-  font-weight: 800;
-  margin-top: 12px;
-}
-
-.painel-idoso__proximo-dose {
-  font-size: 18px;
-  font-weight: 600;
-  opacity: 0.92;
-}
-
-.painel-idoso__proximo-botao {
-  margin-top: 22px;
-  align-self: flex-start;
-  background: var(--fundo-card);
-  color: var(--azul-texto);
-  box-shadow: 0 8px 18px rgba(9, 38, 80, 0.18);
-}
-
-.painel-idoso__coluna-direita {
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  min-height: 0;
-}
-
-.painel-idoso__link {
-  font-size: 16px;
-  font-weight: 800;
-  color: var(--azul);
-  text-decoration: none;
 }
 
 .painel-idoso__lista-doses {
@@ -124,7 +70,7 @@
 
 .painel-idoso__dose-hora {
   font-size: 21px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--azul-texto);
   min-width: 66px;
 }
@@ -136,50 +82,11 @@
 
 .painel-idoso__dose-nome {
   font-size: 19px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .painel-idoso__dose-dosagem {
   font-size: 16px;
   font-weight: 600;
   color: var(--texto-suave);
-}
-
-.painel-idoso__estatisticas {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-  /* Sem os "Acessos rápidos", os contadores ocupam a coluna toda e ficam da
-     mesma altura do card "Próximo medicamento" (sem espaço vazio embaixo). */
-  flex: 1;
-}
-
-.painel-idoso__estatistica {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: var(--fundo-card);
-  border: 1px solid var(--borda);
-  border-radius: 20px;
-  padding: 20px 14px;
-  text-align: center;
-  box-shadow: var(--sombra-card);
-}
-
-.painel-idoso__estatistica-numero {
-  font-size: 32px;
-  font-weight: 800;
-}
-
-.painel-idoso__estatistica-rotulo {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--texto-suave);
-}
-
-@media (max-width: 640px) {
-  .painel-idoso__proximo-hora {
-    font-size: 42px;
-  }
 }

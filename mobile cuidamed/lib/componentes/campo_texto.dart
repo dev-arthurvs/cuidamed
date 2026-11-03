@@ -96,7 +96,7 @@ class _CampoTextoState extends State<CampoTexto> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(widget.rotulo, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Color(0xFF33506F))),
+          Text(widget.rotulo, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: CorApp.textoLabel)),
           const SizedBox(height: 8),
           campo,
         ],

@@ -1,0 +1,82 @@
+ONDE FICA CADA COISA
+- No site: o menu do topo tem "Início", "Agenda" e "Histórico de doses". O Chat abre pelo botão azul no canto inferior direito.
+- No aplicativo: a barra inferior tem "Início", "Agenda", "Histórico" e "Chat".
+- Nos dois: a engrenagem no topo abre "Configurações", e o botão "?" no topo mostra a ajuda da tela atual.
+
+REGISTRAR E DESFAZER DOSE
+1. Em "Início", o card "Doses de hoje" mostra a dose da vez em letra grande.
+2. Depois de tomar o remédio, escolha "Registrar dose".
+3. Registrou sem querer? Escolha "Desfazer" logo depois, ou volte até a dose tomada e escolha "Desfazer". Só dá para desfazer as doses de hoje.
+Para ver as outras doses do dia, use as setas do card: a de cima, no canto superior, volta para a dose anterior; a de baixo, no canto inferior, vai para a próxima.
+A lista "Agenda de hoje", no fim da tela, mostra todos os horários do dia.
+
+CADASTRAR UM REMÉDIO (só se o paciente puder alterar os próprios remédios)
+1. Abra "Agenda" e escolha "+ Inserir medicamento".
+2. Preencha "Nome do medicamento", "Forma" e "Frequência".
+3. Preencha "Estoque atual" e "Quantidade por dose", quando aparecerem.
+4. Em "Horários das doses", informe os horários. Para mais de um, use "Adicionar horário".
+5. Preencha "Data de início" e, se o tratamento tiver fim, "Data de fim (opcional)".
+6. Se precisar, escreva em "Observações / prescrição".
+7. Escolha "Adicionar medicamento".
+
+EDITAR OU EXCLUIR UM REMÉDIO (só se o paciente puder alterar os próprios remédios)
+1. Abra "Agenda", na aba "Em uso".
+2. No card do remédio, escolha "Editar" ou "Excluir".
+3. Ao editar, termine com "Salvar alterações".
+Remédios da aba "Encerrados" não podem ser editados nem excluídos. O remédio vai sozinho para essa aba quando o tratamento termina.
+
+SE O PACIENTE NÃO PODE ALTERAR OS REMÉDIOS
+Os botões de inserir, editar e excluir não aparecem. Só o cuidador pode fazer a alteração ou liberar essa permissão.
+
+ESTOQUE
+O estoque de cada remédio aparece no card dele, em "Agenda". Para corrigir a quantidade, edite o remédio e mude "Estoque atual". Cada dose registrada como tomada já desconta do estoque sozinha. Quando um remédio está acabando, o card "Estoque acabando" aparece em "Início".
+
+VER O HISTÓRICO E GERAR RELATÓRIO
+1. Abra o histórico de doses.
+2. Escolha o período nos campos "De" e "Até".
+3. Para ver um só remédio, use o filtro "Medicamento".
+4. Para imprimir ou salvar e levar ao médico, escolha "Gerar relatório (PDF)".
+
+TROCAR A SENHA
+1. Abra "Configurações", pela engrenagem no topo.
+2. No card "Senha", preencha "Senha atual", "Nova senha" (mínimo de 8 caracteres) e "Confirmar nova senha".
+3. Escolha "Atualizar senha".
+
+ESQUECI A SENHA
+1. Na tela de entrada, escolha "Esqueci minha senha".
+2. Peça ao cuidador um código de nova senha. O código vale por 24 horas.
+3. Preencha o e-mail ou telefone cadastrado, o código e a nova senha.
+Quem não tem cuidador ainda não tem como recuperar a senha pelo aplicativo.
+
+AUMENTAR A LETRA
+1. Abra "Configurações", pela engrenagem no topo.
+2. No card "Aparência", em "Tamanho da fonte", escolha "Pequena", "Média" ou "Grande".
+A mudança vale na hora.
+
+MODO ESCURO
+1. Abra "Configurações", pela engrenagem no topo.
+2. No card "Aparência", em "Tema", escolha "Claro" ou "Escuro".
+
+ALTERAR NOME, TELEFONE OU E-MAIL
+1. Abra "Configurações", pela engrenagem no topo.
+2. No card "Dados pessoais", altere o que precisar.
+3. Escolha "Salvar alterações".
+O telefone com DDD é o número que o cuidador usa para mandar lembretes pelo WhatsApp.
+
+CUIDADOR
+- Quem tem cuidador vê os dados dele em "Configurações", no card "Cuidador(a) responsável".
+- Quem não tem: em "Configurações", no card "Vincular cuidador(a)", informe o e-mail ou telefone do cuidador e escolha "Enviar solicitação". O cuidador já precisa ter conta e tem que confirmar o pedido.
+- O cuidador vê as doses do paciente e recebe um aviso quando uma dose fica atrasada, com o aplicativo dele aberto.
+- Para desfazer o vínculo, o paciente precisa falar com o cuidador.
+
+LEMBRETES
+- No site: os lembretes só tocam com a página aberta. Quando aparecer a faixa azul em "Início", escolha "Ativar" para receber som e notificação.
+- No aplicativo no celular: os lembretes tocam mesmo com o aplicativo fechado, se as notificações estiverem permitidas no aparelho.
+
+SAIR E ENTRAR
+- Para sair: abra "Configurações" e escolha "Sair da conta".
+- Sem uso, a conta sai sozinha depois de 30 minutos no site e de 7 dias no aplicativo. Para continuar conectado, marque "Lembrar de mim" ao entrar.
+
+AJUDA E CHAT
+- O guia completo fica em "Configurações", no botão "Ajuda e acessibilidade".
+- O chat tem um limite de perguntas por hora e por dia. Se aparecer o aviso de limite, é só esperar um pouco e perguntar de novo.

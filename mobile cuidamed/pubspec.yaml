@@ -45,6 +45,14 @@ dependencies:
   url_launcher: ^6.3.2
   shared_preferences: ^2.5.5
   intl: ^0.20.2
+  pdf: ^3.12.0
+  printing: ^5.14.3
+  timezone: ^0.11.2
+
+# O Flutter fixa archive 4.0.9, e as versões novas de image (usada pelo pacote de
+# PDF) precisam de um archive mais novo.
+dependency_overrides:
+  image: 4.5.4
 
 dev_dependencies:
   flutter_test:
@@ -72,8 +80,8 @@ flutter:
   assets:
     - assets/sons/
 
-  # Nunito — mesma fonte do front-end web (Google Fonts), embutida no app pra
-  # funcionar offline. Licença: assets/fonts/OFL.txt (SIL Open Font License).
+  # Source Sans 3 — mesma fonte do front-end web (Google Fonts), embutida no app
+  # pra funcionar offline. Licença: assets/fonts/SourceSans3-OFL.txt (SIL Open Font License).
   fonts:
     - family: Source Sans 3
       fonts:

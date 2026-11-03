@@ -59,9 +59,9 @@ class DataHoraCabecalho extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(formatarDataPorExtenso(agora),
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: CorApp.texto)),
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: CorApp.texto)),
           Text('${formatarHora(agora)} · Agora',
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: CorApp.textoSuave)),
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: CorApp.textoSuave)),
         ],
       ),
     );
@@ -84,7 +84,7 @@ class FaixaDataHora extends StatelessWidget {
         ),
         child: Row(
           children: [
-            const Icon(Icons.calendar_today_outlined, size: 22, color: CorApp.azulTexto),
+            Icon(Icons.calendar_today_outlined, size: 22, color: CorApp.azulTexto),
             const SizedBox(width: 12),
             // Data e hora empilhadas (como no cabeçalho do web) — lado a lado a
             // data quebrava em duas linhas e espremia a hora.
@@ -93,9 +93,9 @@ class FaixaDataHora extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(formatarDataPorExtenso(agora),
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: CorApp.texto)),
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: CorApp.texto)),
                   Text('${formatarHora(agora)} · Agora',
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: CorApp.textoSuave)),
+                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: CorApp.textoSuave)),
                 ],
               ),
             ),
@@ -130,11 +130,11 @@ class AvatarUsuario extends StatelessWidget {
         width: tamanho,
         height: tamanho,
         alignment: Alignment.center,
-        decoration: const BoxDecoration(gradient: CorApp.gradienteAzul, shape: BoxShape.circle),
+        decoration: BoxDecoration(gradient: CorApp.gradienteAzul, shape: BoxShape.circle),
         child: Text(
           _iniciais,
           textScaler: TextScaler.noScaling, // cabe sempre no círculo, mesmo com fonte grande
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: tamanho * 0.36),
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: tamanho * 0.36),
         ),
       ),
     );

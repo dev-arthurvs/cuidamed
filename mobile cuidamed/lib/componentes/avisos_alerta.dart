@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../estado/monitor_alertas.dart';
@@ -14,7 +15,8 @@ void dispararAlerta(AlertaPaciente alerta, {NotificacaoServico? servico}) {
   final notificacoes = servico ?? NotificacaoServico.instancia;
   mostrarAlertaNaTela(alerta);
   notificacoes.tocarAlerta();
-  notificacoes.notificar(alerta.titulo, alerta.mensagem);
+  // No navegador não há agendamento: lá a notificação sai sempre daqui.
+  if (kIsWeb || !alerta.notificacaoAgendada) notificacoes.notificar(alerta.titulo, alerta.mensagem);
 }
 
 void mostrarAlertaNaTela(AlertaPaciente alerta) {
@@ -37,7 +39,7 @@ void mostrarAlertaNaTela(AlertaPaciente alerta) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(alerta.titulo, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16, color: Colors.white)),
+                  Text(alerta.titulo, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Colors.white)),
                   const SizedBox(height: 2),
                   Text(alerta.mensagem, style: const TextStyle(fontSize: 15, color: Colors.white)),
                 ],
@@ -96,12 +98,12 @@ class _FaixaAtivarNotificacoesState extends State<FaixaAtivarNotificacoes> {
         children: [
           ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 520),
-            child: const Column(
+            child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text('Ative os lembretes sonoros e notificações',
-                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: CorApp.texto)),
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: CorApp.texto)),
                 SizedBox(height: 4),
                 Text(
                   'Receba um aviso no dispositivo e um som quando for a hora de tomar um remédio.',

@@ -1,6 +1,9 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:timezone/timezone.dart' as tz;
+
+import '../estado/lembretes_agendados.dart';
 
 /// Situação da permissão de notificação — espelha o Notification.permission
 /// do web ('default' | 'granted' | 'denied' | 'unsupported').
@@ -112,6 +115,43 @@ class NotificacaoServico {
     } catch (erro) {
       debugPrint('Falha ao notificar: $erro');
     }
+  }
+
+  /// Troca os lembretes agendados no celular por [lembretes]: tocam mesmo com o
+  /// app fechado. No navegador não existe agendamento (lá o aviso sai com a
+  /// página aberta). Se o Android não liberar o horário exato, usa o aproximado.
+  Future<void> agendarLembretes(List<LembreteAgendado> lembretes) async {
+    if (kIsWeb) return;
+    await inicializar();
+    try {
+      await _plugin.cancelAllPendingNotifications();
+      final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      final exato = await android?.canScheduleExactNotifications() ?? true;
+      for (final lembrete in lembretes) {
+        await _plugin.zonedSchedule(
+          id: lembrete.id,
+          title: lembrete.titulo,
+          body: lembrete.corpo,
+          // Em UTC basta: é o mesmo instante, e o horário local já foi resolvido.
+          scheduledDate: tz.TZDateTime.from(lembrete.quando, tz.UTC),
+          notificationDetails: const NotificationDetails(
+            android: _canalAndroid,
+            iOS: DarwinNotificationDetails(presentAlert: true, presentSound: true),
+          ),
+          androidScheduleMode: exato ? AndroidScheduleMode.exactAllowWhileIdle : AndroidScheduleMode.inexactAllowWhileIdle,
+        );
+      }
+    } catch (erro) {
+      debugPrint('Falha ao agendar lembretes: $erro');
+    }
+  }
+
+  Future<void> cancelarLembretes() async {
+    if (kIsWeb) return;
+    await inicializar();
+    try {
+      await _plugin.cancelAllPendingNotifications();
+    } catch (_) {}
   }
 
   Future<void> _prepararSom() async {

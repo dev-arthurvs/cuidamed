@@ -33,7 +33,7 @@ class Medicamento {
       id: json['id'] as int,
       pacienteId: json['pacienteId'] as int,
       nome: json['nome'] as String,
-      dosagem: json['dosagem'] as String,
+      dosagem: json['dosagem'] as String? ?? '', // opcional: saiu do formulário
       forma: json['forma'] as String,
       frequencia: json['frequencia'] as String,
       dataInicio: DateTime.parse(json['dataInicio']),

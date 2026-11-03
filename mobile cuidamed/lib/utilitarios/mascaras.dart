@@ -2,6 +2,12 @@ import 'package:flutter/services.dart';
 
 String _apenasDigitos(String texto) => texto.replaceAll(RegExp(r'\D'), '');
 
+/// Tem DDD + número? (10 dígitos no fixo, 11 no celular.)
+bool telefoneCompleto(String texto) {
+  final tamanho = _apenasDigitos(texto).length;
+  return tamanho == 10 || tamanho == 11;
+}
+
 /// Telefone brasileiro: "(79) 99999-9999" (celular, 11 dígitos) ou
 /// "(79) 3333-4444" (fixo, 10 dígitos) — mesma regra do web (mascaras.js).
 String formatarTelefone(String texto) {

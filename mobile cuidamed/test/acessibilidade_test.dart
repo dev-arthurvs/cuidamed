@@ -16,12 +16,14 @@ void main() {
 
     final passo = guiaSecoes.firstWhere((s) => s.chave == 'historico').passos.first;
     expect(find.text(passo), findsNothing);
-    await rolarAte(tester, find.text('Histórico'));
-    await tester.tap(find.text('Histórico'));
+    // "Histórico" também é rótulo da barra inferior — procura só no ListView.
+    final titulo = find.descendant(of: find.byType(ListView), matching: find.text('Histórico de doses'));
+    await rolarAte(tester, titulo);
+    await tester.tap(titulo);
     await tester.pumpAndSettle();
     expect(find.text(passo), findsOneWidget);
 
-    await tester.tap(find.text('Histórico'));
+    await tester.tap(titulo);
     await tester.pumpAndSettle();
     expect(find.text(passo), findsNothing);
   });
@@ -37,7 +39,7 @@ void main() {
     final estado = estadoPaciente()..tamanhoFonte = 'grande';
     await montarPagina(tester, estado, '/acessibilidade', (_) => const Acessibilidade());
     for (final secao in guiaSecoes.where((s) => s.visivelPara('paciente'))) {
-      // "Farmácias" também é rótulo da barra inferior — procura só no ListView.
+      // Alguns títulos (ex.: "Histórico") também são rótulos da barra inferior — procura só no ListView.
       final titulo = find.descendant(of: find.byType(ListView), matching: find.text(secao.titulo));
       await rolarAte(tester, titulo);
       await tester.tap(titulo);
@@ -58,7 +60,7 @@ void main() {
     expect(obterChaveAjuda('/painel', 'cuidador'), 'inicio-cuidador');
     expect(obterChaveAjuda('/painel', 'paciente'), 'inicio-paciente');
     expect(obterChaveAjuda('/cuidador/paciente/3', 'cuidador'), 'detalhes-paciente');
-    expect(obterChaveAjuda('/cuidador/paciente/3/painel', 'cuidador'), 'painel-paciente-config');
+    expect(obterChaveAjuda('/cuidador/paciente/3/painel', 'cuidador'), 'detalhes-paciente');
     expect(obterChaveAjuda('/historico/3', 'cuidador'), 'historico');
     expect(obterChaveAjuda('/login', 'paciente'), isNull);
   });

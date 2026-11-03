@@ -76,6 +76,8 @@ class PacienteServico {
 
   Future<void> excluir(int id) => _api.delete('/api/pacientes/$id');
 
+  Future<void> gerarCodigoNovaSenha(int id) => _api.post('/api/pacientes/$id/codigo-nova-senha');
+
   static String _formatarData(DateTime data) =>
       '${data.year.toString().padLeft(4, '0')}-${data.month.toString().padLeft(2, '0')}-${data.day.toString().padLeft(2, '0')}';
 }

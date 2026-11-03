@@ -68,7 +68,9 @@ const int diasJanelaAdesao = 30;
 
 /// Adesão dos últimos 30 dias (hoje incluso) — é o período que as telas
 /// anunciam ("Adesão média (30 dias)"). Antes considerava o histórico inteiro.
-int calcularAdesao(List<Historico> historico, {String? hojeIso}) {
+/// Dose que passou do limite sem registro conta como perdida, a mesma regra do
+/// Início e do Histórico; a atrasada ainda não conta, porque ainda pode ser tomada.
+int calcularAdesao(List<Historico> historico, {List<Medicamento> medicamentos = const [], String? hojeIso}) {
   final hoje = DateTime.parse(hojeIso ?? dataAtualISO());
   final inicioIso = dataAtualISO(hoje.subtract(const Duration(days: diasJanelaAdesao - 1)));
   final hojeStr = dataAtualISO(hoje);
@@ -76,6 +78,9 @@ int calcularAdesao(List<Historico> historico, {String? hojeIso}) {
     final dia = dataAtualISO(h.data);
     return dia.compareTo(inicioIso) >= 0 && dia.compareTo(hojeStr) <= 0;
   }).toList();
+  recentes.addAll(
+    dosesSemRegistro(0, medicamentos, historico, DateTime.parse(inicioIso), hoje).where((d) => d.status == 'PERDIDO'),
+  );
   if (recentes.isEmpty) return 100;
   final tomados = recentes.where((h) => h.status.toLowerCase() == 'tomado').length;
   return ((tomados / recentes.length) * 100).round();
@@ -103,6 +108,54 @@ bool medicamentoIniciado(Medicamento medicamento, {String? hojeIso}) =>
 int _diasEntre(String deIso, String ateIso) => DateTime.parse(ateIso).difference(DateTime.parse(deIso)).inDays;
 
 String _somarDias(String dataIso, int dias) => dataAtualISO(DateTime.parse(dataIso).add(Duration(days: dias)));
+
+/// Doses que já passaram do horário e não têm registro no histórico (ninguém
+/// marcou "tomada" nem "perdida") — porta de dosesSemRegistro do web. O Início
+/// já as mostra como atrasadas ou perdidas; o Histórico usa isto para mostrar o
+/// mesmo. Dias anteriores: PERDIDO. Hoje: ATRASADO ou PERDIDO pela regra do
+/// Início (dose ainda no horário não entra). Nada é gravado no banco.
+List<Historico> dosesSemRegistro(
+  int pacienteId,
+  List<Medicamento> medicamentos,
+  List<Historico> historico,
+  DateTime de,
+  DateTime ate, {
+  DateTime? agora,
+}) {
+  final momento = agora ?? DateTime.now();
+  final hojeIso = dataAtualISO(momento);
+  final ateIso = dataAtualISO(ate).compareTo(hojeIso) > 0 ? hojeIso : dataAtualISO(ate);
+  // Não precisa varrer dias antes do primeiro tratamento.
+  var dia = dataAtualISO(de);
+  final inicios = medicamentos.map((m) => dataAtualISO(m.dataInicio)).toList()..sort();
+  if (inicios.isNotEmpty && inicios.first.compareTo(dia) > 0) dia = inicios.first;
+  final registrados = historico.map((h) => '${h.medicamentoId}|${dataAtualISO(h.data)}|${h.hora}').toSet();
+  final agoraEmMinutos = minutosAgora(momento);
+  final doses = <Historico>[];
+  for (; dia.compareTo(ateIso) <= 0; dia = _somarDias(dia, 1)) {
+    for (final medicamento in medicamentos) {
+      if (!temDoseNoDia(medicamento, diaIso: dia)) continue;
+      for (final horario in medicamento.horarios) {
+        if (registrados.contains('${medicamento.id}|$dia|$horario')) continue;
+        final status = dia.compareTo(hojeIso) < 0
+            ? 'perdido'
+            : calcularStatusAtual(horario, null, agoraEmMinutos: agoraEmMinutos);
+        if (status == 'pendente') continue;
+        doses.add(Historico(
+          id: 0, // não existe no banco
+          pacienteId: pacienteId,
+          medicamentoId: medicamento.id,
+          data: DateTime.parse(dia),
+          hora: horario,
+          nomeMedicamento: medicamento.nome,
+          dosagem: medicamento.dosagem,
+          status: status.toUpperCase(),
+        ));
+      }
+    }
+  }
+  return doses;
+}
 
 /// Frequências que não são diárias: "Dias alternados" = dose a cada 2 dias e
 /// "Semanal" = a cada 7, contando a partir da data de início. As demais
@@ -225,4 +278,28 @@ int calcularIdade(DateTime? nascimento, [DateTime? hoje]) {
       agora.month < nascimento.month || (agora.month == nascimento.month && agora.day < nascimento.day);
   if (aindaNaoFezAniversario) idade -= 1;
   return idade;
+}
+
+/// Remédio com estoque baixo ou esgotado, para o Início e o painel do cuidador.
+class AvisoEstoque {
+  final String nome;
+  final String texto;
+  final bool esgotado;
+  const AvisoEstoque({required this.nome, required this.texto, required this.esgotado});
+}
+
+List<AvisoEstoque> avisosEstoque(List<Medicamento> medicamentosAtivos, List<Historico> historico, {String? hojeIso}) {
+  final avisos = <AvisoEstoque>[];
+  for (final medicamento in medicamentosAtivos) {
+    final estoque = calcularEstoque(medicamento, historico: historico, hojeIso: hojeIso);
+    if (estoque == null) continue;
+    if (estoque.esgotado) {
+      avisos.add(AvisoEstoque(nome: medicamento.nome, texto: 'Estoque esgotado. Reponha o quanto antes.', esgotado: true));
+    } else if (estoque.baixo) {
+      final dias = estoque.diasRestantes;
+      final duracao = dias <= 0 ? 'não dá para o dia todo' : 'dura $dias dia${dias == 1 ? '' : 's'}';
+      avisos.add(AvisoEstoque(nome: medicamento.nome, texto: 'Restam ${estoque.quantidade} ${estoque.unidade} ($duracao).', esgotado: false));
+    }
+  }
+  return avisos;
 }

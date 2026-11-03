@@ -24,18 +24,45 @@ Repositório: https://github.com/dev-arthurvs/cuidamed (privado, branch `main`).
 - **Segredos** ficam em `back-end cuidamed/.env` (fora do Git) ou nas variáveis
   do Railway. Os `.env.example` listam os nomes sem valores.
 
+## Doses
+
+- Dose sem registro é calculada na tela, sem gravar nada: atrasada de 15 min a
+  3 h, perdida depois disso. Início, Histórico, adesão e relatório usam a mesma
+  regra (`dosesSemRegistro` em `horarios.js`/`horarios.dart`). O chat tem a mesma
+  regra em Java (`chat/ContextoDoChat.java`), com a hora de Brasília: mudou a regra,
+  mude nos três.
+- Registro de hoje pode ser desfeito (`DELETE /api/historicos/{id}`), o que devolve
+  o estoque.
+- O chat ensina a usar o app pelo guia `back-end cuidamed/src/main/resources/chat/guia-do-paciente.txt`:
+  mudou tela ou botão do paciente, atualize esse guia junto com o `ajudaConteudo`.
+- Lembretes com o app fechado: só no Android/iOS, agendados no aparelho
+  (`estado/lembretes_agendados.dart`). No navegador só tocam com a página aberta.
+  O aviso de dose atrasada ao cuidador só sai com o app aberto; não há push.
+
 ## Segurança (não afrouxar)
 
+- Login por e-mail **ou telefone** (`conta/Contato.java`; o telefone compara só
+  os dígitos). E-mail é opcional ("Não tenho e-mail" nos cadastros); conta com
+  senha precisa de um dos dois, e o telefone é único entre pacientes e cuidadores
+  (`conta/VerificadorDeContato.java`, regra na API, não no banco).
 - Login gera um JWT (7 dias), enviado como `Authorization: Bearer`. Rotas
   públicas: login, cadastro (`POST /api/cuidadores`, `POST /api/pacientes`),
   `POST /api/pacientes/definir-senha` e `GET /actuator/health`.
 - `seguranca/Autorizacao.java`: o paciente acessa só os próprios dados; o
-  cuidador, só os pacientes vinculados. Os controllers usam o id do token e
+  cuidador, só os pacientes vinculados. O vínculo fica na tabela
+  `pacientecuidador` (pacote `vinculo`), com histórico: PENDENTE → ATIVO →
+  ENCERRADO (ou RECUSADO/CANCELADO); no máximo um ATIVO e um PENDENTE por
+  paciente. O id do vínculo ativo é o "nº do cartão" do paciente. Os controllers usam o id do token e
   ignoram o `cuidadorId` enviado no corpo.
 - Remédios: o cuidador vinculado altera; o paciente só se `permiteAlteracoes`
   estiver ligado (ou se não tiver cuidador).
-- "Ativar meu acesso" exige e-mail + código de ativação (o cuidador vê o código
+- "Ativar meu acesso" exige e-mail ou telefone + código de ativação (o cuidador vê o código
   nos detalhes do paciente).
+- "Esqueci minha senha": o cuidador vinculado gera um código de nova senha
+  (`POST /api/pacientes/{id}/codigo-nova-senha`, vale 24 horas). O paciente usa na
+  mesma tela de "Ativar meu acesso". Quem não tem cuidador ainda não tem saída.
+- Sessão: sai sozinho após 30 min sem uso no web e 7 dias no mobile, a não ser
+  com "Lembrar de mim".
 - `seguranca/LimitadorDeTentativas.java`: limites por conta (login, ativação,
   chat), não por IP.
 

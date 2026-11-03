@@ -95,9 +95,38 @@
 }
 
 /* "Esqueci minha senha": discreto, alinhado à direita logo abaixo da senha. */
-.autenticacao__esqueci {
-  align-self: flex-end;
+/* "Lembrar de mim" à esquerda e "Esqueci minha senha" à direita, na mesma
+   linha logo abaixo da senha. */
+.autenticacao__opcoes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 16px;
   margin-top: -10px;
+}
+
+.autenticacao__lembrar {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--texto-label);
+  cursor: pointer;
+  user-select: none;
+}
+
+.autenticacao__lembrar input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--azul-solido);
+  cursor: pointer;
+}
+
+.autenticacao__esqueci {
+  margin-left: auto;
   font-size: 16px;
   font-weight: 600;
   color: var(--azul);
