@@ -35,7 +35,7 @@ class Cartao extends StatelessWidget {
                 children: [
                   if (titulo != null)
                     Expanded(
-                      child: Text(titulo!, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800, color: CorApp.texto)),
+                      child: Text(titulo!, style: TextStyle(fontSize: 19, fontWeight: FontWeight.w700, color: CorApp.texto)),
                     ),
                   ?acao,
                 ],

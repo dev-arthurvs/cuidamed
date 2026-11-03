@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:cuidamed_mobile/paginas/agenda_medicamentos.dart';
-import 'package:cuidamed_mobile/paginas/ciclos_encerrados.dart';
 import 'package:cuidamed_mobile/paginas/historico.dart';
 import 'package:cuidamed_mobile/paginas/painel_idoso.dart';
 import 'package:cuidamed_mobile/modelos/historico.dart';
@@ -12,11 +11,13 @@ import 'package:cuidamed_mobile/estado/app_estado.dart';
 import 'apoio.dart';
 
 void main() {
-  testWidgets('Agenda lista só ativos e abre o formulário de inserção', (tester) async {
+  testWidgets('Agenda abre em "Em uso" (só ativos) e abre o formulário de inserção', (tester) async {
     await montarPagina(tester, estadoPaciente(), '/agenda', (_) => const AgendaMedicamentos());
+    expect(find.text('1 medicamento em uso'), findsOneWidget);
     expect(find.text('Losartana'), findsOneWidget);
-    expect(find.text('Amoxicilina'), findsNothing); // ciclo já encerrado
-    expect(find.text('Ciclos encerrados (1)'), findsOneWidget);
+    expect(find.text('Amoxicilina'), findsNothing); // tratamento já encerrado
+    expect(find.text('Em uso'), findsOneWidget);
+    expect(find.text('Encerrados'), findsOneWidget);
 
     await rolarAte(tester, find.text('+ Inserir medicamento'));
     await tester.tap(find.text('+ Inserir medicamento'));
@@ -29,9 +30,9 @@ void main() {
     await montarPagina(tester, estadoCuidador(), '/agenda', (_) => const AgendaMedicamentos());
     expect(find.byType(FloatingActionButton), findsNothing);
     expect(find.text('Agenda de Maria'.toUpperCase()), findsOneWidget);
-    final encerrados = tester.getRect(find.textContaining('Ciclos encerrados'));
+    final abas = tester.getRect(find.text('Encerrados'));
     final inserir = tester.getRect(find.text('+ Inserir medicamento'));
-    expect(inserir.top, greaterThan(encerrados.bottom)); // celular: empilhado abaixo do link
+    expect(inserir.top, greaterThan(abas.bottom)); // celular: empilhado abaixo das abas
     expect(find.textContaining('Cadastre, edite ou remova'), findsNothing); // sem texto de finalidade
 
     await rolarAte(tester, find.text('Excluir'));
@@ -44,9 +45,9 @@ void main() {
     expect(find.text('Excluir medicamento?'), findsNothing);
     expect(find.text('Losartana'), findsOneWidget);
 
-    // Tela larga: "Ciclos encerrados" e o botão na mesma linha, à direita, como no web.
+    // Tela larga: abas à esquerda e o botão na mesma linha, à direita, como no web.
     await montarPagina(tester, estadoCuidador(), '/agenda', (_) => const AgendaMedicamentos(), tamanho: const Size(1200, 900));
-    final d = tester.getRect(find.textContaining('Ciclos encerrados'));
+    final d = tester.getRect(find.text('Encerrados'));
     final b = tester.getRect(find.text('+ Inserir medicamento'));
     expect(b.center.dy, closeTo(d.center.dy, 14));
     expect(b.left, greaterThan(d.right));
@@ -67,16 +68,34 @@ void main() {
     expect(find.textContaining('ainda não liberou alterações'), findsNothing);
   });
 
-  testWidgets('Ciclos encerrados lista o medicamento vencido', (tester) async {
-    await montarPagina(tester, estadoPaciente(), '/ciclos-encerrados', (_) => const CiclosEncerrados());
+  testWidgets('Aba "Encerrados" lista o tratamento vencido, sem inserir/editar', (tester) async {
+    await montarPagina(tester, estadoPaciente(), '/agenda', (_) => const AgendaMedicamentos());
+    await tester.tap(find.text('Encerrados'));
+    await tester.pumpAndSettle();
+    expect(find.text('1 tratamento encerrado'), findsOneWidget);
+    expect(find.text('Amoxicilina'), findsOneWidget);
+    expect(find.text('Losartana'), findsNothing);
+    expect(find.textContaining('Tratamento de '), findsOneWidget);
+    expect(find.text('+ Inserir medicamento'), findsNothing);
+    expect(find.text('Editar'), findsNothing);
+
+    // Volta para "Em uso".
+    await tester.tap(find.text('Em uso'));
+    await tester.pumpAndSettle();
+    expect(find.text('Losartana'), findsOneWidget);
+    expect(find.text('Amoxicilina'), findsNothing);
+  });
+
+  testWidgets('?aba=encerrados abre direto na aba "Encerrados"', (tester) async {
+    await montarPagina(tester, estadoCuidador(), '/agenda?aba=encerrados', (_) => const AgendaMedicamentos());
     expect(find.text('Amoxicilina'), findsOneWidget);
     expect(find.text('Losartana'), findsNothing);
   });
 
-  testWidgets('Ciclos encerrados: sem exclusão e card com 1/3 da largura em tela larga', (tester) async {
-    await montarPagina(tester, estadoPaciente(), '/ciclos-encerrados', (_) => const CiclosEncerrados(),
+  testWidgets('Encerrados: sem exclusão e card com 1/3 da largura em tela larga', (tester) async {
+    await montarPagina(tester, estadoPaciente(), '/agenda?aba=encerrados', (_) => const AgendaMedicamentos(),
         tamanho: const Size(1400, 900));
-    expect(find.text('Excluir definitivamente'), findsNothing);
+    expect(find.text('Excluir'), findsNothing);
     final lista = tester.getSize(find.byType(LayoutBuilder).last).width;
     final card = tester.getSize(find.ancestor(of: find.text('Amoxicilina'), matching: find.byType(SizedBox)).last).width;
     expect(card, closeTo((lista - 28) / 3, 1)); // um card só não estica na linha toda
@@ -108,8 +127,16 @@ void main() {
     await tester.enterText(find.byType(TextField).last, '${dd(antiga.day)}/${dd(antiga.month)}/${antiga.year}');
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
-    expect(find.text('06:00'), findsOneWidget);
-    expect(find.text('08:00'), findsOneWidget);
+    // O registro de 10 dias atrás aparece, junto com as doses daqueles dias que
+    // passaram sem registro (contam como perdidas, como no Início).
+    expect(find.text('08:00'), findsWidgets);
+    // Os mais antigos ficam no fim da lista: rola até aparecerem.
+    for (var i = 0; i < 40 && find.text('06:00').evaluate().isEmpty; i++) {
+      await tester.drag(find.byType(ListView).first, const Offset(0, -400));
+      await tester.pump();
+    }
+    expect(find.text('Amoxicilina'), findsWidgets);
+    expect(find.text('06:00'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 
@@ -123,7 +150,7 @@ void main() {
   testWidgets('Telas antigas com fonte grande em 360px não estouram', (tester) async {
     for (final (rota, pagina) in [
       ('/agenda', const AgendaMedicamentos() as Widget),
-      ('/ciclos-encerrados', const CiclosEncerrados()),
+      ('/agenda?aba=encerrados', const AgendaMedicamentos()),
       ('/historico', const HistoricoPagina()),
     ]) {
       await montarPagina(tester, estadoPaciente()..tamanhoFonte = 'grande', rota, (_) => pagina);

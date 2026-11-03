@@ -19,31 +19,13 @@
   min-width: 0;
 }
 
-.cabecalho__menu {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  border: 1.5px solid var(--borda);
-  background: var(--fundo-card);
-  color: var(--texto);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: none;
-  cursor: pointer;
-}
-
-.cabecalho__menu:hover {
-  background: var(--fundo-destaque);
-}
-
 .cabecalho__titulos {
   min-width: 0;
 }
 
 .cabecalho__kicker {
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--azul);
   letter-spacing: 0.6px;
   text-transform: uppercase;
@@ -51,7 +33,7 @@
 
 .cabecalho__titulo {
   font-size: 28px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.5px;
   margin: 0;
 }
@@ -68,7 +50,7 @@
 
 .cabecalho__dia {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .cabecalho__hora {
@@ -84,7 +66,7 @@
   background: var(--gradiente-azul);
   color: #fff;
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;

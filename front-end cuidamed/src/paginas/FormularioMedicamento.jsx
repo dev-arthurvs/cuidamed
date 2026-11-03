@@ -115,12 +115,6 @@ export default function FormularioMedicamento({ medicamentoExistente, aoFechar }
               value={form.nome}
               onChange={(e) => definirCampo('nome', e.target.value)}
             />
-            <Campo
-              rotulo="Dosagem"
-              placeholder={ehPomada ? 'Ex.: 1% (concentração)' : '50 mg'}
-              value={form.dosagem}
-              onChange={(e) => definirCampo('dosagem', e.target.value)}
-            />
             <Campo rotulo="Forma" tipo="select" value={form.forma} onChange={(e) => definirCampo('forma', e.target.value)}>
               {FORMAS_MEDICAMENTO.map((forma) => (
                 <option key={forma}>{forma}</option>

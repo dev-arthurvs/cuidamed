@@ -1,0 +1,23 @@
+.avisos-estoque {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.avisos-estoque__item {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 16px;
+  padding: 12px 16px;
+  border-radius: var(--raio-pequeno);
+  background: var(--amarelo-fundo);
+  color: var(--amarelo-texto);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.avisos-estoque__item--esgotado {
+  background: var(--vermelho-fundo);
+  color: var(--vermelho-texto);
+}

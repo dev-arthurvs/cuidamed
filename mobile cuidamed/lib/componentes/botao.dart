@@ -54,7 +54,7 @@ class Botao extends StatelessWidget {
               Flexible(
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
-                  child: Text(texto, maxLines: 1, style: TextStyle(fontSize: tamanhoTexto, fontWeight: FontWeight.w800)),
+                  child: Text(texto, maxLines: 1, style: TextStyle(fontSize: tamanhoTexto, fontWeight: FontWeight.w700)),
                 ),
               ),
             ],
@@ -100,7 +100,7 @@ class Botao extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             minimumSize: tamanhoMinimo,
             padding: larguraTotal ? const EdgeInsets.symmetric(horizontal: 12) : paddingLateral,
-            side: const BorderSide(color: CorApp.azul, width: 2),
+            side: BorderSide(color: CorApp.azul, width: 2),
             backgroundColor: CorApp.azulFundo,
             foregroundColor: CorApp.azulTexto,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RaioApp.medio)),
@@ -114,7 +114,7 @@ class Botao extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             minimumSize: tamanhoMinimo,
             padding: larguraTotal ? const EdgeInsets.symmetric(horizontal: 12) : paddingLateral,
-            side: const BorderSide(color: CorApp.borda, width: 1.5),
+            side: BorderSide(color: CorApp.borda, width: 1.5),
             foregroundColor: CorApp.texto,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RaioApp.medio)),
           ),
@@ -127,7 +127,7 @@ class Botao extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             minimumSize: tamanhoMinimo,
             padding: larguraTotal ? const EdgeInsets.symmetric(horizontal: 12) : paddingLateral,
-            side: const BorderSide(color: CorApp.vermelho, width: 2),
+            side: BorderSide(color: CorApp.vermelho, width: 2),
             backgroundColor: CorApp.vermelhoFundo,
             foregroundColor: CorApp.vermelhoTexto,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RaioApp.medio)),

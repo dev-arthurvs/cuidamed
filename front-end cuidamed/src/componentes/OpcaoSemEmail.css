@@ -1,0 +1,32 @@
+.opcao-sem-email {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.opcao-sem-email__rotulo {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--texto-label);
+  cursor: pointer;
+  user-select: none;
+}
+
+.opcao-sem-email__rotulo input {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--azul-solido);
+  cursor: pointer;
+}
+
+.opcao-sem-email__nota {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--texto-suave);
+}

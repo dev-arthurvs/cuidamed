@@ -1,7 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { Suspense, useState } from 'react'
+import { Suspense } from 'react'
 import { useLocation, useOutlet } from 'react-router-dom'
-import BarraNavegacao from './BarraNavegacao'
 import BarraSuperior from './BarraSuperior'
 import BotaoChatFlutuante from './BotaoChatFlutuante'
 import Toast from './Toast'
@@ -14,13 +13,11 @@ const variantesPagina = {
 }
 
 export default function LayoutApp() {
-  const [menuAberto, setMenuAberto] = useState(false)
   const location = useLocation()
-  const outlet = useOutlet({ abrirMenu: () => setMenuAberto(true) })
+  const outlet = useOutlet()
 
   return (
     <div className="layout-app">
-      <BarraNavegacao aberta={menuAberto} aoFechar={() => setMenuAberto(false)} />
       <div className="layout-app__conteudo">
         <BarraSuperior />
         <AnimatePresence mode="popLayout" initial={false}>
@@ -33,7 +30,7 @@ export default function LayoutApp() {
             exit="exit"
             transition={{ duration: 0.22, ease: 'easeInOut' }}
           >
-            {/* Telas carregadas sob demanda: o menu e a barra continuam na tela enquanto baixam. */}
+            {/* Telas carregadas sob demanda: a barra continua na tela enquanto baixam. */}
             <Suspense fallback={null}>{outlet}</Suspense>
           </motion.div>
         </AnimatePresence>

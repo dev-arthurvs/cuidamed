@@ -1,17 +1,22 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useOutletContext, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import AcessoPaciente from '../componentes/AcessoPaciente'
+import AvisosEstoque from '../componentes/AvisosEstoque'
 import Botao from '../componentes/Botao'
 import BotaoWhatsApp from '../componentes/BotaoWhatsApp'
 import Cabecalho from '../componentes/Cabecalho'
 import Cartao from '../componentes/Cartao'
 import CartaoObservacoes from '../componentes/CartaoObservacoes'
+import FaixaNotificacoes from '../componentes/FaixaNotificacoes'
+import GerenciarVinculo from '../componentes/GerenciarVinculo'
 import Rotulo from '../componentes/Rotulo'
 import { useApp } from '../contexto/useApp'
 import { api } from '../utilitarios/api'
 import { TRANSICAO_ITEM_LISTA, VARIANTES_ITEM_LISTA } from '../utilitarios/animacoes'
-import { calcularAdesao } from '../utilitarios/horarios'
+import { avisosEstoque, calcularAdesao } from '../utilitarios/horarios'
 import CadastroPaciente from './CadastroPaciente'
+import { formatarNumeroCartao } from '../utilitarios/mascaras'
 import './PainelCuidador.css'
 
 function corAdesao(pct) {
@@ -26,16 +31,16 @@ export default function PainelCuidador() {
   const [enviandoAlerta, setEnviandoAlerta] = useState(false)
   const { pacienteId } = useParams()
   const navegar = useNavigate()
-  const { abrirMenu } = useOutletContext()
   const [cadastroAberto, setCadastroAberto] = useState(false)
   const [solicitacoes, setSolicitacoes] = useState([])
 
   const pacientesComResumo = useMemo(
     () =>
       pacientes.map((paciente) => {
-        const pct = calcularAdesao(paciente.historico)
+        const pct = calcularAdesao(paciente.historico, paciente.medicamentos)
         const precisaAtencao = paciente.dosesHoje.some((dose) => dose.status === 'atrasado' || dose.status === 'perdido')
-        return { ...paciente, pct, precisaAtencao }
+        const estoqueAcabando = avisosEstoque(paciente.medicamentosAtivos, paciente.historico).length > 0
+        return { ...paciente, pct, precisaAtencao, estoqueAcabando }
       }),
     [pacientes],
   )
@@ -86,11 +91,6 @@ export default function PainelCuidador() {
       navegar('/agenda')
     }
 
-    function irParaCiclosEncerrados() {
-      selecionarPaciente(paciente.id)
-      navegar('/ciclos-encerrados')
-    }
-
     async function lembrarAgora() {
       setEnviandoAlerta(true)
       try {
@@ -105,7 +105,7 @@ export default function PainelCuidador() {
 
     return (
       <>
-        <Cabecalho kicker="Detalhes do paciente" titulo={paciente.nome} aoAbrirMenu={abrirMenu} />
+        <Cabecalho kicker="Detalhes do paciente" titulo={paciente.nome} />
         <div className="pagina-corpo">
           <div className="pagina-corpo__miolo painel-cuidador-detalhe">
             <Botao variante="texto" onClick={() => navegar('/painel')}>
@@ -113,6 +113,7 @@ export default function PainelCuidador() {
             </Botao>
 
             <div className="painel-cuidador-detalhe__grade">
+              <div className="painel-cuidador-detalhe__coluna">
               <Cartao>
                 <div className="painel-cuidador-detalhe__cabecalho">
                   <div className="painel-cuidador__avatar painel-cuidador__avatar--grande">{paciente.iniciais}</div>
@@ -122,6 +123,11 @@ export default function PainelCuidador() {
                       {paciente.idade ? `${paciente.idade} anos · ` : ''}
                       {paciente.medicamentosAtivos.length} medicamentos
                     </div>
+                    {paciente.codigoVinculo && (
+                      <div className="painel-cuidador-detalhe__cartao">
+                        Cartão nº {formatarNumeroCartao(paciente.codigoVinculo)}
+                      </div>
+                    )}
                   </div>
                   <div className="painel-cuidador-detalhe__pct">
                     <div className="painel-cuidador-detalhe__pct-numero">{paciente.pct}%</div>
@@ -156,6 +162,8 @@ export default function PainelCuidador() {
                   )}
                 </div>
               </Cartao>
+              <GerenciarVinculo paciente={paciente} />
+              </div>
 
               <div className="painel-cuidador-detalhe__coluna">
                 <Cartao titulo="Ações">
@@ -164,29 +172,15 @@ export default function PainelCuidador() {
                       {enviandoAlerta ? 'Enviando...' : 'Lembrar agora 🔔'}
                     </Botao>
                     <Botao variante="secundario" onClick={() => navegar(`/historico/${paciente.id}`)}>
-                      Ver histórico completo
+                      Ver histórico de doses
                     </Botao>
                     <Botao variante="secundario" onClick={irParaAgenda}>
                       Acessar agenda
                     </Botao>
-                    <Botao variante="contorno" onClick={irParaCiclosEncerrados}>
-                      Ver ciclos encerrados
-                    </Botao>
-                    <Botao variante="contorno" onClick={() => navegar(`/cuidador/paciente/${paciente.id}/painel`)}>
-                      Painel do paciente ⚙️
-                    </Botao>
                   </div>
                 </Cartao>
-                {paciente.codigoAtivacao && (
-                  // Paciente cadastrado pelo cuidador que ainda não criou a senha.
-                  <Cartao titulo="Acesso do paciente">
-                    <p className="painel-cuidador-detalhe__ativacao-texto">
-                      Ainda não ativou o acesso ao app. Passe este código para usar em “Ativar meu acesso”, junto com o
-                      e-mail cadastrado.
-                    </p>
-                    <div className="painel-cuidador-detalhe__codigo">{paciente.codigoAtivacao}</div>
-                  </Cartao>
-                )}
+                <AvisosEstoque paciente={paciente} />
+                <AcessoPaciente paciente={paciente} />
                 <CartaoObservacoes paciente={paciente} />
               </div>
             </div>
@@ -197,7 +191,7 @@ export default function PainelCuidador() {
   }
 
   const emAtencao = pacientesComResumo.filter((paciente) => paciente.precisaAtencao).length
-  // Só os ativos: medicamentos de ciclos encerrados não estão mais sendo monitorados.
+  // Só os ativos: medicamentos de tratamentos encerrados não estão mais sendo monitorados.
   const totalMedicamentos = pacientesComResumo.reduce((soma, paciente) => soma + paciente.medicamentosAtivos.length, 0)
   const adesaoMedia = pacientesComResumo.length
     ? Math.round(pacientesComResumo.reduce((soma, paciente) => soma + paciente.pct, 0) / pacientesComResumo.length)
@@ -205,9 +199,11 @@ export default function PainelCuidador() {
 
   return (
     <>
-      <Cabecalho kicker="Painel do cuidador" titulo="Acompanhe seus pacientes" aoAbrirMenu={abrirMenu} />
+      <Cabecalho kicker="Painel do cuidador" titulo="Acompanhe seus pacientes" />
       <div className="pagina-corpo">
         <div className="pagina-corpo__miolo painel-cuidador">
+          <FaixaNotificacoes descricao="Receba um aviso no dispositivo e um som quando a dose de um paciente atrasar." />
+
           <div className="painel-cuidador__estatisticas">
             <div className="painel-cuidador__estatistica">
               <div className="painel-cuidador__estatistica-numero" style={{ color: 'var(--azul-texto)' }}>
@@ -222,7 +218,7 @@ export default function PainelCuidador() {
               <div className="painel-cuidador__estatistica-rotulo">Precisam de atenção</div>
             </div>
             <div className="painel-cuidador__estatistica">
-              <div className="painel-cuidador__estatistica-numero" style={{ color: 'var(--verde)' }}>
+              <div className="painel-cuidador__estatistica-numero" style={{ color: corAdesao(adesaoMedia) }}>
                 {adesaoMedia}%
               </div>
               <div className="painel-cuidador__estatistica-rotulo">Adesão média (30 dias)</div>
@@ -250,7 +246,7 @@ export default function PainelCuidador() {
                     <div className="painel-cuidador__avatar">{paciente.nome.slice(0, 2).toUpperCase()}</div>
                     <div className="painel-cuidador__paciente-info">
                       <div className="painel-cuidador__paciente-nome">{paciente.nome}</div>
-                      <div className="painel-cuidador__paciente-sub">{paciente.email}</div>
+                      <div className="painel-cuidador__paciente-sub">{paciente.email || paciente.telefone}</div>
                     </div>
                     <div className="painel-cuidador__solicitacao-acoes">
                       <Botao tamanho="pequeno" onClick={() => aceitar(paciente)}>
@@ -318,6 +314,11 @@ export default function PainelCuidador() {
                       >
                         {paciente.precisaAtencao ? 'Atrasado' : 'Em dia'}
                       </span>
+                      {paciente.estoqueAcabando && (
+                        <span className="painel-cuidador__status-badge" style={{ background: 'var(--vermelho-fundo)', color: 'var(--vermelho-texto)' }}>
+                          Estoque acabando
+                        </span>
+                      )}
                       <div className="painel-cuidador__paciente-pct">{paciente.pct}%</div>
                     </div>
                   </Link>

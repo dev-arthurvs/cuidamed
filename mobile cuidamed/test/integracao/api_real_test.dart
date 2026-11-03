@@ -26,6 +26,12 @@ Future<void> _como(String email, String senha) async {
   ApiCliente.instancia.token = (await AuthServico().login(email, senha)).token;
 }
 
+/// Telefone diferente a cada execução: a API não aceita o mesmo número em duas contas.
+String _fone(int carimbo, int n) {
+  final oito = ((carimbo % 10000000) * 10 + n).toString().padLeft(8, '0');
+  return '(79) 9${oito.substring(0, 4)}-${oito.substring(4)}';
+}
+
 void main() {
   final carimbo = DateTime.now().millisecondsSinceEpoch;
   final emailPaciente = 'paciente.integracao.$carimbo@email.com';
@@ -63,14 +69,14 @@ void main() {
       email: emailPaciente,
       dataNascimento: DateTime(1948, 7, 2),
       sexo: 'Masculino',
-      telefone: '(79) 99999-1234',
+      telefone: _fone(carimbo, 1),
       endereco: 'Rua Teste, 1',
     );
     final paciente = estado.pacienteFoco!.paciente;
     expect(estado.usuario!.nome, 'Paciente Integração Editado');
     expect(paciente.nome, 'Paciente Integração Editado');
     expect(paciente.sexo, 'MASCULINO');
-    expect(paciente.telefone, '(79) 99999-1234');
+    expect(paciente.telefone, _fone(carimbo, 1));
     expect(paciente.dataNascimento, DateTime(1948, 7, 2));
 
     await expectLater(estado.alterarSenha('senha-errada', 'novaSenha99'), throwsA(isA<ApiExcecao>()));
@@ -93,16 +99,22 @@ void main() {
     await estadoCuidador.entrar(emailCuidador, 'senha1234');
     expect(estadoCuidador.usuario!.profissao, 'Enfermeiro');
     expect(estadoCuidador.pacientes.map((p) => p.paciente.id), contains(pacienteId));
+    // Vínculo ativo ganha um código ("nº do cartão"), o mesmo para paciente e cuidador.
+    final codigo = estadoCuidador.pacientes.firstWhere((p) => p.paciente.id == pacienteId).paciente.codigoVinculo;
+    expect(codigo, isNotNull);
+    await _como(emailPaciente, 'novaSenha99');
+    expect((await PacienteServico().buscarPorId(pacienteId)).codigoVinculo, codigo);
+    await _como(emailCuidador, 'senha1234');
 
     // Perfil do cuidador (profissão/telefone) também persiste.
     await estadoCuidador.atualizarPerfil(
       nome: 'Cuidador Teste Integração',
       email: emailCuidador,
       profissao: 'Médica',
-      telefone: '(79) 98888-0000',
+      telefone: _fone(carimbo, 2),
     );
     expect(estadoCuidador.usuario!.profissao, 'Médica');
-    expect((await CuidadorServico().buscarPorId(cuidadorId)).telefone, '(79) 98888-0000');
+    expect((await CuidadorServico().buscarPorId(cuidadorId)).telefone, _fone(carimbo, 2));
 
     await estadoCuidador.atualizarPermissaoAlteracoes(pacienteId, true);
     expect(estadoCuidador.pacientes.firstWhere((p) => p.paciente.id == pacienteId).paciente.permiteAlteracoes, isTrue);
@@ -115,7 +127,9 @@ void main() {
       throwsA(isA<ApiExcecao>().having((e) => e.mensagem, 'mensagem', contains('não tem acesso'))),
     );
     await _como(emailPaciente, 'novaSenha99');
-    expect((await PacienteServico().buscarPorId(pacienteId)).cuidadorId, isNull);
+    final desvinculado = await PacienteServico().buscarPorId(pacienteId);
+    expect(desvinculado.cuidadorId, isNull);
+    expect(desvinculado.codigoVinculo, isNull); // sem cuidador, sem nº do cartão
   }, skip: _url.isEmpty ? 'defina --dart-define=API_BASE_URL' : null);
 
   test('Cuidador cadastra paciente sem senha e o paciente ativa o acesso', () async {
@@ -128,7 +142,7 @@ void main() {
       dataNascimento: DateTime(1945, 5, 20),
       sexo: 'Feminino',
       enfermidade: 'Hipertensão',
-      telefone: '(79) 99999-0001',
+      telefone: _fone(carimbo, 3),
       endereco: 'Rua Teste, 2',
     );
     final novo = estadoCuidador.pacientes.firstWhere((p) => p.paciente.email == emailNovo).paciente;
@@ -284,7 +298,7 @@ void main() {
     final emailObs = 'paciente.obs.$carimbo@email.com';
     await estadoCuidador.cadastrarPacienteDoCuidador(
       nome: 'Paciente Obs Teste', email: emailObs, dataNascimento: DateTime(1940, 2, 3), sexo: 'Masculino',
-      enfermidade: 'Diabetes', telefone: '(79) 90000-0000', endereco: 'Rua das Flores, 1',
+      enfermidade: 'Diabetes', telefone: _fone(carimbo, 4), endereco: 'Rua das Flores, 1',
     );
     final antes = estadoCuidador.pacientes.firstWhere((p) => p.paciente.email == emailObs).paciente;
     try {

@@ -28,7 +28,7 @@
 
 .historico__filtro-titulo {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--texto-label);
   margin-bottom: 10px;
 }
@@ -58,7 +58,7 @@
 
 .historico__data-rotulo {
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--texto-suave);
   flex-shrink: 0;
 }
@@ -83,7 +83,7 @@
 
 .historico__resumo-numero {
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .historico__resumo-rotulo {
@@ -105,7 +105,7 @@
 
 .historico__dia {
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--texto-suave);
   margin: 14px 0 10px;
 }
@@ -130,7 +130,7 @@
 
 .historico__item-hora {
   font-size: 18px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--azul-texto);
   min-width: 64px;
 }

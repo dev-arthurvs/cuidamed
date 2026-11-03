@@ -7,7 +7,7 @@ import LogoMarca from './LogoMarca'
 import ModalAjuda from './ModalAjuda'
 import './BarraSuperior.css'
 
-const ROTAS_POR_PACIENTE = new Set(['/agenda', '/ciclos-encerrados', '/historico'])
+const ROTAS_POR_PACIENTE = new Set(['/agenda', '/historico'])
 
 export default function BarraSuperior() {
   const { usuario, pacientes, pacienteFoco, selecionarPaciente } = useApp()
@@ -156,14 +156,25 @@ export default function BarraSuperior() {
         })}
       </div>
 
-      <button
-        type="button"
-        className="barra-superior__ajuda"
-        onClick={() => setAjudaAberta(true)}
-        aria-label="Ajuda sobre esta tela"
-      >
-        ?
-      </button>
+      {/* Engrenagem (Configurações) e "?" (ajuda da tela) no canto direito. */}
+      <div className="barra-superior__acoes">
+        <NavLink
+          to="/configuracoes"
+          className={({ isActive }) => `barra-superior__ajuda${isActive ? ' barra-superior__ajuda--ativo' : ''}`}
+          aria-label="Configurações"
+          title="Configurações"
+        >
+          {ICONES_NAVEGACAO.configuracoes}
+        </NavLink>
+        <button
+          type="button"
+          className="barra-superior__ajuda"
+          onClick={() => setAjudaAberta(true)}
+          aria-label="Ajuda sobre esta tela"
+        >
+          ?
+        </button>
+      </div>
 
       {ajudaAberta && <ModalAjuda secao={secaoAjuda} onFechar={() => setAjudaAberta(false)} />}
     </nav>

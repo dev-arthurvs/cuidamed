@@ -8,7 +8,7 @@ class _EstiloStatus {
   const _EstiloStatus(this.rotulo, this.fundo, this.texto);
 }
 
-const Map<String, _EstiloStatus> _estilos = {
+final Map<String, _EstiloStatus> _estilos = {
   'tomado': _EstiloStatus('Tomado', CorApp.verdeFundo, CorApp.verdeTexto),
   'pendente': _EstiloStatus('A tomar', CorApp.azulFundo, CorApp.azulTexto),
   'atrasado': _EstiloStatus('Atrasado', CorApp.amareloFundo, CorApp.amareloTexto),
@@ -26,7 +26,7 @@ class RotuloStatus extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(color: estilo.fundo, borderRadius: BorderRadius.circular(RaioApp.pilula)),
-      child: Text(estilo.rotulo, style: TextStyle(color: estilo.texto, fontWeight: FontWeight.w800, fontSize: 13)),
+      child: Text(estilo.rotulo, style: TextStyle(color: estilo.texto, fontWeight: FontWeight.w700, fontSize: 13)),
     );
   }
 }

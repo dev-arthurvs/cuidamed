@@ -39,7 +39,7 @@ void main() {
     await montarPagina(tester, estadoPaciente()..usuario = null, '/definir-senha', (_) => const DefinirSenha());
     expect(find.text('Código de ativação'), findsOneWidget);
 
-    await tester.enterText(find.widgetWithText(TextField, 'seu@email.com'), 'maria@email.com');
+    await tester.enterText(find.widgetWithText(TextField, 'seu@email.com ou (79) 99999-9999'), 'maria@email.com');
     await rolarAte(tester, find.text('Ativar acesso'));
     await tester.tap(find.text('Ativar acesso'));
     await tester.pump();

@@ -34,9 +34,12 @@ class _DefinirSenhaState extends State<DefinirSenha> {
     super.dispose();
   }
 
+  // Veio de "Esqueci minha senha": mesmo formulário, com o código de nova senha.
+  bool _ehRecuperacao(BuildContext context) => GoRouterState.of(context).uri.queryParameters['novaSenha'] == '1';
+
   Future<void> _ativarAcesso() async {
     if (_emailController.text.trim().isEmpty) {
-      setState(() => _erro = 'Informe o e-mail cadastrado pelo seu cuidador.');
+      setState(() => _erro = 'Informe o e-mail ou telefone cadastrado pelo seu cuidador.');
       return;
     }
     if (_codigoController.text.trim().isEmpty) {
@@ -57,7 +60,7 @@ class _DefinirSenhaState extends State<DefinirSenha> {
     });
     try {
       await ApiCliente.instancia.post('/api/pacientes/definir-senha', {
-        'email': _emailController.text.trim(),
+        'login': _emailController.text.trim(),
         'codigo': _codigoController.text.trim().toUpperCase(),
         'novaSenha': _novaSenhaController.text,
       });
@@ -81,14 +84,17 @@ class _DefinirSenhaState extends State<DefinirSenha> {
       cartao: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const TituloAutenticacao(titulo: 'Ativar meu acesso'),
+          TituloAutenticacao(
+            titulo: _ehRecuperacao(context) ? 'Criar nova senha' : 'Ativar meu acesso',
+            subtitulo: _ehRecuperacao(context) ? 'Peça ao seu cuidador um código de nova senha. Ele gera nos detalhes do paciente.' : null,
+          ),
           const SizedBox(height: 22),
           CampoTexto(
-            rotulo: 'E-mail cadastrado',
-            icone: Icons.mail_outline,
+            rotulo: 'E-mail ou telefone cadastrado',
+            icone: Icons.person_outline,
             fundoBranco: true,
             rotuloExterno: true,
-            placeholder: 'seu@email.com',
+            placeholder: 'seu@email.com ou (79) 99999-9999',
             controller: _emailController,
             tipoTeclado: TextInputType.emailAddress,
           ),
@@ -126,7 +132,7 @@ class _DefinirSenhaState extends State<DefinirSenha> {
           ),
           if (_erro != null) ...[
             const SizedBox(height: 14),
-            Text(_erro!, style: const TextStyle(color: CorApp.vermelho, fontWeight: FontWeight.w600)),
+            Text(_erro!, style: TextStyle(color: CorApp.vermelho, fontWeight: FontWeight.w600)),
           ],
           const SizedBox(height: 22),
           Botao(texto: 'Ativar acesso', variante: VarianteBotao.solido, onPressed: _ativarAcesso, carregando: _carregando),

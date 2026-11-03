@@ -34,7 +34,7 @@ public class MedicamentoService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe o paciente do medicamento.");
         }
         validarCamposObrigatorios(
-                dto.nome(), dto.dosagem(), dto.forma(), dto.frequencia(), dto.dataInicio(), dto.horarios(),
+                dto.nome(), dto.forma(), dto.frequencia(), dto.dataInicio(), dto.horarios(),
                 dto.quantidadeEstoque(), dto.quantidadePorDose());
         validarPeriodo(dto.dataInicio(), dto.dataFim());
 
@@ -44,7 +44,7 @@ public class MedicamentoService {
         Medicamento medicamento = new Medicamento();
         medicamento.setPaciente(paciente);
         medicamento.setNome(dto.nome());
-        medicamento.setDosagem(dto.dosagem());
+        medicamento.setDosagem(textoOuNulo(dto.dosagem()));
         medicamento.setForma(dto.forma());
         medicamento.setFrequencia(dto.frequencia());
         medicamento.setDataInicio(dto.dataInicio());
@@ -68,13 +68,13 @@ public class MedicamentoService {
 
     public MedicamentoRespostaDTO atualizar(Long id, MedicamentoAtualizacaoDTO dto) {
         validarCamposObrigatorios(
-                dto.nome(), dto.dosagem(), dto.forma(), dto.frequencia(), dto.dataInicio(), dto.horarios(),
+                dto.nome(), dto.forma(), dto.frequencia(), dto.dataInicio(), dto.horarios(),
                 dto.quantidadeEstoque(), dto.quantidadePorDose());
         validarPeriodo(dto.dataInicio(), dto.dataFim());
 
         Medicamento medicamento = buscarEntidadePorId(id);
         medicamento.setNome(dto.nome());
-        medicamento.setDosagem(dto.dosagem());
+        medicamento.setDosagem(textoOuNulo(dto.dosagem()));
         medicamento.setForma(dto.forma());
         medicamento.setFrequencia(dto.frequencia());
         medicamento.setDataInicio(dto.dataInicio());
@@ -139,17 +139,18 @@ public class MedicamentoService {
         }
     }
 
-    // Pomada não tem controle de estoque: a "dosagem" ali é só a concentração da
-    // substância (ex.: "1%"), informação visual pra comprar o produto certo — não
-    // dá pra contar "unidades" de pomada do mesmo jeito que comprimido ou xarope.
+    // Dosagem é opcional (saiu do formulário); vazia vira nulo no banco.
+    private static String textoOuNulo(String texto) {
+        return texto == null || texto.isBlank() ? null : texto.trim();
+    }
+
+    // Pomada não tem controle de estoque: não dá pra contar "unidades" de pomada
+    // do mesmo jeito que comprimido ou xarope.
     private void validarCamposObrigatorios(
-            String nome, String dosagem, FormaMedicamento forma, FrequenciaMedicamento frequencia,
+            String nome, FormaMedicamento forma, FrequenciaMedicamento frequencia,
             LocalDate dataInicio, List<String> horarios, Integer quantidadeEstoque, Integer quantidadePorDose) {
         if (nome == null || nome.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe o nome do medicamento.");
-        }
-        if (dosagem == null || dosagem.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe a dosagem do medicamento.");
         }
         if (forma == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe a forma do medicamento.");

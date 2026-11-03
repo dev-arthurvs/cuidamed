@@ -18,7 +18,7 @@ class Cuidador {
     return Cuidador(
       id: json['id'] as int,
       nome: json['nome'] as String,
-      email: json['email'] as String,
+      email: json['email'] as String? ?? '', // opcional: pode entrar pelo telefone
       profissao: json['profissao'] as String?,
       telefone: json['telefone'] as String?,
     );

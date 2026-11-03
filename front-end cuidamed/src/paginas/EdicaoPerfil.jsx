@@ -1,31 +1,47 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useOutletContext } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import Botao from '../componentes/Botao'
 import Cabecalho from '../componentes/Cabecalho'
 import Campo from '../componentes/Campo'
 import Cartao from '../componentes/Cartao'
+import OpcaoSemEmail from '../componentes/OpcaoSemEmail'
 import { useApp } from '../contexto/useApp'
 import { OPCOES_SEXO } from '../dados/dadosMock'
 import { api } from '../utilitarios/api'
 import { obterIniciais } from '../utilitarios/horarios'
 import { OPCOES_TAMANHO_FONTE } from '../utilitarios/preferenciaFonte'
-import { dataDeHojeISO, formatarTelefone } from '../utilitarios/mascaras'
+import { dataDeHojeISO, formatarTelefone, telefoneCompleto } from '../utilitarios/mascaras'
 import './EdicaoPerfil.css'
 
+const OPCOES_TEMA = [
+  { valor: 'claro', rotulo: 'Claro' },
+  { valor: 'escuro', rotulo: 'Escuro' },
+]
+
 export default function EdicaoPerfil() {
-  const { usuario, pacienteFoco, atualizarPerfil, alterarSenha, solicitarVinculoCuidador, sair, mostrarToast, tamanhoFonte, definirTamanhoFonte } =
-    useApp()
+  const {
+    usuario,
+    pacienteFoco,
+    atualizarPerfil,
+    alterarSenha,
+    solicitarVinculoCuidador,
+    sair,
+    mostrarToast,
+    tamanhoFonte,
+    definirTamanhoFonte,
+    tema,
+    alternarTema,
+  } = useApp()
   const navegar = useNavigate()
-  const { abrirMenu } = useOutletContext()
   const ehPaciente = usuario.tipo === 'paciente'
 
   const [nome, setNome] = useState(usuario.nome)
-  const [email, setEmail] = useState(usuario.email)
+  const [email, setEmail] = useState(usuario.email || '')
+  const [semEmail, setSemEmail] = useState(!usuario.email)
   const [dataNascimento, setDataNascimento] = useState(pacienteFoco?.dataNascimento || '')
   const [sexo, setSexo] = useState(pacienteFoco?.sexo || OPCOES_SEXO[0])
   // Telefones salvos antes da máscara aparecem já formatados.
   const [telefone, setTelefone] = useState(() => formatarTelefone((ehPaciente ? pacienteFoco?.telefone : usuario.telefone) || ''))
-  const [endereco, setEndereco] = useState(pacienteFoco?.endereco || '')
   const [profissao, setProfissao] = useState(usuario.profissao || '')
   const [senhaAtual, setSenhaAtual] = useState('')
   const [novaSenha, setNovaSenha] = useState('')
@@ -52,31 +68,35 @@ export default function EdicaoPerfil() {
 
   async function salvarDados(evento) {
     evento.preventDefault()
-    if (!nome.trim() || !email.trim()) {
-      mostrarToast('Preencha nome e e-mail.')
+    if (!nome.trim()) {
+      mostrarToast('Preencha o nome.')
       return
     }
+    if (semEmail ? !telefoneCompleto(telefone) : !email.trim()) {
+      mostrarToast(semEmail ? 'Sem e-mail, informe o telefone com DDD.' : 'Preencha o e-mail ou marque "Não tenho e-mail".')
+      return
+    }
+    const emailSalvo = semEmail ? '' : email.trim()
     try {
       if (ehPaciente) {
         await atualizarPerfil({
           nome: nome.trim(),
-          email: email.trim(),
+          email: emailSalvo,
           dataNascimento,
           sexo,
           telefone: telefone.trim(),
-          endereco: endereco.trim(),
         })
       } else {
         await atualizarPerfil({
           nome: nome.trim(),
-          email: email.trim(),
+          email: emailSalvo,
           profissao: profissao.trim(),
           telefone: telefone.trim(),
         })
       }
-      mostrarToast('Perfil atualizado.')
+      mostrarToast('Dados atualizados.')
     } catch (erro) {
-      mostrarToast(erro.message || 'Não foi possível atualizar o perfil.')
+      mostrarToast(erro.message || 'Não foi possível atualizar os dados.')
     }
   }
 
@@ -104,7 +124,7 @@ export default function EdicaoPerfil() {
   async function enviarSolicitacaoVinculo(evento) {
     evento.preventDefault()
     if (!emailCuidadorSolicitado.trim()) {
-      mostrarToast('Informe o e-mail do cuidador.')
+      mostrarToast('Informe o e-mail ou telefone do cuidador.')
       return
     }
     setEnviandoSolicitacao(true)
@@ -124,13 +144,111 @@ export default function EdicaoPerfil() {
     navegar('/login')
   }
 
+  // Paciente: card do cuidador (vinculado, pedido pendente ou formulário de
+  // vínculo), ao lado da Aparência.
+  let cartaoCuidador = null
+  if (ehPaciente) {
+    if (cuidadorResponsavel) {
+      cartaoCuidador = (
+        <Cartao titulo="Cuidador(a) responsável" className="edicao-perfil__cartao">
+          <div className="edicao-perfil__cabecalho">
+            <div className="edicao-perfil__avatar">{obterIniciais(cuidadorResponsavel.nome)}</div>
+            <div>
+              <div className="edicao-perfil__nome">{cuidadorResponsavel.nome}</div>
+              <div className="edicao-perfil__papel">{cuidadorResponsavel.profissao || 'Cuidador(a) / Médico(a)'}</div>
+            </div>
+          </div>
+          <div className="edicao-perfil__cuidador-info">
+            <div className="edicao-perfil__cuidador-linha">
+              <span className="edicao-perfil__cuidador-rotulo">E-mail</span>
+              <span>{cuidadorResponsavel.email || '—'}</span>
+            </div>
+            <div className="edicao-perfil__cuidador-linha">
+              <span className="edicao-perfil__cuidador-rotulo">Telefone</span>
+              <span>{cuidadorResponsavel.telefone || '—'}</span>
+            </div>
+          </div>
+          <p className="edicao-perfil__cuidador-nota">
+            Seu cuidador(a) vê no painel e recebe um aviso, com o app aberto, quando uma dose fica atrasada.
+          </p>
+        </Cartao>
+      )
+    } else if (pacienteFoco?.cuidadorSolicitadoId) {
+      cartaoCuidador = (
+        <Cartao titulo="Cuidador(a) responsável" className="edicao-perfil__cartao">
+          <p className="edicao-perfil__cuidador-nota">
+            Solicitação enviada — aguardando confirmação do cuidador. Assim que ele aceitar, os dados aparecem
+            aqui.
+          </p>
+        </Cartao>
+      )
+    } else {
+      cartaoCuidador = (
+        <Cartao titulo="Vincular cuidador(a)" className="edicao-perfil__cartao">
+          <form className="edicao-perfil__formulario" onSubmit={enviarSolicitacaoVinculo}>
+            <p className="edicao-perfil__cuidador-nota">
+              Informe o e-mail ou telefone do seu cuidador(a) já cadastrado — ele(a) precisa confirmar antes do vínculo valer.
+            </p>
+            <Campo
+              rotulo="E-mail ou telefone do cuidador"
+              placeholder="cuidador@email.com ou (79) 99999-9999"
+              value={emailCuidadorSolicitado}
+              onChange={(e) => setEmailCuidadorSolicitado(e.target.value)}
+            />
+            <Botao type="submit" variante="secundario" larguraTotal disabled={enviandoSolicitacao}>
+              {enviandoSolicitacao ? 'Enviando...' : 'Enviar solicitação'}
+            </Botao>
+          </form>
+        </Cartao>
+      )
+    }
+  }
+
+  const aparencia = (
+    <Cartao titulo="Aparência" className="edicao-perfil__cartao">
+      <div className="edicao-perfil__opcao">
+        <span className="edicao-perfil__opcao-rotulo">Tamanho da fonte</span>
+        <div className="edicao-perfil__opcoes">
+          {OPCOES_TAMANHO_FONTE.map((opcao) => (
+            <Botao
+              key={opcao.valor}
+              variante={tamanhoFonte === opcao.valor ? 'primario' : 'secundario'}
+              onClick={() => definirTamanhoFonte(opcao.valor)}
+              aria-pressed={tamanhoFonte === opcao.valor}
+            >
+              {opcao.rotulo}
+            </Botao>
+          ))}
+        </div>
+      </div>
+      <div className="edicao-perfil__opcao">
+        <span className="edicao-perfil__opcao-rotulo">Tema</span>
+        <div className="edicao-perfil__opcoes">
+          {OPCOES_TEMA.map((opcao) => (
+            <Botao
+              key={opcao.valor}
+              variante={tema === opcao.valor ? 'primario' : 'secundario'}
+              onClick={() => tema !== opcao.valor && alternarTema()}
+              aria-pressed={tema === opcao.valor}
+            >
+              {opcao.rotulo}
+            </Botao>
+          ))}
+        </div>
+      </div>
+      <Botao variante="secundario" larguraTotal onClick={() => navegar('/acessibilidade')}>
+        Ajuda e acessibilidade
+      </Botao>
+    </Cartao>
+  )
+
   return (
     <>
-      <Cabecalho kicker="Configurações" titulo="Edição de perfil" aoAbrirMenu={abrirMenu} />
+      <Cabecalho kicker="Minha conta" titulo="Configurações" />
       <div className="pagina-corpo">
         <div className="pagina-corpo__miolo edicao-perfil">
           <div className="edicao-perfil__linha-dupla">
-            <Cartao className="edicao-perfil__cartao">
+            <Cartao titulo="Dados pessoais" className="edicao-perfil__cartao">
               <div className="edicao-perfil__cabecalho">
                 <div className="edicao-perfil__avatar">{obterIniciais(usuario.nome)}</div>
                 <div>
@@ -163,12 +281,6 @@ export default function EdicaoPerfil() {
                       value={telefone}
                       onChange={(e) => setTelefone(e.target.value)}
                     />
-                    <Campo
-                      rotulo="Endereço"
-                      placeholder="Rua, número, bairro - cidade/UF"
-                      value={endereco}
-                      onChange={(e) => setEndereco(e.target.value)}
-                    />
                   </>
                 ) : (
                   <>
@@ -187,15 +299,18 @@ export default function EdicaoPerfil() {
                     />
                   </>
                 )}
-                <Campo rotulo="E-mail" tipo="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  {!semEmail && <Campo rotulo="E-mail" tipo="email" value={email} onChange={(e) => setEmail(e.target.value)} />}
+                  <OpcaoSemEmail marcado={semEmail} aoMudar={setSemEmail} />
+                </div>
                 <Botao type="submit" larguraTotal>
                   Salvar alterações
                 </Botao>
               </form>
             </Cartao>
 
-            <Cartao titulo="Alterar senha" className="edicao-perfil__cartao">
-              <form className="edicao-perfil__formulario" onSubmit={atualizarSenha}>
+            <Cartao titulo="Senha" className="edicao-perfil__cartao">
+              <form className="edicao-perfil__formulario edicao-perfil__formulario--senha" onSubmit={atualizarSenha}>
                 <Campo
                   rotulo="Senha atual"
                   tipo="password"
@@ -228,86 +343,13 @@ export default function EdicaoPerfil() {
             </Cartao>
           </div>
 
-          <div className="edicao-perfil__linha-dupla">
-            <Cartao titulo="Ajuda e acessibilidade" className="edicao-perfil__cartao">
-              <p className="edicao-perfil__cuidador-nota">
-                Não sabe como usar alguma parte do sistema? Veja o guia completo com explicações e passo a passo de
-                cada tela.
-              </p>
-              <Botao variante="secundario" larguraTotal onClick={() => navegar('/acessibilidade')}>
-                Ajuda e acessibilidade
-              </Botao>
-            </Cartao>
-
-            <Cartao titulo="Tamanho da fonte" className="edicao-perfil__cartao">
-              <p className="edicao-perfil__cuidador-nota">Ajusta o tamanho do texto em todo o sistema.</p>
-              <div className="edicao-perfil__fonte-opcoes">
-                {OPCOES_TAMANHO_FONTE.map((opcao) => (
-                  <Botao
-                    key={opcao.valor}
-                    variante={tamanhoFonte === opcao.valor ? 'primario' : 'secundario'}
-                    onClick={() => definirTamanhoFonte(opcao.valor)}
-                    aria-pressed={tamanhoFonte === opcao.valor}
-                  >
-                    {opcao.rotulo}
-                  </Botao>
-                ))}
-              </div>
-            </Cartao>
-          </div>
-
-          {ehPaciente && cuidadorResponsavel && (
-            <Cartao titulo="Cuidador(a) responsável" className="edicao-perfil__cartao">
-              <div className="edicao-perfil__cabecalho">
-                <div className="edicao-perfil__avatar">{obterIniciais(cuidadorResponsavel.nome)}</div>
-                <div>
-                  <div className="edicao-perfil__nome">{cuidadorResponsavel.nome}</div>
-                  <div className="edicao-perfil__papel">{cuidadorResponsavel.profissao || 'Cuidador(a) / Médico(a)'}</div>
-                </div>
-              </div>
-              <div className="edicao-perfil__cuidador-info">
-                <div className="edicao-perfil__cuidador-linha">
-                  <span className="edicao-perfil__cuidador-rotulo">E-mail</span>
-                  <span>{cuidadorResponsavel.email}</span>
-                </div>
-                <div className="edicao-perfil__cuidador-linha">
-                  <span className="edicao-perfil__cuidador-rotulo">Telefone</span>
-                  <span>{cuidadorResponsavel.telefone || '—'}</span>
-                </div>
-              </div>
-              <p className="edicao-perfil__cuidador-nota">
-                Seu cuidador(a) recebe alertas quando uma dose fica atrasada ou é perdida.
-              </p>
-            </Cartao>
-          )}
-
-          {ehPaciente && !cuidadorResponsavel && pacienteFoco?.cuidadorSolicitadoId && (
-            <Cartao titulo="Cuidador(a) responsável" className="edicao-perfil__cartao">
-              <p className="edicao-perfil__cuidador-nota">
-                Solicitação enviada — aguardando confirmação do cuidador. Assim que ele aceitar, os dados aparecem
-                aqui.
-              </p>
-            </Cartao>
-          )}
-
-          {ehPaciente && !cuidadorResponsavel && !pacienteFoco?.cuidadorSolicitadoId && (
-            <Cartao titulo="Vincular cuidador(a)" className="edicao-perfil__cartao">
-              <form className="edicao-perfil__formulario" onSubmit={enviarSolicitacaoVinculo}>
-                <p className="edicao-perfil__cuidador-nota">
-                  Informe o e-mail do seu cuidador(a) já cadastrado — ele(a) precisa confirmar antes do vínculo valer.
-                </p>
-                <Campo
-                  rotulo="E-mail do cuidador"
-                  tipo="email"
-                  placeholder="cuidador@email.com"
-                  value={emailCuidadorSolicitado}
-                  onChange={(e) => setEmailCuidadorSolicitado(e.target.value)}
-                />
-                <Botao type="submit" variante="secundario" larguraTotal disabled={enviandoSolicitacao}>
-                  {enviandoSolicitacao ? 'Enviando...' : 'Enviar solicitação'}
-                </Botao>
-              </form>
-            </Cartao>
+          {cartaoCuidador ? (
+            <div className="edicao-perfil__linha-dupla">
+              {aparencia}
+              {cartaoCuidador}
+            </div>
+          ) : (
+            aparencia
           )}
         </div>
       </div>

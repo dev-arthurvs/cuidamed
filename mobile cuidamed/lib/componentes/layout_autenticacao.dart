@@ -225,13 +225,13 @@ class TituloAutenticacao extends StatelessWidget {
       children: [
         Text(
           titulo,
-          style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w700, letterSpacing: -0.2, color: CorApp.texto),
+          style: TextStyle(fontSize: 26, fontWeight: FontWeight.w700, letterSpacing: -0.2, color: CorApp.texto),
         ),
         if (subtitulo != null) ...[
           const SizedBox(height: 6),
           Text(
             subtitulo!,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: CorApp.textoSuave),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: CorApp.textoSuave),
           ),
         ],
       ],
@@ -313,7 +313,7 @@ class BotoesAlternativosAutenticacao extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Divider(height: 1, color: CorApp.borda),
+        Divider(height: 1, color: CorApp.borda),
         const SizedBox(height: 18),
         LayoutBuilder(
           // Tela muito estreita: um botão abaixo do outro.

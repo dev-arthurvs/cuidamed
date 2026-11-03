@@ -129,7 +129,7 @@ class _PainelCuidadorState extends State<PainelCuidador> {
   /// pra o texto "+ Cadastrar paciente" caber inteiro.
   Widget _cartaoPacientes(BuildContext context, AppEstado estado) {
     final lista = estado.pacientes.isEmpty
-        ? const Padding(
+        ? Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
             child: Text('Nenhum paciente vinculado ainda.', style: TextStyle(color: CorApp.textoSuave)),
           )
@@ -181,7 +181,10 @@ class _PainelCuidadorState extends State<PainelCuidador> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(paciente.nome, style: const TextStyle(fontWeight: FontWeight.w700)),
-                    Text(paciente.email, style: const TextStyle(color: CorApp.textoSuave, fontSize: 12)),
+                    Text(
+                      paciente.email.isNotEmpty ? paciente.email : (paciente.telefone ?? ''),
+                      style: TextStyle(color: CorApp.textoSuave, fontSize: 12),
+                    ),
                   ],
                 ),
               ),
@@ -210,7 +213,8 @@ class _PainelCuidadorState extends State<PainelCuidador> {
   }
 
   Widget _linhaPaciente(BuildContext context, PacienteComDados dados) {
-    final adesao = calcularAdesao(dados.historico);
+    final adesao = calcularAdesao(dados.historico, medicamentos: dados.medicamentos);
+    final estoqueAcabando = avisosEstoque(dados.medicamentosAtivos(), dados.historico).isNotEmpty;
     return InkWell(
       borderRadius: BorderRadius.circular(RaioApp.pequeno),
       onTap: () {
@@ -227,17 +231,27 @@ class _PainelCuidadorState extends State<PainelCuidador> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(dados.paciente.nome, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                  Text(dados.paciente.nome, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                   // Mesmo texto do web: "26 anos · 4 medicamentos" (só os ativos).
                   Text(
                     '${dados.paciente.dataNascimento != null ? '${dados.paciente.calcularIdade()} anos · ' : ''}'
                     '${dados.medicamentosAtivos().length} medicamentos',
-                    style: const TextStyle(color: CorApp.textoSuave, fontSize: 13),
+                    style: TextStyle(color: CorApp.textoSuave, fontSize: 13),
                   ),
+                  if (estoqueAcabando)
+                    Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                      decoration: BoxDecoration(color: CorApp.vermelhoFundo, borderRadius: BorderRadius.circular(RaioApp.pilula)),
+                      child: Text(
+                        'Estoque acabando',
+                        style: TextStyle(color: CorApp.vermelhoTexto, fontSize: 12, fontWeight: FontWeight.w700),
+                      ),
+                    ),
                 ],
               ),
             ),
-            Text('$adesao%', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: CorApp.azulTexto)),
+            Text('$adesao%', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: CorApp.azulTexto)),
           ],
         ),
       ),
@@ -257,11 +271,11 @@ class _Estatisticas extends StatelessWidget {
       final doses = construirDosesHoje(dados.medicamentosAtivos(), dados.historicoHoje());
       return doses.any((dose) => dose.status == 'atrasado' || dose.status == 'perdido');
     }).length;
-    // Só os ativos: medicamentos de ciclos encerrados não estão mais sendo monitorados.
+    // Só os ativos: medicamentos de tratamentos encerrados não estão mais sendo monitorados.
     final totalMedicamentos = pacientes.fold<int>(0, (soma, dados) => soma + dados.medicamentosAtivos().length);
     final adesaoMedia = pacientes.isEmpty
         ? 0
-        : (pacientes.fold<int>(0, (soma, dados) => soma + calcularAdesao(dados.historico)) / pacientes.length).round();
+        : (pacientes.fold<int>(0, (soma, dados) => soma + calcularAdesao(dados.historico, medicamentos: dados.medicamentos)) / pacientes.length).round();
 
     final cartoes = [
       _CartaoEstatistica(valor: '${pacientes.length}', rotulo: 'Pacientes vinculados', cor: CorApp.azulTexto),
@@ -269,7 +283,7 @@ class _Estatisticas extends StatelessWidget {
         valor: '$emAtencao',
         rotulo: 'Precisam de atenção',
         cor: CorApp.amarelo,
-        corBorda: const Color(0xFFF2E0C2),
+        corBorda: CorApp.amareloBorda,
       ),
       _CartaoEstatistica(valor: '$adesaoMedia%', rotulo: 'Adesão média (30 dias)', cor: CorApp.verde),
       _CartaoEstatistica(valor: '$totalMedicamentos', rotulo: 'Medicamentos monitorados', cor: CorApp.texto),
@@ -306,8 +320,8 @@ class _CartaoEstatistica extends StatelessWidget {
   final String valor;
   final String rotulo;
   final Color cor;
-  final Color corBorda;
-  const _CartaoEstatistica({required this.valor, required this.rotulo, required this.cor, this.corBorda = CorApp.borda});
+  final Color? corBorda; // null = borda padrão do tema
+  const _CartaoEstatistica({required this.valor, required this.rotulo, required this.cor, this.corBorda});
 
   @override
   Widget build(BuildContext context) {
@@ -319,16 +333,16 @@ class _CartaoEstatistica extends StatelessWidget {
         decoration: BoxDecoration(
           color: CorApp.fundoCard,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: corBorda),
+          border: Border.all(color: corBorda ?? CorApp.borda),
           boxShadow: const [BoxShadow(color: Color(0x0A133A6E), blurRadius: 16, offset: Offset(0, 6))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(valor, style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800, color: cor, height: 1.1)),
+            Text(valor, style: TextStyle(fontSize: 30, fontWeight: FontWeight.w700, color: cor, height: 1.1)),
             const SizedBox(height: 4),
-            Text(rotulo, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: CorApp.textoSuave, height: 1.25)),
+            Text(rotulo, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: CorApp.textoSuave, height: 1.25)),
           ],
         ),
       ),

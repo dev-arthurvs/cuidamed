@@ -1,6 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
 import Cabecalho from '../componentes/Cabecalho'
 import Cartao from '../componentes/Cartao'
 import SecaoAjuda from '../componentes/SecaoAjuda'
@@ -10,7 +9,6 @@ import './Acessibilidade.css'
 
 export default function Acessibilidade() {
   const { usuario } = useApp()
-  const { abrirMenu } = useOutletContext()
   const [chaveAberta, setChaveAberta] = useState(null)
 
   const secoes = GUIA_SECOES.filter((secao) => secao.publico === 'ambos' || secao.publico === usuario.tipo)
@@ -21,7 +19,7 @@ export default function Acessibilidade() {
 
   return (
     <>
-      <Cabecalho kicker="Ajuda e acessibilidade" titulo="Acessibilidade" aoAbrirMenu={abrirMenu} />
+      <Cabecalho kicker="Ajuda e acessibilidade" titulo="Acessibilidade" />
       <div className="pagina-corpo">
         <div className="pagina-corpo__miolo acessibilidade">
           <Cartao titulo="Como usar cada tela" className="acessibilidade__guia-cartao">

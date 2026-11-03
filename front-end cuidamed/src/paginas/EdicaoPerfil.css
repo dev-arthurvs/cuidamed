@@ -36,7 +36,7 @@
   background: var(--gradiente-azul);
   color: #fff;
   font-size: 25px;
-  font-weight: 800;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -45,7 +45,7 @@
 
 .edicao-perfil__nome {
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .edicao-perfil__papel {
@@ -64,6 +64,16 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
+}
+
+/* Card de senha: "Sair da conta" desce até o fim do card, alinhado com o
+   "Salvar alterações" ao lado (sem sobra de espaço embaixo). */
+.edicao-perfil__formulario--senha {
+  flex: 1;
+}
+
+.edicao-perfil__formulario--senha .edicao-perfil__divisor {
+  margin-top: auto;
 }
 
 .edicao-perfil__divisor {
@@ -93,7 +103,7 @@
 
 .edicao-perfil__cuidador-rotulo {
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--texto-suave);
 }
 
@@ -105,13 +115,26 @@
   margin: 0;
 }
 
-.edicao-perfil__fonte-opcoes {
+/* Aparência: cada opção é um rótulo com os botões de escolha logo abaixo. */
+.edicao-perfil__opcao {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.edicao-perfil__opcao-rotulo {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--texto-label);
+}
+
+.edicao-perfil__opcoes {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
 }
 
-.edicao-perfil__fonte-opcoes .botao {
+.edicao-perfil__opcoes .botao {
   flex: 1;
   min-width: 90px;
 }

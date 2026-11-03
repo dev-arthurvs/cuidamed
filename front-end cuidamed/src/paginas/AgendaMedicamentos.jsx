@@ -1,9 +1,10 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
-import { Link, useOutletContext } from 'react-router-dom'
+import { useSearchParams } from 'react-router-dom'
 import Botao from '../componentes/Botao'
 import Cabecalho from '../componentes/Cabecalho'
 import VoltarDetalhesPaciente from '../componentes/VoltarDetalhesPaciente'
+import ListaTratamentosEncerrados from '../componentes/ListaTratamentosEncerrados'
 import LogoMarca from '../componentes/LogoMarca'
 import ModalConfirmacao from '../componentes/ModalConfirmacao'
 import { useApp } from '../contexto/useApp'
@@ -25,16 +26,31 @@ function descreverDuracao(dias) {
   return `dura ${dias} dia${dias === 1 ? '' : 's'}`
 }
 
+// "1 medicamento em uso" / "3 medicamentos em uso".
+function contar(quantidade, singular, plural) {
+  return `${quantidade} ${quantidade === 1 ? singular : plural}`
+}
+
 export default function AgendaMedicamentos() {
   const { pacienteFoco, usuario, excluirMedicamento, mostrarToast } = useApp()
-  const { abrirMenu } = useOutletContext()
+  // Aba na URL (?aba=encerrados), para onde vai o endereço antigo
+  // /ciclos-encerrados. Sem ela, abre em "Em uso".
+  const [parametros, setParametros] = useSearchParams()
+  const aba = parametros.get('aba') === 'encerrados' ? 'encerrados' : 'em-uso'
+
+  function trocarAba(novaAba) {
+    const proximos = new URLSearchParams(parametros)
+    if (novaAba === 'encerrados') proximos.set('aba', 'encerrados')
+    else proximos.delete('aba')
+    setParametros(proximos, { replace: true })
+  }
   const [medicamentoParaExcluir, setMedicamentoParaExcluir] = useState(null)
   const [medicamentoNoModal, setMedicamentoNoModal] = useState(undefined)
 
   if (!pacienteFoco) {
     return (
       <>
-        <Cabecalho kicker="Agenda de medicamentos" titulo="Nenhum paciente selecionado" aoAbrirMenu={abrirMenu} />
+        <Cabecalho kicker="Agenda de medicamentos" titulo="Nenhum paciente selecionado" />
         <div className="pagina-corpo">
           <p>Selecione um paciente no painel do cuidador para ver a agenda.</p>
         </div>
@@ -45,7 +61,9 @@ export default function AgendaMedicamentos() {
   const medicamentosAtivos = pacienteFoco.medicamentos.filter(
     (medicamento) => !medicamentoEncerrado(medicamento, undefined, pacienteFoco.historico),
   )
-  const totalEncerrados = pacienteFoco.medicamentos.length - medicamentosAtivos.length
+  const medicamentosEncerrados = pacienteFoco.medicamentos.filter((medicamento) =>
+    medicamentoEncerrado(medicamento, undefined, pacienteFoco.historico),
+  )
   const kicker = usuario.tipo === 'cuidador' ? `Agenda de ${pacienteFoco.nome.split(' ')[0]}` : 'Agenda de medicamentos'
   // Paciente sem cuidador cuida da própria agenda; com cuidador, só se ele liberou.
   const podeEditar = usuario.tipo === 'cuidador' || !pacienteFoco.cuidadorId || pacienteFoco.permiteAlteracoes
@@ -63,29 +81,56 @@ export default function AgendaMedicamentos() {
 
   return (
     <>
-      <Cabecalho kicker={kicker} titulo={`${medicamentosAtivos.length} medicamentos cadastrados`} aoAbrirMenu={abrirMenu} />
+      <Cabecalho
+        kicker={kicker}
+        titulo={
+          aba === 'em-uso'
+            ? contar(medicamentosAtivos.length, 'medicamento em uso', 'medicamentos em uso')
+            : contar(medicamentosEncerrados.length, 'tratamento encerrado', 'tratamentos encerrados')
+        }
+      />
       <div className="pagina-corpo">
         <div className="pagina-corpo__miolo agenda">
           <VoltarDetalhesPaciente paciente={pacienteFoco} />
           <div className="agenda__topo">
-            {!podeEditar && (
-              <p className="agenda__descricao">
-                Seu cuidador ainda não liberou alterações nessa agenda. Fale com ele(a) se precisar ajustar algo.
-              </p>
-            )}
-            <div className="agenda__topo-acoes">
-              <Link to="/ciclos-encerrados" className="agenda__link-encerrados">
-                Ciclos encerrados{totalEncerrados > 0 ? ` (${totalEncerrados})` : ''}
-              </Link>
-              {podeEditar && (
+            <div className="agenda__abas" role="tablist" aria-label="Remédios">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={aba === 'em-uso'}
+                className={`agenda__aba${aba === 'em-uso' ? ' agenda__aba--ativa' : ''}`}
+                onClick={() => trocarAba('em-uso')}
+              >
+                Em uso <span className="agenda__aba-contagem">{medicamentosAtivos.length}</span>
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={aba === 'encerrados'}
+                className={`agenda__aba${aba === 'encerrados' ? ' agenda__aba--ativa' : ''}`}
+                onClick={() => trocarAba('encerrados')}
+              >
+                Encerrados <span className="agenda__aba-contagem">{medicamentosEncerrados.length}</span>
+              </button>
+            </div>
+            {aba === 'em-uso' && podeEditar && (
+              <div className="agenda__topo-acoes">
                 <Botao onClick={() => setMedicamentoNoModal(null)}>
                   <span style={{ fontSize: 24, lineHeight: 1 }}>+</span>
                   <span>Inserir medicamento</span>
                 </Botao>
-              )}
-            </div>
+              </div>
+            )}
           </div>
+          {aba === 'em-uso' && !podeEditar && (
+            <p className="agenda__descricao">
+              Seu cuidador ainda não liberou alterações nessa agenda. Fale com ele(a) se precisar ajustar algo.
+            </p>
+          )}
 
+          {aba === 'encerrados' ? (
+            <ListaTratamentosEncerrados medicamentos={medicamentosEncerrados} />
+          ) : (
           <div className="agenda__grade">
             <AnimatePresence>
             {medicamentosAtivos.map((medicamento) => {
@@ -109,7 +154,7 @@ export default function AgendaMedicamentos() {
                   <div className="agenda__cartao-info">
                     <div className="agenda__cartao-nome">{medicamento.nome}</div>
                     <div className="agenda__cartao-dose">
-                      {medicamento.dosagem} · {medicamento.forma}
+                      {[medicamento.dosagem, medicamento.forma].filter(Boolean).join(' · ')}
                     </div>
                   </div>
                 </div>
@@ -163,9 +208,10 @@ export default function AgendaMedicamentos() {
             })}
             </AnimatePresence>
             {medicamentosAtivos.length === 0 && (
-              <p style={{ color: 'var(--texto-suave)' }}>Nenhum medicamento ativo cadastrado no momento.</p>
+              <p style={{ color: 'var(--texto-suave)' }}>Nenhum medicamento em uso no momento.</p>
             )}
           </div>
+          )}
         </div>
       </div>
 

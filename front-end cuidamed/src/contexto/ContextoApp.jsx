@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { api } from '../utilitarios/api'
-import { definirAoExpirarSessao, lerSessao, limparSessao, salvarSessao } from '../utilitarios/sessao'
+import {
+  definirAoExpirarSessao,
+  lerSessao,
+  lembrarLogin,
+  limparSessao,
+  registrarAtividade,
+  salvarSessao,
+  sessaoInativa,
+} from '../utilitarios/sessao'
 import { tocarAlertaSonoro } from '../utilitarios/alertaSonoro'
 import {
   calcularIdade,
@@ -41,10 +49,13 @@ function mapearPacienteDaApi(paciente) {
     observacoesClinicas: paciente.observacoesClinicas || '',
     cuidadorId: paciente.cuidadorId,
     cuidadorSolicitadoId: paciente.cuidadorSolicitadoId,
+    // Id do vínculo ativo com o cuidador ("nº do cartão"); null sem cuidador.
+    codigoVinculo: paciente.codigoVinculo ?? null,
     alertaManualPendente: paciente.alertaManualPendente,
     alertaManualMensagem: paciente.alertaManualMensagem,
     permiteAlteracoes: paciente.permiteAlteracoes,
     codigoAtivacao: paciente.codigoAtivacao || '',
+    codigoNovaSenha: Boolean(paciente.codigoNovaSenha),
     iniciais: obterIniciais(paciente.nome),
   }
 }
@@ -67,6 +78,7 @@ function mapearMedicamentoDaApi(medicamento) {
 
 function mapearHistoricoDaApi(historico) {
   return {
+    id: historico.id,
     medicamentoId: historico.medicamentoId,
     data: historico.data,
     horario: historico.hora,
@@ -101,6 +113,7 @@ export function ProvedorApp({ children }) {
   const [tema, setTema] = useState(obterTemaSalvo)
   const timeoutToast = useRef(null)
   const avisados = useRef(new Set())
+  const atrasosAvisados = useRef(new Set())
 
   const autenticado = usuario !== null
 
@@ -178,7 +191,9 @@ export function ProvedorApp({ children }) {
       const diferenca = agora - paraMinutos(dose.horario)
       if (diferenca >= 0 && diferenca < 1) {
         avisados.current.add(dose.id)
-        const mensagem = `Está na hora de tomar ${dose.nome} (${dose.dosagem}).`
+        const mensagem = dose.dosagem
+          ? `Está na hora de tomar ${dose.nome} (${dose.dosagem}).`
+          : `Está na hora de tomar ${dose.nome}.`
         mostrarToast(mensagem)
         tocarAlertaSonoro()
         notificarDose('Hora do remédio 💊', mensagem)
@@ -186,6 +201,31 @@ export function ProvedorApp({ children }) {
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tick, usuario, pacienteFoco])
+
+  // Cuidador: avisa uma vez quando a dose de um paciente fica atrasada (depois de
+  // 15 minutos sem registro). Só com o app aberto; o status também fica no painel.
+  useEffect(() => {
+    if (!usuario || usuario.tipo !== 'cuidador') return
+    const hoje = dataAtualISO()
+    const novos = []
+    pacientesComStatusAtual.forEach((paciente) => {
+      paciente.dosesHoje.forEach((dose) => {
+        const chave = `${hoje}-${paciente.id}-${dose.id}`
+        if (dose.status !== 'atrasado' || atrasosAvisados.current.has(chave)) return
+        atrasosAvisados.current.add(chave)
+        novos.push({ paciente: paciente.nome.split(' ')[0], dose })
+      })
+    })
+    if (novos.length === 0) return
+    const mensagem =
+      novos.length === 1
+        ? `${novos[0].paciente}: a dose das ${novos[0].dose.horario} (${novos[0].dose.nome}) está atrasada.`
+        : `${novos.length} doses atrasadas: ${[...new Set(novos.map((item) => item.paciente))].join(', ')}.`
+    queueMicrotask(() => mostrarToast(mensagem))
+    tocarAlertaSonoro()
+    notificarDose('Dose atrasada ⏰', mensagem)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tick, usuario, pacientesComStatusAtual])
 
   // Alerta manual: verifica periodicamente se o cuidador pediu pra lembrar o
   // paciente agora, mesmo fora do horário programado de alguma dose.
@@ -281,10 +321,13 @@ export function ProvedorApp({ children }) {
     }
   }, [])
 
+  // lembrar ("Lembrar de mim"): continua logado mesmo sem uso (até o login
+  // vencer) e o e-mail ou telefone já vem preenchido na próxima vez.
   const entrar = useCallback(
-    async (email, senha) => {
-      const login = await api.post('/api/auth/login', { email, senha })
-      salvarSessao({ token: login.token, tipo: login.tipo, id: login.id })
+    async (identificador, senha, lembrar = false) => {
+      const login = await api.post('/api/auth/login', { login: identificador, senha })
+      salvarSessao({ token: login.token, tipo: login.tipo, id: login.id, lembrar })
+      lembrarLogin(lembrar ? identificador : '')
       try {
         await carregarUsuario(login.tipo, login.id)
       } catch (erro) {
@@ -329,12 +372,41 @@ export function ProvedorApp({ children }) {
     return () => definirAoExpirarSessao(null)
   }, [sair, mostrarToast])
 
-  // Depois de criar a conta, entra com o mesmo e-mail e senha (é o login que gera o token).
+  // Inatividade: depois de 30 minutos sem clique, toque, tecla ou rolagem, sai
+  // da conta e volta para o login (vale para paciente e cuidador). Atualizações
+  // automáticas (sincronização, alertas) não contam como uso.
+  const autenticadoAgora = usuario !== null
+  useEffect(() => {
+    if (!autenticadoAgora) return undefined
+    let ultimaGravacao = 0
+    function aoUsar() {
+      const agora = Date.now()
+      if (agora - ultimaGravacao < 15000) return // grava no máximo a cada 15 s
+      ultimaGravacao = agora
+      registrarAtividade(agora)
+    }
+    function verificar() {
+      if (sessaoInativa()) sair()
+    }
+    const eventos = ['pointerdown', 'keydown', 'wheel', 'touchstart', 'scroll']
+    eventos.forEach((evento) => window.addEventListener(evento, aoUsar, { passive: true, capture: true }))
+    document.addEventListener('visibilitychange', verificar)
+    window.addEventListener('focus', verificar)
+    const intervalo = setInterval(verificar, 30000)
+    return () => {
+      eventos.forEach((evento) => window.removeEventListener(evento, aoUsar, { capture: true }))
+      document.removeEventListener('visibilitychange', verificar)
+      window.removeEventListener('focus', verificar)
+      clearInterval(intervalo)
+    }
+  }, [autenticadoAgora, sair])
+
+  // Depois de criar a conta, entra com o mesmo e-mail (ou telefone) e senha (é o login que gera o token).
   const cadastrar = useCallback(async ({ nome, email, senha, tipo, dataNascimento, sexo, telefone, endereco, profissao }) => {
     if (tipo === 'paciente') {
       await api.post('/api/pacientes', {
         nome,
-        email,
+        email: email || null,
         senha,
         dataNascimento: dataNascimento || null,
         sexo: sexo ? SEXO_PARA_API[sexo] : null,
@@ -344,13 +416,13 @@ export function ProvedorApp({ children }) {
     } else {
       await api.post('/api/cuidadores', {
         nome,
-        email,
+        email: email || null,
         senha,
         profissao: profissao || null,
         telefone: telefone || null,
       })
     }
-    await entrar(email, senha)
+    await entrar(email || telefone, senha)
   }, [entrar])
 
   const selecionarPaciente = useCallback((id) => setPacienteFocoId(id), [])
@@ -372,7 +444,6 @@ export function ProvedorApp({ children }) {
         sexo: dados.sexo ? SEXO_PARA_API[dados.sexo] : null,
         enfermidade: dados.enfermidade || null,
         telefone: dados.telefone || null,
-        endereco: dados.endereco || null,
         cuidadorId: usuario?.id,
       })
       const base = await api.get(`/api/cuidadores/${usuario.id}/pacientes`)
@@ -444,11 +515,40 @@ export function ProvedorApp({ children }) {
           status: statusFinal,
         })
         await recarregarPaciente(pacienteId)
+        return true
       } catch (erro) {
         mostrarToast(erro.message)
+        return false
       }
     },
     [pacientesComStatusAtual, recarregarPaciente, mostrarToast],
+  )
+
+  // "Desfazer": apaga o registro de hoje; o servidor devolve o estoque descontado.
+  const desfazerDose = useCallback(
+    async (pacienteId, dose) => {
+      const paciente = pacientes.find((item) => item.id === pacienteId)
+      const registro = paciente?.historico.find(
+        (item) => item.medicamentoId === dose.medicamentoId && item.data === dataAtualISO() && item.horario === dose.horario,
+      )
+      if (!registro) return
+      try {
+        await api.delete(`/api/historicos/${registro.id}`)
+        await recarregarPaciente(pacienteId)
+        mostrarToast('Registro desfeito.')
+      } catch (erro) {
+        mostrarToast(erro.message || 'Não foi possível desfazer.')
+      }
+    },
+    [pacientes, recarregarPaciente, mostrarToast],
+  )
+
+  const gerarCodigoNovaSenha = useCallback(
+    async (pacienteId) => {
+      await api.post(`/api/pacientes/${pacienteId}/codigo-nova-senha`, {})
+      await recarregarPaciente(pacienteId)
+    },
+    [recarregarPaciente],
   )
 
   const atualizarPerfil = useCallback(
@@ -461,7 +561,8 @@ export function ProvedorApp({ children }) {
           sexo: dados.sexo ? SEXO_PARA_API[dados.sexo] : null,
           enfermidade: pacienteFoco?.enfermidade || null,
           telefone: dados.telefone || null,
-          endereco: dados.endereco || null,
+          // Endereço saiu dos formulários: mantém o que já estava salvo.
+          endereco: pacienteFoco?.endereco || null,
           observacoesClinicas: pacienteFoco?.observacoesClinicas || null,
           cuidadorId: pacienteFoco?.cuidadorId || null,
         })
@@ -584,6 +685,8 @@ export function ProvedorApp({ children }) {
       editarMedicamento,
       excluirMedicamento,
       marcarDoseComoTomada,
+      desfazerDose,
+      gerarCodigoNovaSenha,
       atualizarPerfil,
       alterarSenha,
       solicitarVinculoCuidador,
@@ -616,6 +719,8 @@ export function ProvedorApp({ children }) {
       editarMedicamento,
       excluirMedicamento,
       marcarDoseComoTomada,
+      desfazerDose,
+      gerarCodigoNovaSenha,
       atualizarPerfil,
       alterarSenha,
       solicitarVinculoCuidador,

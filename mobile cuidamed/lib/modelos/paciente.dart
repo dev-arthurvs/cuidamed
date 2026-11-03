@@ -17,6 +17,11 @@ class Paciente {
   /// Só enquanto o paciente cadastrado pelo cuidador não ativou o acesso.
   final String? codigoAtivacao;
 
+  /// true quando o código é de nova senha (a conta já tem senha).
+  final bool codigoNovaSenha;
+  /// Id do vínculo ativo com o cuidador ("nº do cartão"); null sem cuidador.
+  final int? codigoVinculo;
+
   Paciente({
     required this.id,
     required this.nome,
@@ -33,13 +38,15 @@ class Paciente {
     this.alertaManualMensagem,
     this.permiteAlteracoes = false,
     this.codigoAtivacao,
+    this.codigoNovaSenha = false,
+    this.codigoVinculo,
   });
 
   factory Paciente.fromJson(Map<String, dynamic> json) {
     return Paciente(
       id: json['id'] as int,
       nome: json['nome'] as String,
-      email: json['email'] as String,
+      email: json['email'] as String? ?? '', // opcional: pode entrar pelo telefone
       dataNascimento: json['dataNascimento'] != null ? DateTime.parse(json['dataNascimento']) : null,
       sexo: json['sexo'] as String?,
       enfermidade: json['enfermidade'] as String?,
@@ -52,6 +59,8 @@ class Paciente {
       alertaManualMensagem: json['alertaManualMensagem'] as String?,
       permiteAlteracoes: json['permiteAlteracoes'] as bool? ?? false,
       codigoAtivacao: json['codigoAtivacao'] as String?,
+      codigoNovaSenha: json['codigoNovaSenha'] as bool? ?? false,
+      codigoVinculo: json['codigoVinculo'] as int?,
     );
   }
 

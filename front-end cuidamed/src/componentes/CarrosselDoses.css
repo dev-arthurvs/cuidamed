@@ -1,0 +1,266 @@
+/* Carrossel vertical do card "Doses de hoje" (dentro de .painel-idoso__proximo,
+   que dá o fundo azul e o texto branco). */
+.carrossel-doses {
+  --dose-tomada: #7ef0b4;
+  --dose-perdida: #ffb0b0;
+  --dose-linha: rgba(255, 255, 255, 0.09);
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 0;
+}
+
+/* No modo escuro o card é azul-claro: as linhas ganham um fundo escuro para o
+   verde e o vermelho continuarem legíveis. */
+:root[data-tema='escuro'] .carrossel-doses {
+  --dose-linha: rgba(6, 32, 74, 0.4);
+}
+
+.carrossel-doses__topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.carrossel-doses__kicker {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  opacity: 0.9;
+}
+
+.carrossel-doses__seta {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+/* Canto inferior direito do card, alinhada à linha da próxima dose. */
+.carrossel-doses__seta--baixo {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.carrossel-doses__seta:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.carrossel-doses__seta:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.carrossel-doses__janela {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.carrossel-doses__trilho {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Aviso logo depois de registrar, com o "Desfazer". */
+.carrossel-doses__registrada {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--dose-linha);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.carrossel-doses__desfazer {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 12px;
+  background: transparent;
+  color: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.carrossel-doses__desfazer:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* Linhas pequenas: dose anterior (em cima) e próxima (embaixo). */
+.carrossel-doses__vaga {
+  min-height: 44px;
+}
+
+.carrossel-doses__linha-proxima {
+  margin-right: 54px;
+}
+
+.carrossel-doses__linha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  background: var(--dose-linha);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.carrossel-doses__linha-texto {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.carrossel-doses__linha strong {
+  font-weight: 700;
+  margin-right: 4px;
+}
+
+.carrossel-doses__linha svg {
+  flex: none;
+}
+
+.carrossel-doses__linha--tomado {
+  color: var(--dose-tomada);
+}
+
+.carrossel-doses__linha--perdido {
+  color: var(--dose-perdida);
+}
+
+.carrossel-doses__linha--perdido .carrossel-doses__linha-texto {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+}
+
+.carrossel-doses__ponto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
+  flex: none;
+}
+
+/* Dose em foco: fonte grande, com "Registrar dose" ao lado. */
+.carrossel-doses__atual {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px 24px;
+  flex-wrap: wrap;
+}
+
+.carrossel-doses__atual-info {
+  min-width: 0;
+}
+
+.carrossel-doses__hora-linha {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.carrossel-doses__hora {
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.carrossel-doses__selo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--dose-linha);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.carrossel-doses__selo--tomado {
+  color: var(--dose-tomada);
+}
+
+.carrossel-doses__selo--perdido {
+  color: var(--dose-perdida);
+}
+
+.carrossel-doses__selo--atrasado {
+  color: #ffd98a;
+}
+
+.carrossel-doses__selo--atrasado .carrossel-doses__ponto {
+  opacity: 1;
+}
+
+.carrossel-doses__nome {
+  font-size: 28px;
+  font-weight: 700;
+  margin-top: 10px;
+  overflow-wrap: anywhere;
+}
+
+.carrossel-doses__atual--perdido .carrossel-doses__nome {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  opacity: 0.85;
+}
+
+.carrossel-doses__quantidade {
+  font-size: 18px;
+  font-weight: 600;
+  opacity: 0.92;
+}
+
+.carrossel-doses__botao {
+  flex: none;
+  /* Sempre branco com texto azul-marinho: é o principal chamado da tela, nos
+     dois modos (sobre o card escuro no claro e sobre o card claro no escuro). */
+  background: #fff;
+  color: #0b3a78;
+  box-shadow: 0 8px 18px rgba(9, 38, 80, 0.18);
+}
+
+@media (max-width: 640px) {
+  .carrossel-doses__hora {
+    font-size: 42px;
+  }
+
+  .carrossel-doses__nome {
+    font-size: 24px;
+  }
+
+  .carrossel-doses__botao {
+    width: 100%;
+  }
+}

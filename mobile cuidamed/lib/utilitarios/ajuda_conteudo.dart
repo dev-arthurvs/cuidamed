@@ -28,7 +28,11 @@ const List<SecaoAjuda> guiaSecoes = [
     paraQueServe:
         'É a tela principal quando você entra no aplicativo. Mostra quantas doses faltam hoje, qual é o próximo remédio e um resumo rápido do seu dia.',
     passos: [
-      'O card azul grande mostra o próximo medicamento a tomar. Quando tomar, toque em "Registrar dose".',
+      'O card "Doses de hoje" mostra no meio, em letra grande, a dose da vez. Quando tomar, toque em "Registrar dose".',
+      'Registrou sem querer? Toque em "Desfazer" logo depois, ou volte até a dose tomada e toque em "Desfazer". Dá para desfazer as doses de hoje.',
+      'Se algum remédio estiver acabando, o card "Estoque acabando" aparece nesta tela.',
+      'Em cima fica a dose anterior: verde com ✓ se foi tomada, vermelha e riscada com ✕ se foi perdida. Embaixo fica a próxima dose.',
+      'Para ver as outras doses do dia, use as setas do card: ↑ no canto de cima e ↓ no canto de baixo.',
       'Os números embaixo mostram quantas doses já foram tomadas, quantas faltam e quantas estão atrasadas.',
       'A lista "Agenda de hoje" no final mostra todos os horários do dia, em ordem.',
       'Puxe a tela para baixo para atualizar as informações.',
@@ -45,7 +49,7 @@ const List<SecaoAjuda> guiaSecoes = [
       'Se aparecer "Solicitações pendentes", é porque um paciente pediu para se vincular a você — toque em "Aceitar" ou "Recusar".',
       'Toque em qualquer paciente da lista "Pacientes vinculados" para abrir os detalhes dele.',
       'Use o botão "+ Cadastrar paciente" para registrar um novo paciente que ainda não tem conta própria. Preencha o telefone dele se quiser poder mandar lembretes de dose pelo WhatsApp depois.',
-      'Depois de cadastrar, abra os detalhes do paciente para ver o código de ativação: é com ele (e o e-mail cadastrado) que o paciente cria a própria senha em "Ativar meu acesso".',
+      'Depois de cadastrar, abra os detalhes do paciente para ver o código de ativação: é com ele (e o e-mail ou telefone cadastrado) que o paciente cria a própria senha em "Ativar meu acesso".',
     ],
   ),
   SecaoAjuda(
@@ -56,24 +60,15 @@ const List<SecaoAjuda> guiaSecoes = [
     passos: [
       'Veja as doses de hoje e o percentual de adesão dos últimos 30 dias no topo.',
       'Use "Lembrar agora 🔔" para mandar um alerta imediato para o paciente, a qualquer momento.',
-      'Use "Ver histórico completo" para consultar todas as doses já registradas.',
-      'Use "Acessar agenda" para adicionar, editar ou remover remédios da agenda do paciente.',
-      'Use "Ver ciclos encerrados" para ver remédios cujo tratamento já terminou.',
+      'Use "Ver histórico de doses" para consultar todas as doses já registradas.',
+      'Use "Acessar agenda" para adicionar, editar ou remover remédios da agenda do paciente. Os remédios cujo tratamento já terminou ficam lá, na aba "Encerrados".',
       'Ao lado do status de cada dose em "Doses de hoje", use o ícone verde de telefone para mandar um lembrete pelo WhatsApp direto pro paciente. Só aparece pra doses ainda não tomadas, e fica desabilitado se o paciente não tiver telefone cadastrado.',
-      'Use "Painel do paciente ⚙️" para gerenciar permissões e desvincular o paciente, se precisar.',
-      'Se o paciente ainda não ativou o acesso ao app, o card "Acesso do paciente" mostra o código de ativação. Passe esse código para ele usar em "Ativar meu acesso", junto com o e-mail cadastrado. Depois de usado, o card some.',
+      'O card "Permite alterações" define se o paciente pode adicionar, editar ou excluir os próprios remédios. Desligado por padrão.',
+      'Use "Desvincular paciente" se quiser parar de acompanhar esse paciente. Se ele não tiver e-mail, telefone ou senha próprios, o aplicativo avisa antes de confirmar.',
+      'Se o paciente esqueceu a senha, toque em "Gerar código de nova senha" no card "Acesso do paciente" e passe o código a ele. O código vale por 24 horas.',
+      'A adesão considera os últimos 30 dias, e doses que passaram do limite sem registro contam como perdidas.',
+      'Se o paciente ainda não ativou o acesso ao app, o card "Acesso do paciente" mostra o código de ativação. Passe esse código para ele usar em "Ativar meu acesso", junto com o e-mail ou telefone cadastrado. Depois de usado, o card some.',
       'No card "Observações clínicas", escreva informações importantes (alergias, cuidados ao tomar os remédios) e toque em "Salvar observações". O assistente do chat também usa essas observações para responder o paciente.',
-    ],
-  ),
-  SecaoAjuda(
-    chave: 'painel-paciente-config',
-    publico: 'cuidador',
-    titulo: 'Painel do paciente (configurações)',
-    paraQueServe: 'Tela de configurações do vínculo com um paciente específico. Só o cuidador pode acessar e alterar essas opções.',
-    passos: [
-      'A chave "Permite alterações" define se o paciente pode adicionar, editar ou excluir os próprios remédios. Desligada por padrão — ligue se quiser dar autonomia a ele.',
-      'Use "Desvincular paciente" se quiser parar de acompanhar esse paciente. Essa ação desfaz o vínculo dos dois lados e não pode ser feita pelo paciente, só pelo cuidador.',
-      'Se o paciente não tiver e-mail/senha próprios, desvincular o deixa sem nenhum cuidador responsável — o aplicativo avisa antes de confirmar.',
     ],
   ),
   SecaoAjuda(
@@ -81,41 +76,31 @@ const List<SecaoAjuda> guiaSecoes = [
     publico: 'ambos',
     titulo: 'Agenda de medicamentos',
     paraQueServe:
-        'É onde os remédios são cadastrados, com nome, dosagem, forma, frequência e horários. Cuidadores veem a agenda do paciente selecionado; pacientes veem a própria.',
+        'É onde ficam os remédios, com nome, forma, frequência e horários, em duas abas: "Em uso" (o tratamento atual) e "Encerrados" (remédios cujo tratamento já terminou). Cuidadores veem a agenda do paciente selecionado; pacientes veem a própria.',
     passos: [
-      'Se você é cuidador e abriu a agenda pelo menu ou pela barra inferior, escolha primeiro o paciente na lista. Pelos detalhes do paciente ("Acessar agenda"), ela abre direto.',
-      'Toque em "+ Inserir medicamento" para cadastrar um novo remédio: preencha nome, dosagem, forma (comprimido, gotas, etc.), frequência e os horários do dia.',
+      'Se você é cuidador e abriu a agenda pela barra inferior, escolha primeiro o paciente na lista. Pelos detalhes do paciente ("Acessar agenda"), ela abre direto.',
+      'Toque em "+ Inserir medicamento" para cadastrar um novo remédio: preencha nome, forma (comprimido, gotas, etc.), frequência e os horários do dia.',
       'Em cada card já cadastrado, use "Editar" para mudar alguma informação ou "Excluir" para remover.',
-      'Remédios saem daqui automaticamente assim que a última dose do ciclo é confirmada (mesmo no próprio dia em que o tratamento termina) e vão para "Ciclos encerrados".',
+      'Quando o tratamento termina, o remédio passa sozinho de "Em uso" para "Encerrados": assim que a última dose é confirmada (mesmo no próprio dia da data final) ou, o mais tardar, no dia seguinte.',
+      'Na aba "Encerrados" você consulta o período em que cada remédio foi usado (data de início até data de fim). Ali não dá para editar nem excluir.',
       'Cada card mostra o estoque do remédio: suficiente até o fim do tratamento (verde), baixo (amarelo, hora de repor) ou esgotado (vermelho).',
       'Se você é paciente e não vê os botões de inserir/editar/excluir, é porque seu cuidador ainda não liberou essa permissão para você — fale com ele.',
       'Se você é cuidador, use "‹ Voltar para os detalhes do paciente" no topo para voltar aos detalhes do paciente.',
     ],
   ),
   SecaoAjuda(
-    chave: 'ciclos-encerrados',
-    publico: 'ambos',
-    titulo: 'Ciclos encerrados',
-    paraQueServe:
-        'Guarda os remédios cujo período de tratamento já terminou, para consulta futura. Um remédio entra aqui assim que a última dose do ciclo é confirmada, mesmo no próprio dia da data final — ou, o mais tardar, no dia seguinte, mesmo que a última dose não tenha sido registrada.',
-    passos: [
-      'Se você é cuidador e abriu pelo menu ou pela barra inferior, escolha primeiro o paciente na lista. Pelos detalhes do paciente ("Ver ciclos encerrados"), abre direto.',
-      'A lista mostra o período em que cada remédio foi usado (data de início até data de fim).',
-      'Para voltar aos remédios ativos, use o botão voltar do celular ou toque em "Agenda" na barra inferior.',
-      'Se você é cuidador, use "‹ Voltar para os detalhes do paciente" no topo para voltar aos detalhes do paciente.',
-    ],
-  ),
-  SecaoAjuda(
     chave: 'historico',
     publico: 'ambos',
-    titulo: 'Histórico',
-    paraQueServe: 'Mostra o registro de todas as doses já passadas: quais foram tomadas, atrasadas ou perdidas.',
+    titulo: 'Histórico de doses',
+    paraQueServe:
+        'Mostra o registro de todas as doses já passadas: quais foram tomadas, atrasadas ou perdidas. (Os remédios que já terminaram ficam na Agenda, aba "Encerrados".)',
     passos: [
-      'Se você é cuidador e abriu pelo menu, escolha primeiro o paciente na lista. Pelos detalhes do paciente ("Ver histórico completo"), abre direto.',
+      'Se você é cuidador e abriu pela barra inferior, escolha primeiro o paciente na lista. Pelos detalhes do paciente ("Ver histórico de doses"), abre direto.',
       'Escolha o período nos campos "De" e "Até" (começam no dia de hoje). Não dá para escolher datas futuras.',
       'Use o filtro "Medicamento" para ver o histórico de um remédio específico.',
       'Os três números no topo resumem quantas doses foram tomadas, atrasadas e perdidas no período escolhido.',
       'A lista abaixo mostra cada dose, organizada por dia, da mais recente para a mais antiga.',
+      'Use "Gerar relatório (PDF)" para imprimir ou salvar o período escolhido e levar ao médico.',
       'Se você é cuidador, use "‹ Voltar para os detalhes do paciente" no topo para voltar aos detalhes do paciente.',
     ],
   ),
@@ -124,11 +109,11 @@ const List<SecaoAjuda> guiaSecoes = [
     publico: 'paciente',
     titulo: 'Chat com o assistente',
     paraQueServe:
-        'Um assistente virtual que responde perguntas sobre a sua própria rotina de remédios: quais toma, em que horário, e se já tomou nos últimos dias.',
+        'Um assistente virtual que responde sobre os seus remédios (horários, estoque, próxima dose e histórico) e explica como usar o aplicativo.',
     passos: [
       'Toque em uma das perguntas sugeridas para enviar direto, sem precisar digitar.',
       'Ou digite sua pergunta no campo de texto e toque em "Enviar".',
-      'O assistente só responde sobre os seus próprios medicamentos e histórico — ele não dá conselhos médicos nem opina sobre outros assuntos.',
+      'O assistente responde sobre os seus próprios medicamentos e sobre como usar o aplicativo. Ele não registra doses, não altera nada, não dá conselhos médicos e não opina sobre outros assuntos.',
       'Se a pergunta for sobre saúde em geral, ele vai pedir para você falar com seu médico ou cuidador.',
       'Há um limite de perguntas por hora e por dia. Se aparecer o aviso de limite, espere um pouco e pergunte de novo.',
     ],
@@ -136,13 +121,15 @@ const List<SecaoAjuda> guiaSecoes = [
   SecaoAjuda(
     chave: 'perfil',
     publico: 'ambos',
-    titulo: 'Perfil',
-    paraQueServe: 'Reúne seus dados pessoais, troca de senha e (se você for paciente) o vínculo com o cuidador.',
+    titulo: 'Configurações',
+    paraQueServe:
+        'Reúne seus dados pessoais, a troca de senha, o tamanho da fonte e (se você for paciente) o vínculo com o cuidador.',
     passos: [
-      'Atualize nome, e-mail e outros dados no primeiro formulário e toque em "Salvar alterações".',
+      'Atualize nome, e-mail e outros dados no card "Dados pessoais" e toque em "Salvar alterações".',
       'Se você é paciente, cadastre seu telefone com DDD — é ele que o cuidador usa pra mandar lembretes de dose pelo WhatsApp.',
       'Para trocar a senha, preencha a senha atual e a nova senha (mínimo 8 caracteres) e toque em "Atualizar senha".',
-      'Se você é paciente sem cuidador vinculado, informe o e-mail do cuidador no card "Vincular cuidador(a)" — ele precisa confirmar o pedido antes do vínculo valer.',
+      'No card "Aparência", escolha o tamanho da fonte (Pequena, Média ou Grande). A escolha vale na hora, em todo o aplicativo.',
+      'Se você é paciente sem cuidador vinculado, informe o e-mail ou telefone do cuidador no card "Vincular cuidador(a)" — ele precisa confirmar o pedido antes do vínculo valer.',
       'Use "Sair da conta" para fazer logout.',
     ],
   ),
@@ -161,13 +148,11 @@ const List<SecaoAjuda> guiaSecoes = [
 ];
 
 String? obterChaveAjuda(String rota, String tipoUsuario) {
-  if (RegExp(r'^/cuidador/paciente/[^/]+/painel').hasMatch(rota)) return 'painel-paciente-config';
   if (rota.startsWith('/cuidador/paciente/')) return 'detalhes-paciente';
   if (rota == '/painel') return tipoUsuario == 'cuidador' ? 'inicio-cuidador' : 'inicio-paciente';
   if (rota.startsWith('/agenda')) return 'agenda';
-  if (rota.startsWith('/ciclos-encerrados')) return 'ciclos-encerrados';
   if (rota.startsWith('/historico')) return 'historico';
-  if (rota.startsWith('/perfil')) return 'perfil';
+  if (rota.startsWith('/configuracoes')) return 'perfil';
   if (rota.startsWith('/chat')) return 'chat';
   if (rota.startsWith('/acessibilidade')) return 'acessibilidade';
   return null;

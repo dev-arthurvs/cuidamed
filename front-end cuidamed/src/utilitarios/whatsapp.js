@@ -14,10 +14,11 @@ export function formatarTelefoneWhatsApp(telefone) {
 }
 
 // Pomada não tem quantidadePorDose (não tem unidade discreta, ver dadosMock.js)
-// — nesse caso mostra a dosagem (concentração) como substituta.
+// — nesse caso mostra a dosagem (concentração), se o remédio antigo tiver uma;
+// sem nenhuma das duas, devolve texto vazio.
 export function formatarQuantidadePorDose({ forma, quantidadePorDose, dosagem }) {
   const temQuantidade = quantidadePorDose !== '' && quantidadePorDose != null
-  if (!temQuantidade) return dosagem
+  if (!temQuantidade) return dosagem || ''
   const unidade = UNIDADE_ESTOQUE_POR_FORMA[forma] || 'unidades'
   return `${quantidadePorDose} ${unidade}`
 }
@@ -31,8 +32,8 @@ export function montarMensagemLembrete({ nomePaciente, medicamento, horario, for
     'CUIDAMED💊💙',
     `Olá ${primeiroNome}! Está na hora do seu remédio das ${horario}.`,
     `Medicamento: ${medicamento}`,
-    `Quantidade: ${quantidadeTexto}`,
   ]
+  if (quantidadeTexto) linhas.push(`Quantidade: ${quantidadeTexto}`)
   if (diasRestantes != null) {
     linhas.push(
       diasRestantes <= 0

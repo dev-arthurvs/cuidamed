@@ -1,5 +1,7 @@
 package com.cuidamed.cuidamed_backend.seguranca;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -11,6 +13,8 @@ import com.cuidamed.cuidamed_backend.historico.HistoricoRepository;
 import com.cuidamed.cuidamed_backend.medicamento.MedicamentoRepository;
 import com.cuidamed.cuidamed_backend.paciente.Paciente;
 import com.cuidamed.cuidamed_backend.paciente.PacienteRepository;
+import com.cuidamed.cuidamed_backend.vinculo.SituacaoVinculo;
+import com.cuidamed.cuidamed_backend.vinculo.VinculoRepository;
 
 /**
  * Regras de "quem pode acessar o quê", usadas nos controllers antes de cada
@@ -30,14 +34,17 @@ public class Autorizacao {
     private final PacienteRepository pacienteRepository;
     private final MedicamentoRepository medicamentoRepository;
     private final HistoricoRepository historicoRepository;
+    private final VinculoRepository vinculoRepository;
 
     public Autorizacao(
             PacienteRepository pacienteRepository,
             MedicamentoRepository medicamentoRepository,
-            HistoricoRepository historicoRepository) {
+            HistoricoRepository historicoRepository,
+            VinculoRepository vinculoRepository) {
         this.pacienteRepository = pacienteRepository;
         this.medicamentoRepository = medicamentoRepository;
         this.historicoRepository = historicoRepository;
+        this.vinculoRepository = vinculoRepository;
     }
 
     /** Usuário do token da requisição, ou null se ela veio sem login (rotas públicas). */
@@ -105,11 +112,9 @@ public class Autorizacao {
         if (usuario.ehCuidador() && usuario.id().equals(cuidadorId)) {
             return;
         }
-        if (usuario.ehPaciente()) {
-            Paciente paciente = pacienteRepository.findById(usuario.id()).orElseThrow(this::semAcesso);
-            if (mesmoCuidador(paciente, cuidadorId)) {
-                return;
-            }
+        if (usuario.ehPaciente() && vinculoRepository.existsByPacienteIdAndCuidadorIdAndSituacaoIn(
+                usuario.id(), cuidadorId, List.of(SituacaoVinculo.ATIVO, SituacaoVinculo.PENDENTE))) {
+            return;
         }
         throw semAcesso();
     }
@@ -123,7 +128,8 @@ public class Autorizacao {
         }
         if (usuario.ehPaciente() && usuario.id().equals(pacienteId)) {
             Paciente paciente = pacienteRepository.findById(pacienteId).orElseThrow(this::semAcesso);
-            if (paciente.getCuidador() == null || paciente.isPermiteAlteracoes()) {
+            if (!vinculoRepository.existsByPacienteIdAndSituacao(pacienteId, SituacaoVinculo.ATIVO)
+                    || paciente.isPermiteAlteracoes()) {
                 return;
             }
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
@@ -155,14 +161,7 @@ public class Autorizacao {
     }
 
     private boolean cuidadorDoPaciente(Long pacienteId, Long cuidadorId) {
-        return pacienteRepository.findById(pacienteId)
-                .map(paciente -> paciente.getCuidador() != null && paciente.getCuidador().getId().equals(cuidadorId))
-                .orElse(false);
-    }
-
-    private static boolean mesmoCuidador(Paciente paciente, Long cuidadorId) {
-        return (paciente.getCuidador() != null && paciente.getCuidador().getId().equals(cuidadorId))
-                || (paciente.getCuidadorSolicitado() != null && paciente.getCuidadorSolicitado().getId().equals(cuidadorId));
+        return vinculoRepository.existsByPacienteIdAndCuidadorIdAndSituacao(pacienteId, cuidadorId, SituacaoVinculo.ATIVO);
     }
 
     private static void exigirId(Long id, String mensagem) {

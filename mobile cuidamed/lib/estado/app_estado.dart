@@ -34,6 +34,15 @@ const List<({String valor, String rotulo})> opcoesTamanhoFonte = [
   (valor: 'grande', rotulo: 'Grande'),
 ];
 const _chaveTamanhoFonte = 'tamanhoFonte';
+const _chaveTema = 'tema';
+// Sai sozinho depois de 7 dias sem uso (qualquer tipo de usuário). O horário do
+// último toque fica salvo no aparelho, então vale também com o app fechado.
+const limiteInatividade = Duration(days: 7);
+const _chaveUltimaAtividade = 'ultimaAtividade';
+// "Lembrar de mim": a sessão não sai por inatividade (vale até o login vencer)
+// e o e-mail ou telefone já vem preenchido no próximo login.
+const _chaveLembrar = 'lembrarMim';
+const _chaveLoginLembrado = 'loginLembrado';
 // Sessão salva no aparelho (o app continua logado ao reabrir; o token expira em alguns dias).
 const _chaveId = 'usuarioId';
 const _chaveTipo = 'usuarioTipo';
@@ -127,7 +136,16 @@ class AppEstado extends ChangeNotifier {
   bool carregandoSessao = true;
   String tamanhoFonte = 'media';
 
+  /// 'claro' | 'escuro' — preferência salva no aparelho, como no web
+  /// (cuidamed_tema). Só vale dentro do sistema: deslogado fica sempre claro.
+  String tema = 'claro';
+
   double get escalaFonte => escalaPorTamanhoFonte[tamanhoFonte] ?? 1.0;
+
+  bool get modoEscuro => tema == 'escuro';
+
+  /// Tema que as telas devem usar agora (login/cadastro/ativação: sempre claro).
+  bool get usarModoEscuro => autenticado && modoEscuro;
 
   bool get autenticado => usuario != null;
 
@@ -164,12 +182,22 @@ class AppEstado extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final fonteSalva = prefs.getString(_chaveTamanhoFonte);
     if (fonteSalva != null && escalaPorTamanhoFonte.containsKey(fonteSalva)) tamanhoFonte = fonteSalva;
+    if (prefs.getString(_chaveTema) == 'escuro') tema = 'escuro';
     final id = prefs.getInt(_chaveId);
     final tipo = prefs.getString(_chaveTipo);
     final token = prefs.getString(_chaveToken);
-    // Sessões antigas (de antes do login com token) não têm token: pedem login de novo.
-    if (id != null && tipo != null && token != null) {
+    final ultimaAtividade = prefs.getInt(_chaveUltimaAtividade);
+    final inativa = prefs.getBool(_chaveLembrar) != true &&
+        ultimaAtividade != null &&
+        DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(ultimaAtividade)) > limiteInatividade;
+    if (token != null && inativa) {
+      // Ficou 7 dias sem abrir/usar o app: a sessão salva não volta.
+      await _apagarSessaoSalva(prefs);
+    } else if (id != null && tipo != null && token != null) {
+      // Sessões antigas (de antes do login com token) não têm token: pedem login de novo.
       ApiCliente.instancia.token = token;
+      _ultimaGravacaoAtividade = null;
+      await registrarAtividade(); // abrir o app conta como uso
       try {
         await _carregarAposLogin(tipo, id);
       } catch (_) {
@@ -182,8 +210,10 @@ class AppEstado extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> entrar(String email, String senha) async {
-    final login = await _authServico.login(email, senha);
+  /// [lembrar] ("Lembrar de mim"): continua logado mesmo sem uso (até o login
+  /// vencer) e o e-mail ou telefone já vem preenchido na próxima vez.
+  Future<void> entrar(String identificador, String senha, {bool lembrar = false}) async {
+    final login = await _authServico.login(identificador, senha);
     ApiCliente.instancia.token = login.token;
     try {
       await _carregarAposLogin(login.tipo, login.id);
@@ -195,6 +225,39 @@ class AppEstado extends ChangeNotifier {
     await prefs.setInt(_chaveId, login.id);
     await prefs.setString(_chaveTipo, login.tipo);
     await prefs.setString(_chaveToken, login.token);
+    await prefs.setBool(_chaveLembrar, lembrar);
+    if (lembrar) {
+      await prefs.setString(_chaveLoginLembrado, identificador);
+    } else {
+      await prefs.remove(_chaveLoginLembrado);
+    }
+    _ultimaGravacaoAtividade = null;
+    await registrarAtividade();
+  }
+
+  DateTime? _ultimaGravacaoAtividade;
+
+  /// Toque na tela (ou app aberto): guarda o horário da última atividade —
+  /// no máximo uma gravação por minuto.
+  Future<void> registrarAtividade() async {
+    if (ApiCliente.instancia.token == null) return; // deslogado: nada a registrar
+    final agora = DateTime.now();
+    final ultima = _ultimaGravacaoAtividade;
+    if (ultima != null && agora.difference(ultima) < const Duration(minutes: 1)) return;
+    _ultimaGravacaoAtividade = agora;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_chaveUltimaAtividade, agora.millisecondsSinceEpoch);
+  }
+
+  /// Com o app aberto ou ao voltar para ele: passou do limite sem uso? Sai da conta.
+  Future<void> verificarInatividade() async {
+    if (!autenticado) return;
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool(_chaveLembrar) == true) return; // "Lembrar de mim"
+    final ultima = prefs.getInt(_chaveUltimaAtividade);
+    if (ultima == null) return;
+    if (DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(ultima)) <= limiteInatividade) return;
+    await sair();
   }
 
   Future<void> _apagarSessaoSalva(SharedPreferences prefs) async {
@@ -202,7 +265,12 @@ class AppEstado extends ChangeNotifier {
     await prefs.remove(_chaveId);
     await prefs.remove(_chaveTipo);
     await prefs.remove(_chaveToken);
+    await prefs.remove(_chaveUltimaAtividade);
+    await prefs.remove(_chaveLembrar); // o login lembrado fica, para a próxima vez
   }
+
+  /// E-mail ou telefone salvo pelo "Lembrar de mim" (null se a pessoa não pediu).
+  Future<String?> loginLembrado() async => (await SharedPreferences.getInstance()).getString(_chaveLoginLembrado);
 
   Future<void> cadastrar({
     required String tipo, // 'paciente' | 'cuidador'
@@ -228,8 +296,8 @@ class AppEstado extends ChangeNotifier {
     } else {
       await _cuidadorServico.criar(nome: nome, email: email, senha: senha, profissao: profissao, telefone: telefone);
     }
-    // Depois de criar a conta, entra com o mesmo e-mail e senha (é o login que gera o token).
-    await entrar(email, senha);
+    // Depois de criar a conta, entra com o mesmo e-mail (ou telefone) e senha (é o login que gera o token).
+    await entrar(email.isNotEmpty ? email : (telefone ?? ''), senha);
   }
 
   Future<void> _carregarAposLogin(String tipo, int id) async {
@@ -309,6 +377,22 @@ class AppEstado extends ChangeNotifier {
     await recarregarPaciente(pacienteId);
   }
 
+  /// "Desfazer" uma dose registrada hoje por engano.
+  Future<void> desfazerDose(int pacienteId, int medicamentoId, String horario) async {
+    final encontrados = pacientes.where((p) => p.paciente.id == pacienteId);
+    if (encontrados.isEmpty) return;
+    final registros = encontrados.first.historicoHoje().where((h) => h.medicamentoId == medicamentoId && h.hora == horario);
+    if (registros.isEmpty) return;
+    await _historicoServico.desfazer(registros.first.id);
+    await recarregarPaciente(pacienteId);
+  }
+
+  /// O paciente esqueceu a senha: o cuidador gera um código para ele criar uma nova.
+  Future<void> gerarCodigoNovaSenha(int pacienteId) async {
+    await _pacienteServico.gerarCodigoNovaSenha(pacienteId);
+    await recarregarPaciente(pacienteId);
+  }
+
   /// Paciente: [sexo] vem no rótulo da tela ('Feminino'...) e é convertido
   /// pro enum da API. Campos que a tela não edita (enfermidade, observações,
   /// cuidador) são reenviados como estão, porque o PUT substitui tudo.
@@ -332,7 +416,8 @@ class AppEstado extends ChangeNotifier {
         'sexo': sexo != null ? sexoParaApi[sexo] : null,
         'enfermidade': paciente?.enfermidade,
         'telefone': vazioParaNulo(telefone),
-        'endereco': vazioParaNulo(endereco),
+        // Endereço saiu da tela: sem valor novo, mantém o que já estava salvo.
+        'endereco': vazioParaNulo(endereco) ?? paciente?.endereco,
         'observacoesClinicas': paciente?.observacoesClinicas,
         'cuidadorId': paciente?.cuidadorId,
       });
@@ -429,6 +514,17 @@ class AppEstado extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_chaveTamanhoFonte, tamanho);
   }
+
+  /// 'claro' ou 'escuro' — Configurações › Aparência e a chave do menu.
+  Future<void> definirTema(String novoTema) async {
+    if (novoTema != 'claro' && novoTema != 'escuro') return;
+    tema = novoTema;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_chaveTema, novoTema);
+  }
+
+  Future<void> alternarTema() => definirTema(modoEscuro ? 'claro' : 'escuro');
 
   Future<void> sair() async {
     final prefs = await SharedPreferences.getInstance();

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import Botao from '../componentes/Botao'
 import Campo from '../componentes/Campo'
 import { ICONES_CAMPO } from '../componentes/iconesCampo'
@@ -13,7 +13,10 @@ import '../estilos/autenticacao.css'
 export default function DefinirSenha() {
   const { mostrarToast } = useApp()
   const navegar = useNavigate()
-  const [email, setEmail] = useState('')
+  // Veio de "Esqueci minha senha": mesmo formulário, com o código de nova senha.
+  const [parametros] = useSearchParams()
+  const ehRecuperacao = parametros.get('novaSenha') === '1'
+  const [login, setLogin] = useState('')
   const [codigo, setCodigo] = useState('')
   const [novaSenha, setNovaSenha] = useState('')
   const [confirmarSenha, setConfirmarSenha] = useState('')
@@ -21,8 +24,8 @@ export default function DefinirSenha() {
 
   async function ativarAcesso(evento) {
     evento.preventDefault()
-    if (!email.trim()) {
-      mostrarToast('Informe o e-mail cadastrado pelo seu cuidador.')
+    if (!login.trim()) {
+      mostrarToast('Informe o e-mail ou telefone cadastrado pelo seu cuidador.')
       return
     }
     if (!codigo.trim()) {
@@ -39,8 +42,8 @@ export default function DefinirSenha() {
     }
     setEnviando(true)
     try {
-      await api.post('/api/pacientes/definir-senha', { email: email.trim(), codigo: codigo.trim(), novaSenha })
-      mostrarToast('Acesso ativado! Faça login com sua nova senha.')
+      await api.post('/api/pacientes/definir-senha', { login: login.trim(), codigo: codigo.trim(), novaSenha })
+      mostrarToast(ehRecuperacao ? 'Senha criada! Entre com a nova senha.' : 'Acesso ativado! Faça login com sua nova senha.')
       navegar('/login')
     } catch (erro) {
       mostrarToast(erro.message || 'Não foi possível ativar o acesso.')
@@ -72,16 +75,18 @@ export default function DefinirSenha() {
       <div className="autenticacao__painel">
         <form className="autenticacao__caixa" onSubmit={ativarAcesso}>
           <div>
-            <h1 className="autenticacao__titulo">Ativar meu acesso</h1>
+            <h1 className="autenticacao__titulo">{ehRecuperacao ? 'Criar nova senha' : 'Ativar meu acesso'}</h1>
+            {ehRecuperacao && (
+              <p className="autenticacao__subtitulo">Peça ao seu cuidador um código de nova senha. Ele gera nos detalhes do paciente.</p>
+            )}
           </div>
 
           <Campo
-            rotulo="E-mail cadastrado"
-            tipo="email"
-            icone={ICONES_CAMPO.email}
-            placeholder="seu@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            rotulo="E-mail ou telefone cadastrado"
+            icone={ICONES_CAMPO.pessoa}
+            placeholder="seu@email.com ou (79) 99999-9999"
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
           />
           <Campo
             rotulo="Código de ativação"

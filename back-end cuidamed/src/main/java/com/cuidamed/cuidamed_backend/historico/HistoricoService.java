@@ -8,8 +8,10 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.cuidamed.cuidamed_backend.configuracao.FusoHorario;
 import com.cuidamed.cuidamed_backend.medicamento.FrequenciaMedicamento;
 import com.cuidamed.cuidamed_backend.medicamento.Medicamento;
 import com.cuidamed.cuidamed_backend.medicamento.MedicamentoRepository;
@@ -97,6 +99,23 @@ public class HistoricoService {
         }
 
         return HistoricoRespostaDTO.paraDTO(historicoRepository.save(historico));
+    }
+
+    /** Apaga o registro de hoje e, se a dose tinha sido tomada, devolve o estoque descontado. */
+    @Transactional
+    public void desfazer(Long id) {
+        Historico historico = historicoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Registro de histórico não encontrado."));
+        if (!historico.getData().equals(FusoHorario.hoje())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Só é possível desfazer registros de hoje.");
+        }
+        Medicamento medicamento = historico.getMedicamento();
+        if (historico.getStatus() == StatusHistorico.TOMADO && medicamento.getQuantidadeEstoque() != null) {
+            int consumoPorDose = medicamento.getQuantidadePorDose() != null ? medicamento.getQuantidadePorDose() : 1;
+            medicamento.setQuantidadeEstoque(medicamento.getQuantidadeEstoque() + consumoPorDose);
+            medicamentoRepository.save(medicamento);
+        }
+        historicoRepository.delete(historico);
     }
 
     public List<HistoricoRespostaDTO> listarPorPaciente(Long pacienteId, LocalDate data, Long medicamentoId) {

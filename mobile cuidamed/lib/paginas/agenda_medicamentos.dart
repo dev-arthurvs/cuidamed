@@ -8,6 +8,7 @@ import '../componentes/cabecalho.dart';
 import '../componentes/confirmacao.dart';
 import '../componentes/voltar_detalhes_paciente.dart';
 import '../componentes/escolha_paciente.dart';
+import '../componentes/lista_tratamentos_encerrados.dart';
 import '../estado/app_estado.dart';
 import '../modelos/historico.dart';
 import '../modelos/medicamento.dart';
@@ -17,12 +18,32 @@ import '../utilitarios/tema.dart';
 import '../utilitarios/animacoes.dart';
 import 'formulario_medicamento.dart';
 
-class AgendaMedicamentos extends StatelessWidget {
+/// "1 medicamento em uso" / "3 medicamentos em uso".
+String _contar(int quantidade, String singular, String plural) => '$quantidade ${quantidade == 1 ? singular : plural}';
+
+/// Agenda com duas abas, como no web: "Em uso" (remédios ativos) e
+/// "Encerrados" (tratamentos que já terminaram). Abre em "Encerrados" com
+/// ?aba=encerrados (é para onde vai o endereço antigo /ciclos-encerrados).
+class AgendaMedicamentos extends StatefulWidget {
   const AgendaMedicamentos({super.key});
+
+  @override
+  State<AgendaMedicamentos> createState() => _AgendaMedicamentosState();
+}
+
+class _AgendaMedicamentosState extends State<AgendaMedicamentos> {
+  bool? _encerrados; // null = ainda não leu a URL
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _encerrados ??= GoRouterState.of(context).uri.queryParameters['aba'] == 'encerrados';
+  }
 
   @override
   Widget build(BuildContext context) {
     final estado = context.watch<AppEstado>();
+    final encerrados = _encerrados ?? false;
     if (deveEscolherPaciente(context)) {
       return const EscolhaPaciente(kicker: 'Agenda de medicamentos', rotaDestino: '/agenda');
     }
@@ -36,7 +57,7 @@ class AgendaMedicamentos extends StatelessWidget {
     }
 
     final medicamentosAtivos = dados.medicamentosAtivos();
-    final totalEncerrados = dados.medicamentos.length - medicamentosAtivos.length;
+    final medicamentosEncerrados = dados.medicamentos.where((m) => !medicamentosAtivos.contains(m)).toList();
     // Paciente sem cuidador cuida da própria agenda; com cuidador, só se ele liberou.
     final podeEditar =
         estado.usuario!.tipo == 'cuidador' || dados.paciente.cuidadorId == null || dados.paciente.permiteAlteracoes;
@@ -46,21 +67,34 @@ class AgendaMedicamentos extends StatelessWidget {
         : 'Agenda de medicamentos';
 
     return AndaimeApp(
-      appBar: Cabecalho(kicker: kicker, titulo: '${medicamentosAtivos.length} medicamentos cadastrados'),
+      appBar: Cabecalho(
+        kicker: kicker,
+        titulo: encerrados
+            ? _contar(medicamentosEncerrados.length, 'tratamento encerrado', 'tratamentos encerrados')
+            : _contar(medicamentosAtivos.length, 'medicamento em uso', 'medicamentos em uso'),
+      ),
       body: RefreshIndicator(
         onRefresh: () => estado.recarregarPaciente(dados.paciente.id),
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
             VoltarDetalhesPaciente(pacienteId: dados.paciente.id),
-            _TopoAgenda(podeEditar: podeEditar, totalEncerrados: totalEncerrados),
+            _TopoAgenda(
+              podeEditar: podeEditar,
+              encerrados: encerrados,
+              totalEmUso: medicamentosAtivos.length,
+              totalEncerrados: medicamentosEncerrados.length,
+              aoTrocarAba: (valor) => setState(() => _encerrados = valor),
+            ),
             const SizedBox(height: 20),
-            if (medicamentosAtivos.isEmpty)
-              const Padding(
+            if (encerrados) ListaTratamentosEncerrados(medicamentos: medicamentosEncerrados),
+            if (!encerrados && medicamentosAtivos.isEmpty)
+              Padding(
                 padding: EdgeInsets.symmetric(vertical: 24),
-                child: Text('Nenhum medicamento ativo cadastrado no momento.', style: TextStyle(color: CorApp.textoSuave)),
+                child: Text('Nenhum medicamento em uso no momento.', style: TextStyle(color: CorApp.textoSuave)),
               ),
-            for (final (indice, medicamento) in medicamentosAtivos.indexed)
+            if (!encerrados)
+              for (final (indice, medicamento) in medicamentosAtivos.indexed)
               EntradaSuave(
                 key: ValueKey(medicamento.id),
                 indice: indice,
@@ -117,8 +151,11 @@ class _CartaoMedicamento extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(medicamento.nome, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
-                    Text('${medicamento.dosagem} · ${rotuloForma[medicamento.forma] ?? medicamento.forma}', style: const TextStyle(color: CorApp.textoSuave)),
+                    Text(medicamento.nome, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 17)),
+                    Text(
+                      [medicamento.dosagem, rotuloForma[medicamento.forma] ?? medicamento.forma].where((t) => t.isNotEmpty).join(' · '),
+                      style: TextStyle(color: CorApp.textoSuave),
+                    ),
                   ],
                 ),
               ),
@@ -234,33 +271,41 @@ class _CartaoMedicamento extends StatelessWidget {
   }
 }
 
-/// Topo da agenda igual ao web: descrição à esquerda; "Ciclos encerrados" e
-/// "+ Inserir medicamento" à direita. No celular empilha, com o botão na
-/// largura toda (no lugar do antigo botão flutuante).
+/// Topo da agenda igual ao web: abas "Em uso" / "Encerrados" à esquerda e
+/// "+ Inserir medicamento" à direita (só em "Em uso"). No celular empilha, com o
+/// botão na largura toda.
 class _TopoAgenda extends StatelessWidget {
   final bool podeEditar;
+  final bool encerrados;
+  final int totalEmUso;
   final int totalEncerrados;
-  const _TopoAgenda({required this.podeEditar, required this.totalEncerrados});
+  final ValueChanged<bool> aoTrocarAba;
+
+  const _TopoAgenda({
+    required this.podeEditar,
+    required this.encerrados,
+    required this.totalEmUso,
+    required this.totalEncerrados,
+    required this.aoTrocarAba,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Só o aviso de "sem permissão" aparece; o texto explicando a finalidade da
-    // tela foi removido (a ajuda "?" cobre isso).
-    final descricao = const Text(
-      'Seu cuidador ainda não liberou alterações nessa agenda. Fale com ele(a) se precisar ajustar algo.',
-      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: CorApp.textoSuave, height: 1.4),
+    final abas = _Abas(
+      encerrados: encerrados,
+      totalEmUso: totalEmUso,
+      totalEncerrados: totalEncerrados,
+      aoTrocar: aoTrocarAba,
     );
-    final linkEncerrados = InkWell(
-      borderRadius: BorderRadius.circular(8),
-      onTap: () => context.push('/ciclos-encerrados'),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
-        child: Text(
-          'Ciclos encerrados${totalEncerrados > 0 ? ' ($totalEncerrados)' : ''}',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: CorApp.azul),
-        ),
-      ),
-    );
+    // Só o aviso de "sem permissão" aparece (e só em "Em uso"); o texto
+    // explicando a finalidade da tela foi removido (a ajuda "?" cobre isso).
+    final aviso = !encerrados && !podeEditar
+        ? Text(
+            'Seu cuidador ainda não liberou alterações nessa agenda. Fale com ele(a) se precisar ajustar algo.',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: CorApp.textoSuave, height: 1.4),
+          )
+        : null;
+    final mostrarInserir = !encerrados && podeEditar;
 
     return LayoutBuilder(
       builder: (context, restricoes) {
@@ -270,25 +315,105 @@ class _TopoAgenda extends StatelessWidget {
           larguraTotal: !largo,
           onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const FormularioMedicamento())),
         );
-        if (largo) {
-          return Row(
-            children: [
-              Expanded(child: podeEditar ? const SizedBox.shrink() : descricao),
-              const SizedBox(width: 20),
-              linkEncerrados,
-              if (podeEditar) ...[const SizedBox(width: 18), botaoInserir],
-            ],
-          );
-        }
         return Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (!podeEditar) ...[descricao, const SizedBox(height: 10)],
-            Align(alignment: Alignment.centerLeft, child: linkEncerrados),
-            if (podeEditar) ...[const SizedBox(height: 12), botaoInserir],
+            if (largo)
+              Row(children: [abas, const Spacer(), if (mostrarInserir) botaoInserir])
+            else ...[
+              abas,
+              if (mostrarInserir) ...[const SizedBox(height: 12), botaoInserir],
+            ],
+            if (aviso != null) ...[const SizedBox(height: 12), aviso],
           ],
         );
       },
+    );
+  }
+}
+
+/// Controle segmentado com a contagem em cada aba.
+class _Abas extends StatelessWidget {
+  final bool encerrados;
+  final int totalEmUso;
+  final int totalEncerrados;
+  final ValueChanged<bool> aoTrocar;
+
+  const _Abas({required this.encerrados, required this.totalEmUso, required this.totalEncerrados, required this.aoTrocar});
+
+  @override
+  Widget build(BuildContext context) {
+    Widget aba(String rotulo, int total, bool ativa, bool valor) {
+      return Expanded(
+        child: Semantics(
+          selected: ativa,
+          button: true,
+          child: Material(
+            color: ativa ? CorApp.fundoCard : Colors.transparent,
+            elevation: ativa ? 1 : 0,
+            shadowColor: const Color(0x1F0B2F63),
+            borderRadius: BorderRadius.circular(999),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(999),
+              onTap: () => aoTrocar(valor),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 44),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          rotulo,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 15,
+                            color: ativa ? CorApp.azulTexto : CorApp.textoSuave,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 1),
+                        decoration: BoxDecoration(color: CorApp.azulFundo, borderRadius: BorderRadius.circular(999)),
+                        child: Text(
+                          '$total',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: ativa ? CorApp.azulTexto : CorApp.textoSuave,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 360),
+      child: Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: CorApp.fundoDestaque,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: CorApp.borda, width: 1.5),
+        ),
+        child: Row(
+          children: [
+            aba('Em uso', totalEmUso, !encerrados, false),
+            const SizedBox(width: 4),
+            aba('Encerrados', totalEncerrados, encerrados, true),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -30,16 +30,24 @@
   gap: 4px;
 }
 
+.barra-superior__acoes {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  flex: none;
+}
+
 .barra-superior__ajuda {
   width: 32px;
   height: 32px;
-  margin-left: auto;
   border-radius: 999px;
+  text-decoration: none;
   border: 1.5px solid var(--borda-destaque);
   background: var(--azul-fundo);
   color: var(--azul-texto);
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -49,6 +57,19 @@
 
 .barra-superior__ajuda:hover {
   background: var(--fundo-destaque);
+}
+
+.barra-superior__ajuda svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Engrenagem na tela de Configurações: preenchida, como item ativo. */
+.barra-superior__ajuda--ativo,
+.barra-superior__ajuda--ativo:hover {
+  background: var(--azul-texto);
+  border-color: var(--azul-texto);
+  color: var(--fundo-card);
 }
 
 .barra-superior__item {
@@ -61,7 +82,7 @@
   border-radius: 999px;
   color: var(--texto-suave);
   font-size: 15px;
-  font-weight: 800;
+  font-weight: 700;
   font-family: inherit;
   text-decoration: none;
   white-space: nowrap;
@@ -134,7 +155,7 @@
 
 .barra-superior__dropdown-titulo {
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--texto-suave);
   text-transform: uppercase;
   letter-spacing: 0.4px;
@@ -174,7 +195,7 @@
   background: var(--gradiente-azul);
   color: #fff;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;

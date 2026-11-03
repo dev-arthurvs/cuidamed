@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,6 +40,14 @@ public class HistoricoController {
             @RequestParam(required = false) Long medicamentoId) {
         autorizacao.exigirAcessoAoPaciente(pacienteId);
         return historicoService.listarPorPaciente(pacienteId, data, medicamentoId);
+    }
+
+    /** "Desfazer" uma dose registrada por engano (só as de hoje). */
+    @DeleteMapping("/api/historicos/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void desfazer(@PathVariable Long id) {
+        autorizacao.exigirAcessoAoPaciente(autorizacao.pacienteDoHistorico(id));
+        historicoService.desfazer(id);
     }
 
     @GetMapping("/api/historicos/{id}")

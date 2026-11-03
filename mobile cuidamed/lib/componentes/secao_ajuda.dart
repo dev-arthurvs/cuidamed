@@ -15,10 +15,10 @@ class SecaoAjudaConteudo extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (mostrarTitulo) ...[
-          Text(secao.titulo, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w800)),
+          Text(secao.titulo, style: const TextStyle(fontSize: 19, fontWeight: FontWeight.w700)),
           const SizedBox(height: 10),
         ],
-        Text(secao.paraQueServe, style: const TextStyle(color: CorApp.textoLabel, height: 1.4)),
+        Text(secao.paraQueServe, style: TextStyle(color: CorApp.textoLabel, height: 1.4)),
         const SizedBox(height: 12),
         for (var i = 0; i < secao.passos.length; i++)
           Padding(
@@ -31,9 +31,9 @@ class SecaoAjudaConteudo extends StatelessWidget {
                   height: 24,
                   margin: const EdgeInsets.only(right: 10, top: 1),
                   alignment: Alignment.center,
-                  decoration: const BoxDecoration(color: CorApp.azulFundo, shape: BoxShape.circle),
+                  decoration: BoxDecoration(color: CorApp.azulFundo, shape: BoxShape.circle),
                   child: Text('${i + 1}',
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: CorApp.azulTexto)),
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: CorApp.azulTexto)),
                 ),
                 Expanded(child: Text(secao.passos[i], style: const TextStyle(height: 1.4))),
               ],

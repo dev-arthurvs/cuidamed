@@ -38,7 +38,7 @@ class _AcessibilidadeState extends State<Acessibilidade> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('Ajusta o tamanho do texto em todo o aplicativo.', style: TextStyle(color: CorApp.textoSuave)),
+                Text('Ajusta o tamanho do texto em todo o aplicativo.', style: TextStyle(color: CorApp.textoSuave)),
                 const SizedBox(height: 16),
                 SeletorTamanhoFonte(estado: estado),
               ],
@@ -50,7 +50,7 @@ class _AcessibilidadeState extends State<Acessibilidade> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('Toque em uma tela para ver para que ela serve e como usá-la.',
+                Text('Toque em uma tela para ver para que ela serve e como usá-la.',
                     style: TextStyle(color: CorApp.textoSuave)),
                 const SizedBox(height: 12),
                 for (final secao in secoes) _item(secao),
@@ -87,13 +87,13 @@ class _AcessibilidadeState extends State<Acessibilidade> {
                     Expanded(
                       child: Text(
                         secao.titulo,
-                        style: TextStyle(fontWeight: FontWeight.w800, color: aberta ? CorApp.azulTexto : CorApp.texto),
+                        style: TextStyle(fontWeight: FontWeight.w700, color: aberta ? CorApp.azulTexto : CorApp.texto),
                       ),
                     ),
                     AnimatedRotation(
                       turns: aberta ? 0.5 : 0,
                       duration: const Duration(milliseconds: 200),
-                      child: const Icon(Icons.expand_more, color: CorApp.textoSuave),
+                      child: Icon(Icons.expand_more, color: CorApp.textoSuave),
                     ),
                   ],
                 ),

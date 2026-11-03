@@ -36,7 +36,7 @@
 
 .formulario-medicamento__kicker {
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--azul);
   letter-spacing: 0.6px;
   text-transform: uppercase;
@@ -44,7 +44,7 @@
 
 .formulario-medicamento__titulo {
   font-size: 24px;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: -0.4px;
   margin: 4px 0 0;
 }
@@ -104,7 +104,7 @@
   border-radius: var(--raio-pilula);
   padding: 8px 10px 8px 16px;
   font-size: 17px;
-  font-weight: 800;
+  font-weight: 700;
   color: var(--azul-texto);
 }
 
@@ -116,7 +116,7 @@
   background: var(--fundo-suave);
   color: var(--texto-suave);
   font-size: 16px;
-  font-weight: 800;
+  font-weight: 700;
   cursor: pointer;
   line-height: 1;
 }

@@ -47,7 +47,7 @@ public class Historico {
     @Column(name = "nomemedicamento_hist", nullable = false, length = 150)
     private String nomeMedicamento;
 
-    @Column(name = "dosagem_hist", nullable = false, length = 50)
+    @Column(name = "dosagem_hist", length = 50)
     private String dosagem;
 
     @Enumerated(EnumType.STRING)

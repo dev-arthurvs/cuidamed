@@ -9,12 +9,12 @@ import '../servicos/api_cliente.dart';
 import '../servicos/chat_servico.dart';
 import '../utilitarios/tema.dart';
 
-const _mensagemBoasVindas = 'Olá! Eu sou o assistente do CuidaMed. Pode me perguntar sobre seus remédios e horários.';
+const _mensagemBoasVindas = 'Olá! Eu sou o assistente do CuidaMed. Pode me perguntar sobre seus remédios e como usar o aplicativo.';
 const _mensagemErroConexao = 'Não consegui me conectar ao servidor agora. Tente novamente em instantes.';
 const _perguntasSugeridas = [
   'Quais remédios eu preciso tomar?',
   'Que horas eu tomo cada remédio?',
-  'Tem alguma observação sobre como tomar meus remédios?',
+  'Como eu troco minha senha?',
   'Eu tomei todos os remédios nos últimos dias?',
 ];
 
@@ -138,7 +138,7 @@ class _ChatState extends State<Chat> {
             ),
           Container(
             padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: CorApp.fundoCard,
               border: Border(top: BorderSide(color: CorApp.borda)),
             ),
@@ -185,7 +185,7 @@ class _PerguntaSugerida extends StatelessWidget {
   Widget build(BuildContext context) {
     final forma = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(22),
-      side: const BorderSide(color: CorApp.bordaDestaque, width: 1.5),
+      side: BorderSide(color: CorApp.bordaDestaque, width: 1.5),
     );
     return Opacity(
       opacity: onPressed == null ? 0.6 : 1,

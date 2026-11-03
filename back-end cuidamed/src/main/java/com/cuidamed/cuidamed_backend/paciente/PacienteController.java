@@ -2,7 +2,6 @@ package com.cuidamed.cuidamed_backend.paciente;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.Locale;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.cuidamed.cuidamed_backend.conta.Contato;
 import com.cuidamed.cuidamed_backend.seguranca.Autorizacao;
 import com.cuidamed.cuidamed_backend.seguranca.LimitadorDeTentativas;
 import com.cuidamed.cuidamed_backend.seguranca.UsuarioAutenticado;
@@ -92,7 +92,7 @@ public class PacienteController {
     @PostMapping("/api/pacientes/definir-senha")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void definirSenha(@RequestBody DefinirSenhaDTO dto) {
-        String chave = "ativacao:" + (dto.email() == null ? "" : dto.email().trim().toLowerCase(Locale.ROOT));
+        String chave = "ativacao:" + Contato.chaveLimite(dto.identificador());
         limitador.exigirDisponivel(chave, MAXIMO_ERROS_ATIVACAO, JANELA_ERROS_ATIVACAO, MUITAS_TENTATIVAS_ATIVACAO);
         try {
             pacienteService.definirSenha(dto);
@@ -124,6 +124,12 @@ public class PacienteController {
 
     // Nas ações abaixo, o cuidador é sempre o do token (o "cuidadorId" do corpo
     // é ignorado); o serviço confere se ele é mesmo o vinculado/solicitado.
+
+    /** Só o cuidador vinculado: o paciente esqueceu a senha e não está logado. */
+    @PostMapping("/api/pacientes/{id}/codigo-nova-senha")
+    public PacienteRespostaDTO gerarCodigoNovaSenha(@PathVariable Long id) {
+        return pacienteService.gerarCodigoNovaSenha(id, autorizacao.exigirCuidador());
+    }
 
     @PostMapping("/api/pacientes/{id}/aceitar-vinculo")
     @ResponseStatus(HttpStatus.NO_CONTENT)

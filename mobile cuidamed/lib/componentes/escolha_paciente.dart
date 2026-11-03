@@ -14,7 +14,7 @@ import 'data_hora_atual.dart';
 /// Telas que mostram dados de um paciente só. Pelo menu ou pela barra inferior,
 /// o cuidador primeiro escolhe o paciente numa lista — antes elas abriam direto
 /// no último paciente acessado. Pelos detalhes do paciente, abrem direto.
-const _rotasPorPaciente = {'/agenda', '/ciclos-encerrados', '/historico'};
+const _rotasPorPaciente = {'/agenda', '/historico'};
 
 /// Rota usada pelo menu lateral e pela barra inferior: para o cuidador, as
 /// telas por paciente abrem com "?escolher=1" (lista de pacientes primeiro).
@@ -50,7 +50,7 @@ class EscolhaPaciente extends StatelessWidget {
                 ? Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      const Padding(
+                      Padding(
                         padding: EdgeInsets.symmetric(vertical: 12),
                         child: Text('Nenhum paciente vinculado ainda.', style: TextStyle(color: CorApp.textoSuave)),
                       ),
@@ -87,16 +87,16 @@ class EscolhaPaciente extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(paciente.nome, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                  Text(paciente.nome, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
                   Text(
                     '${paciente.dataNascimento != null ? '${paciente.calcularIdade()} anos · ' : ''}'
                     '${dados.medicamentosAtivos().length} medicamentos',
-                    style: const TextStyle(color: CorApp.textoSuave, fontSize: 13),
+                    style: TextStyle(color: CorApp.textoSuave, fontSize: 13),
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: CorApp.textoSuave),
+            Icon(Icons.chevron_right, color: CorApp.textoSuave),
           ],
         ),
       ),

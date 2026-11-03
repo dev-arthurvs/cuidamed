@@ -9,6 +9,8 @@ String formatarTelefoneWhatsApp(String? telefone) {
   return '55$digitos';
 }
 
+/// Pomada não tem quantidade por dose: mostra a dosagem (concentração), se o
+/// remédio antigo tiver uma; sem nenhuma das duas, devolve texto vazio.
 String formatarQuantidadePorDose({required String forma, int? quantidadePorDose, required String dosagem}) {
   if (quantidadePorDose == null) return dosagem;
   final unidade = unidadeEstoquePorForma[forma] ?? 'unidades';
@@ -32,7 +34,7 @@ String montarMensagemLembrete({
     'CUIDAMED💊💙',
     'Olá $primeiroNome! Está na hora do seu remédio das $horario.',
     'Medicamento: $medicamento',
-    'Quantidade: $quantidadeTexto',
+    if (quantidadeTexto.isNotEmpty) 'Quantidade: $quantidadeTexto',
   ];
   if (diasRestantes != null) {
     linhas.add(diasRestantes <= 0

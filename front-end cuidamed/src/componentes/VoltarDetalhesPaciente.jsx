@@ -4,8 +4,7 @@ import Botao from './Botao'
 import './VoltarDetalhesPaciente.css'
 
 // "‹ Voltar para os detalhes do paciente" — no topo das telas abertas a partir
-// dos detalhes do paciente (agenda, histórico, ciclos encerrados e painel do
-// paciente). Só para o cuidador: o paciente não tem a tela de detalhes.
+// dos detalhes do paciente (agenda e histórico de doses). Só para o cuidador: o paciente não tem a tela de detalhes.
 export default function VoltarDetalhesPaciente({ paciente }) {
   const { usuario } = useApp()
   const navegar = useNavigate()

@@ -5,8 +5,10 @@ import 'package:provider/provider.dart';
 import '../componentes/botao.dart';
 import '../componentes/campo_texto.dart';
 import '../componentes/layout_autenticacao.dart';
+import '../componentes/opcao_sem_email.dart';
 import '../estado/app_estado.dart';
 import '../servicos/api_cliente.dart';
+import '../utilitarios/mascaras.dart';
 import '../utilitarios/tema.dart';
 import '../utilitarios/animacoes.dart';
 
@@ -41,6 +43,7 @@ class _CadastroState extends State<Cadastro> {
   DateTime? _dataNascimento;
   String _sexo = _opcoesSexo[0];
   bool _carregando = false;
+  bool _semEmail = false;
   String? _erro;
 
   @override
@@ -57,8 +60,12 @@ class _CadastroState extends State<Cadastro> {
   }
 
   Future<void> _criarConta() async {
-    if (_nomeController.text.trim().isEmpty || _emailController.text.trim().isEmpty) {
-      setState(() => _erro = 'Preencha nome e e-mail.');
+    if (_nomeController.text.trim().isEmpty) {
+      setState(() => _erro = 'Preencha o nome.');
+      return;
+    }
+    if (_semEmail ? !telefoneCompleto(_telefoneController.text) : _emailController.text.trim().isEmpty) {
+      setState(() => _erro = _semEmail ? 'Sem e-mail, informe o telefone com DDD.' : 'Preencha o e-mail ou marque "Não tenho e-mail".');
       return;
     }
     if (_senhaController.text.length < 8) {
@@ -73,7 +80,7 @@ class _CadastroState extends State<Cadastro> {
       await context.read<AppEstado>().cadastrar(
             tipo: _tipo,
             nome: _nomeController.text.trim(),
-            email: _emailController.text.trim(),
+            email: _semEmail ? '' : _emailController.text.trim(),
             senha: _senhaController.text,
             dataNascimentoIso: _dataNascimento != null
                 ? '${_dataNascimento!.year.toString().padLeft(4, '0')}-${_dataNascimento!.month.toString().padLeft(2, '0')}-${_dataNascimento!.day.toString().padLeft(2, '0')}'
@@ -99,7 +106,7 @@ class _CadastroState extends State<Cadastro> {
     if (selecionada != null && mounted) setState(() => _dataNascimento = selecionada);
   }
 
-  static const _estiloRotulo = TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: CorApp.textoLabel);
+  static final _estiloRotulo = TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: CorApp.textoLabel);
 
   @override
   Widget build(BuildContext context) {
@@ -156,15 +163,19 @@ class _CadastroState extends State<Cadastro> {
                   ),
                 ],
                 const SizedBox(height: 18),
-                CampoTexto(
-                  rotulo: 'E-mail',
-                  icone: Icons.mail_outline,
-                  fundoBranco: true,
-                  rotuloExterno: true,
-                  controller: _emailController,
-                  tipoTeclado: TextInputType.emailAddress,
-                  placeholder: 'seu@email.com',
-                ),
+                if (!_semEmail) ...[
+                  CampoTexto(
+                    rotulo: 'E-mail',
+                    icone: Icons.mail_outline,
+                    fundoBranco: true,
+                    rotuloExterno: true,
+                    controller: _emailController,
+                    tipoTeclado: TextInputType.emailAddress,
+                    placeholder: 'seu@email.com',
+                  ),
+                  const SizedBox(height: 6),
+                ],
+                OpcaoSemEmail(marcado: _semEmail, aoMudar: (valor) => setState(() => _semEmail = valor)),
                 const SizedBox(height: 18),
                 CampoTexto(
                   rotulo: 'Senha',
@@ -182,7 +193,7 @@ class _CadastroState extends State<Cadastro> {
           ),
           if (_erro != null) ...[
             const SizedBox(height: 14),
-            Text(_erro!, style: const TextStyle(color: CorApp.vermelho, fontWeight: FontWeight.w600)),
+            Text(_erro!, style: TextStyle(color: CorApp.vermelho, fontWeight: FontWeight.w600)),
           ],
           const SizedBox(height: 24),
           Botao(texto: 'Criar conta e entrar', variante: VarianteBotao.solido, onPressed: _criarConta, carregando: _carregando),
@@ -210,7 +221,7 @@ class _CadastroState extends State<Cadastro> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text('Eu sou', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: CorApp.textoLabel)),
+          Text('Eu sou', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: CorApp.textoLabel)),
           const SizedBox(height: 10),
           Row(
             children: [
@@ -246,7 +257,7 @@ class _CadastroState extends State<Cadastro> {
             child: Center(
               child: Text(
                 rotulo,
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w800, color: ativo ? Colors.white : CorApp.textoLabel),
+                style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: ativo ? Colors.white : CorApp.textoLabel),
               ),
             ),
           ),
@@ -260,7 +271,7 @@ class _CadastroState extends State<Cadastro> {
     final campoData = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text('Data de nascimento', style: _estiloRotulo),
+        Text('Data de nascimento', style: _estiloRotulo),
         const SizedBox(height: 8),
         InkWell(
           onTap: _escolherDataNascimento,
@@ -280,7 +291,7 @@ class _CadastroState extends State<Cadastro> {
     final campoSexo = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text('Sexo', style: _estiloRotulo),
+        Text('Sexo', style: _estiloRotulo),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           isExpanded: true,

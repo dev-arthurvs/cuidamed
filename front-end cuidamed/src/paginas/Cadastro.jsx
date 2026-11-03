@@ -5,10 +5,11 @@ import Botao from '../componentes/Botao'
 import Campo from '../componentes/Campo'
 import { ICONES_CAMPO } from '../componentes/iconesCampo'
 import LogoMarca from '../componentes/LogoMarca'
+import OpcaoSemEmail from '../componentes/OpcaoSemEmail'
 import Toast from '../componentes/Toast'
 import { useApp } from '../contexto/useApp'
 import { OPCOES_SEXO } from '../dados/dadosMock'
-import { dataDeHojeISO } from '../utilitarios/mascaras'
+import { dataDeHojeISO, telefoneCompleto } from '../utilitarios/mascaras'
 import '../estilos/autenticacao.css'
 
 const variantesCampos = {
@@ -35,6 +36,7 @@ export default function Cadastro() {
   const [tipo, setTipo] = useState('paciente')
   const [nome, setNome] = useState('')
   const [email, setEmail] = useState('')
+  const [semEmail, setSemEmail] = useState(false)
   const [senha, setSenha] = useState('')
   const [dataNascimento, setDataNascimento] = useState('')
   const [sexo, setSexo] = useState(OPCOES_SEXO[0])
@@ -43,8 +45,12 @@ export default function Cadastro() {
 
   async function criarConta(evento) {
     evento.preventDefault()
-    if (!nome.trim() || !email.trim()) {
-      mostrarToast('Preencha nome e e-mail.')
+    if (!nome.trim()) {
+      mostrarToast('Preencha o nome.')
+      return
+    }
+    if (semEmail ? !telefoneCompleto(telefone) : !email.trim()) {
+      mostrarToast(semEmail ? 'Sem e-mail, informe o telefone com DDD.' : 'Preencha o e-mail ou marque "Não tenho e-mail".')
       return
     }
     if (senha.length < 8) {
@@ -55,7 +61,7 @@ export default function Cadastro() {
     try {
       await cadastrar({
         nome: nome.trim(),
-        email: email.trim(),
+        email: semEmail ? '' : email.trim(),
         senha,
         tipo,
         dataNascimento,
@@ -69,6 +75,15 @@ export default function Cadastro() {
       setEnviando(false)
     }
   }
+
+  const campoEmail = (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      {!semEmail && (
+        <Campo rotulo="E-mail" tipo="email" icone={ICONES_CAMPO.email} placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+      )}
+      <OpcaoSemEmail marcado={semEmail} aoMudar={setSemEmail} />
+    </div>
+  )
 
   return (
     <motion.div
@@ -156,7 +171,7 @@ export default function Cadastro() {
                   value={telefone}
                   onChange={(e) => setTelefone(e.target.value)}
                 />
-                <Campo rotulo="E-mail" tipo="email" icone={ICONES_CAMPO.email} placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                {campoEmail}
                 <Campo
                   rotulo="Senha"
                   tipo="password"
@@ -186,7 +201,7 @@ export default function Cadastro() {
                   value={telefone}
                   onChange={(e) => setTelefone(e.target.value)}
                 />
-                <Campo rotulo="E-mail" tipo="email" icone={ICONES_CAMPO.email} placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+                {campoEmail}
                 <Campo
                   rotulo="Senha"
                   tipo="password"

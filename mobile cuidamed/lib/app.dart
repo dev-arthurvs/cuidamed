@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -5,12 +7,12 @@ import 'package:provider/provider.dart';
 
 import 'componentes/avisos_alerta.dart';
 import 'estado/app_estado.dart';
+import 'estado/lembretes_agendados.dart';
 import 'estado/monitor_alertas.dart';
 import 'paginas/acessibilidade.dart';
 import 'paginas/agenda_medicamentos.dart';
 import 'paginas/cadastro.dart';
 import 'paginas/chat.dart';
-import 'paginas/ciclos_encerrados.dart';
 import 'paginas/definir_senha.dart';
 import 'paginas/detalhe_paciente.dart';
 import 'paginas/edicao_perfil.dart';
@@ -18,7 +20,6 @@ import 'paginas/historico.dart';
 import 'paginas/login.dart';
 import 'paginas/painel_cuidador.dart';
 import 'paginas/painel_idoso.dart';
-import 'paginas/painel_paciente.dart';
 import 'componentes/voltar_detalhes_paciente.dart';
 import 'servicos/notificacao_servico.dart';
 import 'servicos/paciente_servico.dart';
@@ -64,10 +65,10 @@ GoRouter _construirRouter(AppEstado estado) {
         path: rotaDetalhesPaciente, // '/cuidador/paciente/:pacienteId'
         builder: (context, state) => DetalhePaciente(pacienteId: int.parse(state.pathParameters['pacienteId']!)),
         routes: [
+          // O antigo "Painel do paciente" agora faz parte dos detalhes do paciente.
           GoRoute(
             path: 'painel',
-            redirect: (context, state) => estado.usuario?.tipo == 'cuidador' ? null : '/painel',
-            builder: (context, state) => PainelPaciente(pacienteId: int.parse(state.pathParameters['pacienteId']!)),
+            redirect: (context, state) => '/cuidador/paciente/${state.pathParameters['pacienteId']}',
           ),
         ],
       ),
@@ -75,9 +76,10 @@ GoRouter _construirRouter(AppEstado estado) {
         path: '/agenda',
         builder: (context, state) => const AgendaMedicamentos(),
       ),
+      // Tratamentos encerrados viraram a aba "Encerrados" da Agenda.
       GoRoute(
         path: '/ciclos-encerrados',
-        builder: (context, state) => const CiclosEncerrados(),
+        redirect: (context, state) => '/agenda?aba=encerrados',
       ),
       GoRoute(
         path: '/historico',
@@ -88,9 +90,10 @@ GoRouter _construirRouter(AppEstado estado) {
         builder: (context, state) => HistoricoPagina(pacienteId: int.parse(state.pathParameters['pacienteId']!)),
       ),
       GoRoute(
-        path: '/perfil',
+        path: '/configuracoes',
         builder: (context, state) => const EdicaoPerfil(),
       ),
+      GoRoute(path: '/perfil', redirect: (context, state) => '/configuracoes'),
       GoRoute(path: '/acessibilidade', builder: (context, state) => const Acessibilidade()),
       GoRoute(
         path: '/chat',
@@ -113,6 +116,7 @@ class _CuidaMedAppState extends State<CuidaMedApp> {
   late final AppEstado _estado;
   late final GoRouter _router;
   late final MonitorAlertas _monitorAlertas;
+  late final LembretesAgendados _lembretes;
 
   @override
   void initState() {
@@ -129,17 +133,52 @@ class _CuidaMedAppState extends State<CuidaMedApp> {
       aoAlertar: dispararAlerta,
     );
     NotificacaoServico.instancia.inicializar();
+    // Lembretes de "Hora do remédio" agendados no celular: tocam com o app fechado.
+    _lembretes = LembretesAgendados(
+      estado: _estado,
+      agendar: NotificacaoServico.instancia.agendarLembretes,
+      cancelar: NotificacaoServico.instancia.cancelarLembretes,
+    );
+    _estado.addListener(_aplicarTema);
     _estado.restaurarSessao();
-    // Voltou pro app (ou pra aba do navegador): sincroniza na hora.
-    _ciclo = AppLifecycleListener(onResume: _estado.sincronizarDados);
+    // Voltou pro app (ou pra aba do navegador): vê se passou dos 7 dias sem uso
+    // e, se continua logado, sincroniza na hora.
+    _ciclo = AppLifecycleListener(onResume: () async {
+      await _estado.verificarInatividade();
+      if (_estado.autenticado) await _estado.sincronizarDados();
+    });
+    // Com o app aberto o tempo todo, confere também de tempos em tempos.
+    _relogioInatividade = Timer.periodic(const Duration(minutes: 10), (_) => _estado.verificarInatividade());
   }
 
   late final AppLifecycleListener _ciclo;
+  late final Timer _relogioInatividade;
+
+  /// Modo claro/escuro: troca a paleta do CorApp quando o tema efetivo muda
+  /// (chave do menu, Configurações, login ou saída) e redesenha todas as telas
+  /// já abertas — as cores são lidas no build, então basta reconstruir, sem
+  /// perder o que está aberto (pilha de telas, formulários, rolagem).
+  void _aplicarTema() {
+    final escuro = _estado.usarModoEscuro;
+    if (escuro == CorApp.escuro) return;
+    CorApp.usarModoEscuro(escuro);
+    if (!mounted) return;
+    setState(() {}); // tema do MaterialApp (construirTema) com a paleta nova
+    void marcar(Element elemento) {
+      elemento.markNeedsBuild();
+      elemento.visitChildren(marcar);
+    }
+
+    (context as Element).visitChildren(marcar);
+  }
 
   @override
   void dispose() {
+    _estado.removeListener(_aplicarTema);
+    _relogioInatividade.cancel();
     _ciclo.dispose();
     _monitorAlertas.dispose();
+    _lembretes.dispose();
     super.dispose();
   }
 
@@ -160,7 +199,12 @@ class _CuidaMedAppState extends State<CuidaMedApp> {
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
         // Tamanho da fonte escolhido no Perfil/Acessibilidade escala o texto
         // do app inteiro, por cima da preferência de acessibilidade do sistema.
-        builder: aplicarEscalaFonte,
+        // Qualquer toque na tela conta como uso (saída após 7 dias sem uso).
+        builder: (context, child) => Listener(
+          behavior: HitTestBehavior.translucent,
+          onPointerDown: (_) => _estado.registrarAtividade(),
+          child: aplicarEscalaFonte(context, child),
+        ),
       ),
     );
   }

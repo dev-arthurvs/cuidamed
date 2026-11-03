@@ -4,6 +4,9 @@ import 'api_cliente.dart';
 class HistoricoServico {
   final ApiCliente _api = ApiCliente.instancia;
 
+  /// "Desfazer": apaga o registro de hoje; o servidor devolve o estoque descontado.
+  Future<void> desfazer(int id) => _api.delete('/api/historicos/$id');
+
   Future<List<Historico>> listarPorPaciente(int pacienteId, {DateTime? data, int? medicamentoId}) async {
     final query = <String, dynamic>{};
     if (data != null) {
