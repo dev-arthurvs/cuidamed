@@ -29,7 +29,7 @@ const List<SecaoAjuda> guiaSecoes = [
         'É a tela principal quando você entra no aplicativo. Mostra quantas doses faltam hoje, qual é o próximo remédio e um resumo rápido do seu dia.',
     passos: [
       'O card "Doses de hoje" mostra no meio, em letra grande, a dose da vez. Quando tomar, toque em "Registrar dose".',
-      'Registrou sem querer? Toque em "Desfazer" logo depois, ou volte até a dose tomada e toque em "Desfazer". Dá para desfazer as doses de hoje.',
+      'Registrou sem querer? Toque em "Desfazer" no aviso que aparece por alguns segundos, ou volte até a dose tomada e toque em "Desfazer". Dá para desfazer as doses de hoje.',
       'Se algum remédio estiver acabando, o card "Estoque acabando" aparece nesta tela.',
       'Em cima fica a dose anterior: verde com ✓ se foi tomada, vermelha e riscada com ✕ se foi perdida. Embaixo fica a próxima dose.',
       'Para ver as outras doses do dia, use as setas do card: ↑ no canto de cima e ↓ no canto de baixo.',

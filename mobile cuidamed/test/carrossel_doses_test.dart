@@ -66,8 +66,14 @@ void main() {
     await tester.pump();
     expect(registradas.single.nome, 'Metformina');
 
-    // Logo depois de registrar, oferece "Desfazer" e o aviso some sozinho.
+    // Logo depois de registrar, um pop-up oferece "Desfazer", com a barrinha do
+    // tempo que resta, e some sozinho.
     expect(find.text('Dose das 13:00 registrada.'), findsOneWidget);
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
+    expect(tester.getTopLeft(find.text('Dose das 13:00 registrada.')).dy, greaterThan(tester.getBottomLeft(find.text('Registrar dose')).dy));
+    final inicio = tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator)).value!;
+    await tester.pump(const Duration(seconds: 6));
+    expect(tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator)).value!, lessThan(inicio));
     await tester.tap(find.text('Desfazer'));
     await tester.pump();
     expect(_desfeitas.single.nome, 'Metformina');
@@ -77,6 +83,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(seconds: 13));
     expect(find.text('Dose das 13:00 registrada.'), findsNothing);
+    expect(find.byType(LinearProgressIndicator), findsNothing);
   });
 
   testWidgets('Só as setas trocam de dose: arrastar e tocar na linha pequena não', (tester) async {

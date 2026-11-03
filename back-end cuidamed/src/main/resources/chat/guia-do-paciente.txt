@@ -6,7 +6,7 @@ ONDE FICA CADA COISA
 REGISTRAR E DESFAZER DOSE
 1. Em "Início", o card "Doses de hoje" mostra a dose da vez em letra grande.
 2. Depois de tomar o remédio, escolha "Registrar dose".
-3. Registrou sem querer? Escolha "Desfazer" logo depois, ou volte até a dose tomada e escolha "Desfazer". Só dá para desfazer as doses de hoje.
+3. Registrou sem querer? Escolha "Desfazer" no aviso que aparece por alguns segundos, ou volte até a dose tomada e escolha "Desfazer". Só dá para desfazer as doses de hoje.
 Para ver as outras doses do dia, use as setas do card: a de cima, no canto superior, volta para a dose anterior; a de baixo, no canto inferior, vai para a próxima.
 A lista "Agenda de hoje", no fim da tela, mostra todos os horários do dia.
 

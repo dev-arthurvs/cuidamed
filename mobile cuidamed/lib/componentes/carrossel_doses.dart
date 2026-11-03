@@ -50,19 +50,25 @@ class _CarrosselDosesState extends State<CarrosselDoses> {
   static const _tempoDesfazer = Duration(seconds: 12);
   Dose? _registrada;
   Timer? _temporizadorDesfazer;
+  final _popupDesfazer = OverlayPortalController();
 
   Future<void> _registrar(Dose dose) async {
     if (!await widget.aoRegistrar(dose) || !mounted) return;
     _temporizadorDesfazer?.cancel();
+    _popupDesfazer.show();
     setState(() => _registrada = dose);
-    _temporizadorDesfazer = Timer(_tempoDesfazer, () {
-      if (mounted) setState(() => _registrada = null);
-    });
+    _temporizadorDesfazer = Timer(_tempoDesfazer, _fecharPopup);
+  }
+
+  void _fecharPopup() {
+    if (!mounted) return;
+    _popupDesfazer.hide();
+    setState(() => _registrada = null);
   }
 
   void _desfazer(Dose dose) {
     _temporizadorDesfazer?.cancel();
-    setState(() => _registrada = null);
+    _fecharPopup();
     widget.aoDesfazer(dose);
   }
 
@@ -133,7 +139,7 @@ class _CarrosselDosesState extends State<CarrosselDoses> {
     final anterior = _foco > 0 ? _LinhaDose(dose: _item(_foco - 1)) : null;
     final proxima = _foco < _total - 1 ? _LinhaDose(dose: _item(_foco + 1)) : null;
 
-    return Column(
+    final conteudo = Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
@@ -149,25 +155,6 @@ class _CarrosselDosesState extends State<CarrosselDoses> {
           ],
         ),
         const SizedBox(height: 12),
-        if (_registrada != null) ...[
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-            decoration: BoxDecoration(color: _fundoLinha, borderRadius: BorderRadius.circular(12)),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    'Dose das ${_registrada!.horario} registrada.',
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                _botaoDesfazer(_registrada!),
-              ],
-            ),
-          ),
-          const SizedBox(height: 12),
-        ],
         Stack(
           children: [
             AnimatedSwitcher(
@@ -211,6 +198,68 @@ class _CarrosselDosesState extends State<CarrosselDoses> {
           ],
         ),
       ],
+    );
+    return OverlayPortal(controller: _popupDesfazer, overlayChildBuilder: _construirPopup, child: conteudo);
+  }
+
+  /// Pop-up logo depois de registrar, acima da barra inferior, com o "Desfazer"
+  /// e a barrinha do tempo que resta.
+  Widget _construirPopup(BuildContext context) {
+    final dose = _registrada;
+    if (dose == null) return const SizedBox.shrink();
+    return Positioned(
+      left: 16,
+      right: 16,
+      bottom: MediaQuery.viewPaddingOf(context).bottom + kBottomNavigationBarHeight + 12,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 440),
+          child: Semantics(
+            liveRegion: true,
+            child: Material(
+              color: const Color(0xFF0F2C50),
+              elevation: 8,
+              clipBehavior: Clip.antiAlias,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+                side: const BorderSide(color: Color(0x2EFFFFFF)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Dose das ${dose.horario} registrada.',
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 16),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        _botaoDesfazer(dose),
+                      ],
+                    ),
+                  ),
+                  TweenAnimationBuilder<double>(
+                    key: ValueKey(dose.id),
+                    tween: Tween(begin: 1, end: 0),
+                    duration: _tempoDesfazer,
+                    builder: (context, restante, _) => LinearProgressIndicator(
+                      value: restante,
+                      minHeight: 6,
+                      color: Colors.white,
+                      backgroundColor: const Color(0x2EFFFFFF),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 

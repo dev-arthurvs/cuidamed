@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import Botao from './Botao'
 import { formatarQuantidadePorDose } from '../utilitarios/whatsapp'
 import './CarrosselDoses.css'
@@ -126,15 +127,6 @@ export default function CarrosselDoses({ doses, aoRegistrar, aoDesfazer }) {
         )}
       </div>
 
-      {registrada && (
-        <div className="carrossel-doses__registrada" role="status">
-          <span>Dose das {registrada.horario} registrada.</span>
-          <button type="button" className="carrossel-doses__desfazer" onClick={() => desfazer(registrada)}>
-            Desfazer
-          </button>
-        </div>
-      )}
-
       <div className="carrossel-doses__janela">
         <AnimatePresence mode="wait" initial={false} custom={direcao}>
           <motion.div
@@ -217,6 +209,34 @@ export default function CarrosselDoses({ doses, aoRegistrar, aoDesfazer }) {
             <path d="M6 9l6 6 6-6" />
           </svg>
         </button>
+      )}
+
+      {/* No body: as animações da página mudariam a referência do position: fixed. */}
+      {createPortal(
+        <AnimatePresence>
+          {registrada && (
+            <motion.div
+              key={registrada.id}
+              className="carrossel-doses__popup"
+              role="status"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 16 }}
+              transition={{ duration: 0.2, ease: 'easeOut' }}
+            >
+              <div className="carrossel-doses__popup-conteudo">
+                <span>Dose das {registrada.horario} registrada.</span>
+                <button type="button" className="carrossel-doses__desfazer" onClick={() => desfazer(registrada)}>
+                  Desfazer
+                </button>
+              </div>
+              <div className="carrossel-doses__popup-barra" aria-hidden="true">
+                <div className="carrossel-doses__popup-tempo" style={{ animationDuration: `${TEMPO_DESFAZER_MS}ms` }} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body,
       )}
     </div>
   )

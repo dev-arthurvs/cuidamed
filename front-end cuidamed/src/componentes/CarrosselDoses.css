@@ -77,18 +77,54 @@
   gap: 12px;
 }
 
-/* Aviso logo depois de registrar, com o "Desfazer". */
-.carrossel-doses__registrada {
+/* Pop-up logo depois de registrar, com o "Desfazer" e o tempo que resta. */
+.carrossel-doses__popup {
+  position: fixed;
+  left: 32px;
+  right: 32px;
+  bottom: 32px;
+  z-index: 50;
+  max-width: 440px;
+  margin-inline: auto;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  background: #0f2c50;
+  color: #fff;
+  box-shadow: 0 12px 30px rgba(12, 35, 66, 0.35);
+}
+
+.carrossel-doses__popup-conteudo {
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 8px 12px;
-  padding: 8px 14px;
-  border-radius: 12px;
-  background: var(--dose-linha);
-  font-size: 15px;
-  font-weight: 600;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.carrossel-doses__popup-barra {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.carrossel-doses__popup-tempo {
+  height: 100%;
+  background: #fff;
+  transform-origin: left;
+  animation: carrossel-doses-tempo linear forwards;
+}
+
+@keyframes carrossel-doses-tempo {
+  from {
+    transform: scaleX(1);
+  }
+
+  to {
+    transform: scaleX(0);
+  }
 }
 
 .carrossel-doses__desfazer {
@@ -249,6 +285,15 @@
   background: #fff;
   color: #0b3a78;
   box-shadow: 0 8px 18px rgba(9, 38, 80, 0.18);
+}
+
+/* Abaixo do botão flutuante do chat, que nessa largura sobe para dar espaço. */
+@media (max-width: 560px) {
+  .carrossel-doses__popup {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+  }
 }
 
 @media (max-width: 640px) {
