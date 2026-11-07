@@ -91,6 +91,7 @@ class _DefinirSenhaState extends State<DefinirSenha> {
           const SizedBox(height: 22),
           CampoTexto(
             rotulo: 'E-mail ou telefone cadastrado',
+            emailOuTelefone: true,
             icone: Icons.person_outline,
             fundoBranco: true,
             rotuloExterno: true,

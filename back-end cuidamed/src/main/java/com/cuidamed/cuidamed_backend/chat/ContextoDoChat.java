@@ -32,7 +32,7 @@ final class ContextoDoChat {
     private static final int TOLERANCIA_ATRASO_MIN = 15;
     private static final int LIMITE_PERDIDA_MIN = 180;
     private static final int LIMIAR_DIAS_ESTOQUE_BAIXO = 5;
-    private static final int DIAS_DE_HISTORICO = 7;
+    static final int DIAS_DE_HISTORICO = 7;
 
     private static final Locale PT_BR = Locale.of("pt", "BR");
     private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd/MM/yyyy");

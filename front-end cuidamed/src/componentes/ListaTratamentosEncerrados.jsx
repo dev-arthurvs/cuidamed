@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { TRANSICAO_ITEM_LISTA, VARIANTES_ITEM_LISTA } from '../utilitarios/animacoes'
 import { formatarDataCurta } from '../utilitarios/horarios'
 import LogoMarca from './LogoMarca'
@@ -12,7 +12,7 @@ export default function ListaTratamentosEncerrados({ medicamentos }) {
     <div className="agenda__grade tratamentos-encerrados__grade">
       <AnimatePresence>
         {medicamentos.map((medicamento) => (
-          <motion.div
+          <m.div
             className="agenda__cartao tratamentos-encerrados__cartao"
             key={medicamento.id}
             layout
@@ -44,7 +44,7 @@ export default function ListaTratamentosEncerrados({ medicamentos }) {
               Tratamento de {formatarDataCurta(medicamento.inicio)} até {formatarDataCurta(medicamento.fim)}
             </div>
             {medicamento.observacoes && <div className="tratamentos-encerrados__observacoes">{medicamento.observacoes}</div>}
-          </motion.div>
+          </m.div>
         ))}
       </AnimatePresence>
       {medicamentos.length === 0 && <p style={{ color: 'var(--texto-suave)' }}>Nenhum tratamento encerrado até o momento.</p>}

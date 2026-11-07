@@ -64,7 +64,7 @@ class _DetalhePacienteState extends State<DetalhePaciente> {
       return const AndaimeApp(appBar: Cabecalho(kicker: 'Detalhes', titulo: 'Carregando...'), body: Center(child: CircularProgressIndicator()));
     }
 
-    final doses = construirDosesHoje(dados.medicamentosAtivos(), dados.historicoHoje())..sort((a, b) => a.horario.compareTo(b.horario));
+    final doses = construirDosesHoje(dados.medicamentos, dados.historicoHoje())..sort((a, b) => a.horario.compareTo(b.horario));
     final adesao = calcularAdesao(dados.historico, medicamentos: dados.medicamentos);
 
     return AndaimeApp(

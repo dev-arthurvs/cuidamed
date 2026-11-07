@@ -31,6 +31,8 @@ Repositório: https://github.com/dev-arthurvs/cuidamed (privado, branch `main`).
   regra (`dosesSemRegistro` em `horarios.js`/`horarios.dart`). O chat tem a mesma
   regra em Java (`chat/ContextoDoChat.java`), com a hora de Brasília: mudou a regra,
   mude nos três.
+- Web e mobile guardam só 31 dias de histórico (`inicioJanelaHistorico`); a tela de
+  Histórico busca período mais antigo com `?de=&ate=` e não calcula nada até chegar.
 - Registro de hoje pode ser desfeito (`DELETE /api/historicos/{id}`), o que devolve
   o estoque.
 - O chat ensina a usar o app pelo guia `back-end cuidamed/src/main/resources/chat/guia-do-paciente.txt`:

@@ -16,7 +16,11 @@ import '../utilitarios/tema.dart';
 
 class HistoricoPagina extends StatefulWidget {
   final int? pacienteId;
-  const HistoricoPagina({super.key, this.pacienteId});
+
+  /// Busca um período antigo; por padrão, no servidor. Trocado nos testes.
+  final Future<List<Historico>> Function(int pacienteId, DateTime de, DateTime ate)? carregarAntigos;
+
+  const HistoricoPagina({super.key, this.pacienteId, this.carregarAntigos});
 
   @override
   State<HistoricoPagina> createState() => _HistoricoPaginaState();
@@ -33,6 +37,31 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
   late DateTime _inicio;
   late DateTime _fim;
   String _filtroMedicamento = 'todos';
+
+  // O app guarda só os últimos dias do histórico; período mais antigo vem do
+  // servidor. Até chegar, nada é calculado: sem os registros, doses tomadas
+  // apareceriam como perdidas.
+  String? _chaveAntigos;
+  List<Historico>? _antigos;
+  bool _erroAntigos = false;
+
+  Future<void> _buscarAntigos(AppEstado estado, String chave, int pacienteId, DateTime de, DateTime ate) async {
+    _chaveAntigos = chave;
+    _antigos = null;
+    _erroAntigos = false;
+    final carregar = widget.carregarAntigos ?? estado.carregarHistoricoAntigo;
+    List<Historico>? itens;
+    try {
+      itens = await carregar(pacienteId, de, ate);
+    } catch (_) {
+      // Mostra o aviso na lista, sem calcular nada com dados incompletos.
+    }
+    if (!mounted || _chaveAntigos != chave) return;
+    setState(() {
+      _antigos = itens;
+      _erroAntigos = itens == null;
+    });
+  }
 
   static DateTime _semHora(DateTime d) => DateTime(d.year, d.month, d.day);
 
@@ -93,15 +122,26 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
       );
     }
 
-    final nomesMedicamentos =
-        {...dados.historico.map((h) => h.nomeMedicamento), ...dados.medicamentos.map((m) => m.nome)}.toList()..sort();
     final hoje = DateTime.now();
     final hojeSemHora = DateTime(hoje.year, hoje.month, hoje.day);
 
+    final inicioJanela = inicioJanelaHistorico(hojeSemHora);
+    final chaveAntigos = _inicio.isBefore(inicioJanela) ? '${dados.paciente.id}|${_inicio.toIso8601String()}' : null;
+    if (chaveAntigos != null && chaveAntigos != _chaveAntigos) {
+      _buscarAntigos(estado, chaveAntigos, dados.paciente.id, _inicio, inicioJanela.subtract(const Duration(days: 1)));
+    }
+    final periodoDisponivel = chaveAntigos == null || _antigos != null;
+    final carregandoAntigos = !periodoDisponivel && !_erroAntigos;
+    final historicoDoPeriodo = chaveAntigos != null && _antigos != null ? [..._antigos!, ...dados.historico] : dados.historico;
+
+    final nomesMedicamentos =
+        {...historicoDoPeriodo.map((h) => h.nomeMedicamento), ...dados.medicamentos.map((m) => m.nome)}.toList()..sort();
+
     // Registros do banco + doses que passaram do horário sem registro (as
     // mesmas que o Início mostra como atrasadas/perdidas).
-    final semRegistro = dosesSemRegistro(dados.paciente.id, dados.medicamentos, dados.historico, _inicio, _fim);
-    final entradas = [...dados.historico, ...semRegistro]
+    final semRegistro =
+        periodoDisponivel ? dosesSemRegistro(dados.paciente.id, dados.medicamentos, historicoDoPeriodo, _inicio, _fim) : const <Historico>[];
+    final entradas = [...(periodoDisponivel ? historicoDoPeriodo : const <Historico>[]), ...semRegistro]
         .map((item) => (item: item, diferenca: hojeSemHora.difference(DateTime(item.data.year, item.data.month, item.data.day)).inDays))
         .where((e) {
           final dia = _semHora(e.item.data);
@@ -163,13 +203,20 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
           Botao(
             texto: 'Gerar relatório (PDF)',
             variante: VarianteBotao.secundario,
-            onPressed: () => _gerarRelatorio(dados!, entradas.map((e) => e.item).toList()),
+            onPressed: periodoDisponivel ? () => _gerarRelatorio(dados!, entradas.map((e) => e.item).toList()) : null,
           ),
           const SizedBox(height: 20),
           if (entradas.isEmpty)
             Padding(
               padding: EdgeInsets.symmetric(vertical: 24),
-              child: Text('Nenhum registro para este filtro.', style: TextStyle(color: CorApp.textoSuave)),
+              child: Text(
+                carregandoAntigos
+                    ? 'Carregando...'
+                    : _erroAntigos
+                        ? 'Não foi possível carregar esse período.'
+                        : 'Nenhum registro para este filtro.',
+                style: TextStyle(color: CorApp.textoSuave),
+              ),
             ),
           for (var indice = 0; indice < entradas.length; indice++) ...[
             if (indice == 0 || entradas[indice - 1].item.data != entradas[indice].item.data)

@@ -450,6 +450,7 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
           const SizedBox(height: 14),
           CampoTexto(
             rotulo: 'E-mail ou telefone do cuidador',
+            emailOuTelefone: true,
             controller: _emailCuidadorController,
             tipoTeclado: TextInputType.emailAddress,
             placeholder: 'cuidador@email.com ou (79) 99999-9999',

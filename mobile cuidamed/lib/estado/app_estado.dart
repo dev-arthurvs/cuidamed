@@ -74,12 +74,17 @@ class AppEstado extends ChangeNotifier {
   /// perdido) e a virada do dia — sem isso, uma dose das 08:00 ficava
   /// "A tomar" o dia todo até algo redesenhar a tela.
   static const intervaloAtualizacao = Duration(seconds: 30);
+
+  /// App fora da tela: não busca dados (poupa bateria e internet) e atualiza ao voltar.
+  bool emSegundoPlano = false;
+
   Timer? _relogio;
 
   @visibleForTesting
   void iniciarRelogio() {
     _relogio?.cancel();
     _relogio = Timer.periodic(intervaloAtualizacao, (_) {
+      if (emSegundoPlano) return;
       notifyListeners();
       sincronizarDados();
     });
@@ -329,9 +334,13 @@ class AppEstado extends ChangeNotifier {
 
   Future<PacienteComDados> _hidratarPaciente(Paciente paciente) async {
     final medicamentos = await _medicamentoServico.listarPorPaciente(paciente.id);
-    final historico = await _historicoServico.listarPorPaciente(paciente.id);
+    final historico = await _historicoServico.listarPorPaciente(paciente.id, de: inicioJanelaHistorico());
     return PacienteComDados(paciente: paciente, medicamentos: medicamentos, historico: historico);
   }
+
+  /// Período mais antigo que os últimos dias guardados no app (tela de Histórico).
+  Future<List<Historico>> carregarHistoricoAntigo(int pacienteId, DateTime de, DateTime ate) =>
+      _historicoServico.listarPorPaciente(pacienteId, de: de, ate: ate);
 
   Future<void> recarregarPaciente(int pacienteId) async {
     final paciente = await _pacienteServico.buscarPorId(pacienteId);

@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useState } from 'react'
 import Cabecalho from '../componentes/Cabecalho'
 import Cartao from '../componentes/Cartao'
@@ -53,7 +53,7 @@ export default function Acessibilidade() {
                     </button>
                     <AnimatePresence initial={false}>
                       {aberta && (
-                        <motion.div
+                        <m.div
                           className="acessibilidade__item-conteudo"
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: 'auto', opacity: 1 }}
@@ -63,7 +63,7 @@ export default function Acessibilidade() {
                           <div className="acessibilidade__item-miolo">
                             <SecaoAjuda secao={secao} mostrarTitulo={false} />
                           </div>
-                        </motion.div>
+                        </m.div>
                       )}
                     </AnimatePresence>
                   </div>

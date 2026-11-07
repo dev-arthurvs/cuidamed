@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import Botao from '../componentes/Botao'
 import Cabecalho from '../componentes/Cabecalho'
@@ -7,7 +7,7 @@ import VoltarDetalhesPaciente from '../componentes/VoltarDetalhesPaciente'
 import Rotulo from '../componentes/Rotulo'
 import { useApp } from '../contexto/useApp'
 import { ESTILO_STATUS } from '../dados/dadosMock'
-import { dosesSemRegistro } from '../utilitarios/horarios'
+import { dosesSemRegistro, inicioJanelaHistorico, somarDias } from '../utilitarios/horarios'
 import { DATA_MINIMA } from '../utilitarios/mascaras'
 import './Historico.css'
 
@@ -37,18 +37,11 @@ function formatarDiaMes(dataIso) {
 }
 
 export default function Historico() {
-  const { pacientes, pacienteFoco, usuario } = useApp()
+  const { pacientes, pacienteFoco, usuario, carregarHistoricoAntigo } = useApp()
   const { pacienteId } = useParams()
   const [filtroMedicamento, setFiltroMedicamento] = useState('todos')
 
   const paciente = pacienteId ? pacientes.find((item) => String(item.id) === pacienteId) : pacienteFoco
-
-  const nomesMedicamentos = useMemo(() => {
-    if (!paciente) return []
-    return [
-      ...new Set([...paciente.historico.map((item) => item.medicamento), ...paciente.medicamentos.map((item) => item.nome)]),
-    ].sort()
-  }, [paciente])
 
   const hoje = useMemo(() => {
     const data = new Date()
@@ -77,17 +70,55 @@ export default function Historico() {
     if (data < dataInicio) setDataInicio(data)
   }
 
-  const entradasFiltradas = useMemo(() => {
+  // O app guarda só os últimos dias do histórico; período mais antigo vem do
+  // servidor. Até chegar, nada é calculado: sem os registros, doses tomadas
+  // apareceriam como perdidas.
+  const inicioJanela = inicioJanelaHistorico(hojeIso)
+  const pacienteAtualId = paciente?.id
+  const chaveAntigos = pacienteAtualId && dataInicio < inicioJanela ? `${pacienteAtualId}|${dataInicio}` : null
+  const [antigos, setAntigos] = useState(null)
+  useEffect(() => {
+    if (!chaveAntigos) return undefined
+    let cancelado = false
+    carregarHistoricoAntigo(pacienteAtualId, dataInicio, somarDias(inicioJanela, -1))
+      .then((itens) => {
+        if (!cancelado) setAntigos({ chave: chaveAntigos, itens })
+      })
+      .catch(() => {
+        if (!cancelado) setAntigos({ chave: chaveAntigos, itens: [], erro: true })
+      })
+    return () => {
+      cancelado = true
+    }
+  }, [chaveAntigos, pacienteAtualId, dataInicio, inicioJanela, carregarHistoricoAntigo])
+  const antigosAtuais = chaveAntigos && antigos?.chave === chaveAntigos ? antigos : null
+  const carregandoAntigos = Boolean(chaveAntigos) && !antigosAtuais
+  const erroAntigos = Boolean(antigosAtuais?.erro)
+  const periodoDisponivel = !carregandoAntigos && !erroAntigos
+
+  const historicoDoPeriodo = useMemo(() => {
     if (!paciente) return []
+    return antigosAtuais ? [...antigosAtuais.itens, ...paciente.historico] : paciente.historico
+  }, [paciente, antigosAtuais])
+
+  const nomesMedicamentos = useMemo(() => {
+    if (!paciente) return []
+    return [
+      ...new Set([...historicoDoPeriodo.map((item) => item.medicamento), ...paciente.medicamentos.map((item) => item.nome)]),
+    ].sort()
+  }, [paciente, historicoDoPeriodo])
+
+  const entradasFiltradas = useMemo(() => {
+    if (!paciente || !periodoDisponivel) return []
     // Registros do banco + doses que passaram do horário sem registro (as
     // mesmas que o Início mostra como atrasadas/perdidas).
-    const semRegistro = dosesSemRegistro(paciente.medicamentos, paciente.historico, dataInicio, dataFim)
-    return [...paciente.historico, ...semRegistro]
+    const semRegistro = dosesSemRegistro(paciente.medicamentos, historicoDoPeriodo, dataInicio, dataFim)
+    return [...historicoDoPeriodo, ...semRegistro]
       .map((item) => ({ ...item, diferenca: diasDeDiferenca(item.data, hoje) }))
       .filter((item) => item.data >= dataInicio && item.data <= dataFim)
       .filter((item) => filtroMedicamento === 'todos' || item.medicamento === filtroMedicamento)
       .sort((a, b) => (a.data === b.data ? b.horario.localeCompare(a.horario) : b.data.localeCompare(a.data)))
-  }, [paciente, hoje, dataInicio, dataFim, filtroMedicamento])
+  }, [paciente, periodoDisponivel, historicoDoPeriodo, hoje, dataInicio, dataFim, filtroMedicamento])
 
   if (!paciente) {
     return (
@@ -181,7 +212,7 @@ export default function Historico() {
               </div>
             </div>
 
-            <Botao variante="secundario" larguraTotal onClick={() => window.print()}>
+            <Botao variante="secundario" larguraTotal disabled={!periodoDisponivel} onClick={() => window.print()}>
               Gerar relatório (PDF)
             </Botao>
           </div>
@@ -203,7 +234,13 @@ export default function Historico() {
               )
             })}
             {entradasFiltradas.length === 0 && (
-              <div className="historico__vazio">Nenhum registro para este filtro.</div>
+              <div className="historico__vazio">
+                {carregandoAntigos
+                  ? 'Carregando...'
+                  : erroAntigos
+                    ? 'Não foi possível carregar esse período.'
+                    : 'Nenhum registro para este filtro.'}
+              </div>
             )}
           </div>
         </div>

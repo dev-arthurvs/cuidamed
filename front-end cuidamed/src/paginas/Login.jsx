@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Botao from '../componentes/Botao'
@@ -37,7 +37,7 @@ export default function Login() {
   }
 
   return (
-    <motion.div
+    <m.div
       className="autenticacao"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -64,6 +64,7 @@ export default function Login() {
 
           <Campo
             rotulo="E-mail ou telefone"
+            tipo="email-ou-telefone"
             icone={ICONES_CAMPO.pessoa}
             autoComplete="username"
             placeholder="seu@email.com ou (79) 99999-9999"
@@ -108,6 +109,6 @@ export default function Login() {
         </form>
       </div>
       <Toast />
-    </motion.div>
+    </m.div>
   )
 }

@@ -91,8 +91,14 @@ public class PacienteService {
 
     @Transactional(readOnly = true)
     public List<PacienteRespostaDTO> listarPorCuidador(Long cuidadorId) {
-        return vinculoRepository.findByCuidadorIdAndSituacaoOrderByIdAsc(cuidadorId, SituacaoVinculo.ATIVO).stream()
-                .map(vinculo -> paraDTO(vinculo.getPaciente()))
+        List<Vinculo> ativos = vinculoRepository.findByCuidadorIdAndSituacaoOrderByIdAsc(cuidadorId, SituacaoVinculo.ATIVO);
+        // Os pedidos pendentes vêm de uma vez só, em vez de uma consulta por paciente.
+        java.util.Map<Long, Vinculo> pendentes = vinculoRepository
+                .findByPacienteIdInAndSituacao(ativos.stream().map(vinculo -> vinculo.getPaciente().getId()).toList(), SituacaoVinculo.PENDENTE)
+                .stream()
+                .collect(java.util.stream.Collectors.toMap(vinculo -> vinculo.getPaciente().getId(), vinculo -> vinculo, (primeiro, outro) -> primeiro));
+        return ativos.stream()
+                .map(vinculo -> PacienteRespostaDTO.paraDTO(vinculo.getPaciente(), vinculo, pendentes.get(vinculo.getPaciente().getId())))
                 .toList();
     }
 

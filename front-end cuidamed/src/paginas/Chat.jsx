@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import Botao from '../componentes/Botao'
 import Cabecalho from '../componentes/Cabecalho'
@@ -88,7 +88,7 @@ export default function Chat() {
             <div className="chat__lista">
               <AnimatePresence initial={false}>
                 {mensagens.map((mensagem) => (
-                  <motion.div
+                  <m.div
                     key={mensagem.id}
                     className={`chat__bolha${mensagem.autor === 'usuario' ? ' chat__bolha--usuario' : ' chat__bolha--ia'}`}
                     initial={{ opacity: 0, y: 10, scale: 0.97 }}
@@ -104,7 +104,7 @@ export default function Chat() {
                     ) : (
                       mensagem.texto
                     )}
-                  </motion.div>
+                  </m.div>
                 ))}
               </AnimatePresence>
               <div ref={fimDaListaRef} />

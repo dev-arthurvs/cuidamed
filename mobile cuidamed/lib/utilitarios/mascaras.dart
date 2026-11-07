@@ -22,6 +22,23 @@ String formatarTelefone(String texto) {
   return '($ddd) ${numero.substring(0, tamanhoInicio)}-${numero.substring(tamanhoInicio)}';
 }
 
+/// Campo "E-mail ou telefone": só com números vira telefone com máscara; com
+/// letra ou @ fica como foi digitado (e sai a máscara, se ela já tinha entrado).
+/// Mesma regra do web (formatarEmailOuTelefone em mascaras.js).
+class MascaraEmailOuTelefone extends TextInputFormatter {
+  const MascaraEmailOuTelefone();
+
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue anterior, TextEditingValue novo) {
+    if (RegExp(r'[^\d\s()-]').hasMatch(novo.text)) {
+      if (!RegExp(r'^\(\d').hasMatch(anterior.text)) return novo;
+      final texto = novo.text.replaceAll(RegExp(r'[()\s-]'), '');
+      return TextEditingValue(text: texto, selection: TextSelection.collapsed(offset: texto.length));
+    }
+    return const MascaraTelefone().formatEditUpdate(anterior, novo);
+  }
+}
+
 /// Máscara de digitação do telefone: parêntese, espaço e hífen entram
 /// sozinhos e o campo para no 11º dígito. Apagar um caractere de formatação
 /// (o hífen, por exemplo) apaga o dígito anterior — senão ele voltaria na hora.

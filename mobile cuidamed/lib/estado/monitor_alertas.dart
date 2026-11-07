@@ -89,13 +89,15 @@ class MonitorAlertas {
   }
 
   void _verificarAtrasosDosPacientes() {
+    // Em segundo plano os dados não atualizam: o aviso poderia ser de uma dose já tomada.
+    if (estado.emSegundoPlano) return;
     final momento = agora();
     final hojeIso = dataAtualISO(momento);
     final minutos = momento.hour * 60 + momento.minute;
     final novos = <({String paciente, String horario, String remedio})>[];
     for (final dados in estado.pacientes) {
       final historicoHoje = dados.historico.where((h) => dataAtualISO(h.data) == hojeIso).toList();
-      for (final dose in construirDosesHoje(dados.medicamentosAtivos(), historicoHoje, hojeIso: hojeIso)) {
+      for (final dose in construirDosesHoje(dados.medicamentos, historicoHoje, hojeIso: hojeIso)) {
         final chave = '$hojeIso-${dados.paciente.id}-${dose.id}';
         if (dose.status == 'tomado' || _dosesAvisadas.contains(chave)) continue;
         if (calcularStatusAtual(dose.horario, null, agoraEmMinutos: minutos) != 'atrasado') continue;
@@ -116,7 +118,7 @@ class MonitorAlertas {
     final momento = agora();
     final hojeIso = dataAtualISO(momento);
     final historicoHoje = dados.historico.where((h) => dataAtualISO(h.data) == hojeIso).toList();
-    final doses = construirDosesHoje(dados.medicamentosAtivos(), historicoHoje);
+    final doses = construirDosesHoje(dados.medicamentos, historicoHoje);
     final minutosAtuais = momento.hour * 60 + momento.minute;
     for (final dose in doses) {
       final chave = '$hojeIso-${dose.id}';
