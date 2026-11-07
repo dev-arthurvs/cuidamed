@@ -54,7 +54,22 @@ class _FormularioMedicamentoState extends State<FormularioMedicamento> {
   }
 
   Future<void> _escolherHorario() async {
-    final selecionado = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    final selecionado = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+      // Dois defeitos do relógio do Flutter no modo de digitar a hora:
+      // - com a fonte "Pequena" ele ficava menor que o mínimo dele e quebrava
+      //   (aqui o texto nunca fica abaixo do tamanho normal);
+      // - mostrava 24 horas (português), mas no navegador validava em 12 horas
+      //   e recusava "17" (aqui ele usa sempre 24 horas, como no Brasil).
+      builder: (context, filho) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(
+          textScaler: MediaQuery.textScalerOf(context).clamp(minScaleFactor: 1),
+          alwaysUse24HourFormat: true,
+        ),
+        child: filho!,
+      ),
+    );
     if (selecionado == null || !mounted) return;
     final texto = '${selecionado.hour.toString().padLeft(2, '0')}:${selecionado.minute.toString().padLeft(2, '0')}';
     if (_horarios.contains(texto)) {
