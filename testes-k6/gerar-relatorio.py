@@ -7,6 +7,7 @@ Os números vêm de relatorios/<teste>-resumo.json, exportados pelo k6 com
 """
 import json
 import pathlib
+import tempfile
 import subprocess
 import sys
 from datetime import date
@@ -71,6 +72,56 @@ def linha_tabela(chave, titulo, descricao, m):
       </tr>"""
 
 
+CONFIGURACAO = {
+    'carga': 'Sobe de 0 a 50 usuários em 1 minuto, mantém 50 por 3 minutos e desce em 30 segundos. '
+             'Cada usuário tem a própria conta e repete: abrir o Início (dados, remédios e histórico de 31 dias), '
+             'registrar a dose e desfazer, com pausas de 1 a 3 segundos, como uma pessoa usando o app.',
+    'estresse': 'O mesmo uso da carga, em degraus de 1 minuto: 25, 50, 100 e 200 usuários, mais 1 minuto no topo '
+                'de 200, descida para 25 (recuperação) e 30 segundos até zero.',
+    'integracao': '1 usuário virtual, 1 execução: o caminho completo entre cuidador e paciente, conferindo cada resposta.',
+    'regressao': '1 usuário virtual, 1 execução: 34 regras conferidas uma a uma. As recusas exigidas pelas regras são '
+                 'marcadas como esperadas.',
+}
+
+
+def verificacoes(nome):
+    """Lista (etapa, verificação, aprovações, falhas) a partir do resumo do k6."""
+    raiz = json.loads((PASTA / f'{nome}-resumo.json').read_text(encoding='utf-8'))['root_group']
+    linhas = []
+
+    def percorrer(grupo):
+        for check in (grupo.get('checks') or {}).values():
+            linhas.append((grupo.get('name') or '', check['name'], check['passes'], check['fails']))
+        for filho in (grupo.get('groups') or {}).values():
+            percorrer(filho)
+
+    percorrer(raiz)
+    return linhas
+
+
+def secao_detalhes(chave, titulo, m):
+    duracao = m['http_req_duration']
+    recebidos = m['data_received']['count'] / (1024 * 1024)
+    etapas = {'setup': 'Preparação (contas de teste)', '': '—'}
+    linhas = ''.join(
+        f"<tr><td>{etapas.get(g, g)}</td><td>{nome}</td><td>{inteiro(ok)}</td>"
+        f"<td class=\"{'ok' if falhas == 0 else 'falhou'}\">{inteiro(falhas)}</td></tr>"
+        for g, nome, ok, falhas in verificacoes(chave))
+    return f"""
+<h3>{titulo}</h3>
+<p>{CONFIGURACAO[chave]}</p>
+<table class="metas">
+  <tr><th>Média</th><th>Mediana</th><th>p90</th><th>p95</th><th>Máxima</th><th>Iterações</th><th>Dados recebidos</th></tr>
+  <tr><td>{num(duracao['avg'])} ms</td><td>{num(duracao['med'])} ms</td><td>{num(duracao['p(90)'])} ms</td>
+      <td>{num(duracao['p(95)'])} ms</td><td>{num(duracao['max'])} ms</td><td>{inteiro(m['iterations']['count'])}</td>
+      <td>{num(recebidos)} MB</td></tr>
+</table>
+<table class="metas verificacoes">
+  <tr><th>Etapa</th><th>Verificação</th><th>Aprovadas</th><th>Falhas</th></tr>
+  {linhas}
+</table>"""
+
+
 def tabela_metas(resultados):
     nomes = {
         'http_req_duration': 'Tempo de resposta',
@@ -111,6 +162,9 @@ def montar_html():
   pre {{ background: #f3f4f6; padding: 8px 10px; border-radius: 6px; font-size: 8.6pt; white-space: pre-wrap; }}
   code {{ font-size: 8.6pt; }}
   .quebra {{ page-break-before: always; }}
+  h3 {{ font-size: 11pt; margin: 14px 0 4px; }}
+  .verificacoes td {{ white-space: normal; font-size: 8.2pt; padding: 4px; }}
+  .anexos li {{ margin: 2px 0; }}
 </style></head><body>
 <h1>Documentação da Suíte de Testes — CuidaMed API</h1>
 <p class="sub">Testes de carga, estresse, integração e regressão com k6 · {date.today().strftime('%d/%m/%Y')}</p>
@@ -151,7 +205,9 @@ a regra exige (401, 403, 409 e 400) são marcadas como esperadas no script e nã
     {inteiro(carga['http_reqs']['count'])} requisições ({num(carga['http_reqs']['rate'], 1)} por segundo) com
     {num(100 * carga['http_req_failed']['value'])}% de erros, latência média de {num(carga['http_req_duration']['avg'])} ms e
     p95 de {num(carga['http_req_duration']['p(95)'])} ms — muito abaixo da meta de 500 ms. Houve um máximo isolado de
-    {num(carga['http_req_duration']['max'], 0)} ms, que não afetou o p95.</li>
+    {num(carga['http_req_duration']['max'], 0)} ms, num pico de poucos segundos visível no gráfico do Anexo A; não
+    houve erros nesse momento e o p95 do teste não foi afetado. Como a API e o k6 dividem o mesmo notebook, a causa
+    pode ser o próprio notebook; ela não foi investigada.</li>
   <li><strong>Estresse sem queda:</strong> no topo de {inteiro(estresse['vus_max']['max'])} usuários simultâneos a API
     manteve {num(100 * estresse['http_req_failed']['value'])}% de erros e p95 de {num(estresse['http_req_duration']['p(95)'])} ms,
     com {inteiro(estresse['http_reqs']['count'])} requisições ({num(estresse['http_reqs']['rate'], 1)} por segundo) e recuperação
@@ -168,6 +224,9 @@ a regra exige (401, 403, 409 e 400) são marcadas como esperadas no script e nã
     no aplicativo, menos consultas ao banco e índices por paciente.</li>
 </ul>
 
+<h2 class="quebra">Detalhes por teste</h2>
+{''.join(secao_detalhes(chave, titulo, r[chave]) for chave, titulo, _ in TESTES)}
+
 <h2>Limitações</h2>
 <ul>
   <li>A API e o k6 rodaram no mesmo notebook, sem a latência da internet: em produção os tempos tendem a ser maiores.</li>
@@ -178,29 +237,84 @@ a regra exige (401, 403, 409 e 400) são marcadas como esperadas no script e nã
 <h2>Como executar</h2>
 <pre>cd testes-k6
 $env:K6_WEB_DASHBOARD = "true"
+$env:K6_WEB_DASHBOARD_PERIOD = "1s"
 $env:K6_WEB_DASHBOARD_EXPORT = "relatorios/carga.html";      k6 run --summary-export relatorios/carga-resumo.json carga.js
 $env:K6_WEB_DASHBOARD_EXPORT = "relatorios/estresse.html";   k6 run --summary-export relatorios/estresse-resumo.json -e PICO=200 estresse.js
 $env:K6_WEB_DASHBOARD_EXPORT = "relatorios/integracao.html"; k6 run --summary-export relatorios/integracao-resumo.json integracao.js
 $env:K6_WEB_DASHBOARD_EXPORT = "relatorios/regressao.html";  k6 run --summary-export relatorios/regressao-resumo.json regressao.js
 py gerar-relatorio.py</pre>
 <p class="nota">Por padrão os testes usam a API de testes em <code>http://localhost:8081</code>. Para outro servidor:
-<code>k6 run -e API=https://endereco-da-api carga.js</code>. Os relatórios HTML de cada teste, gerados pelo k6, estão na pasta <code>relatorios</code>.</p>
+<code>k6 run -e API=https://endereco-da-api carga.js</code>. Os relatórios HTML completos de cada teste, gerados pelo k6,
+estão na pasta <code>relatorios</code>.</p>
+
+<h2>Anexos — relatórios gerados pelo k6</h2>
+<p>As páginas seguintes trazem, de cada teste, a visão geral e o resumo do relatório que o próprio k6 gerou (web dashboard),
+com os gráficos de requisições por segundo, usuários virtuais e tempo de resposta ao longo do teste.</p>
+<ul class="anexos">
+  <li>Anexo A — Teste de carga</li>
+  <li>Anexo B — Teste de estresse</li>
+  <li>Anexo C — Teste de integração</li>
+  <li>Anexo D — Teste de regressão</li>
+</ul>
 </body></html>"""
 
 
+ANEXOS = [('A', 'carga', 'Teste de carga'), ('B', 'estresse', 'Teste de estresse'),
+          ('C', 'integracao', 'Teste de integração'), ('D', 'regressao', 'Teste de regressão')]
+NAVEGADORES = [r'C:\Program Files\Google\Chrome\Application\chrome.exe',
+               r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe']
+
+
+def imprimir(navegador, origem, destino, esperar_ms=0):
+    comando = [navegador, '--headless', '--disable-gpu', '--no-pdf-header-footer', f'--print-to-pdf={destino}']
+    if esperar_ms:
+        # O relatório do k6 desenha os gráficos com JavaScript: espera antes de imprimir.
+        comando += [f'--virtual-time-budget={esperar_ms}', '--run-all-compositor-stages-before-draw']
+    subprocess.run(comando + [origem.resolve().as_uri()], check=True, capture_output=True, timeout=180)
+
+
+def paginas_do_k6(leitor):
+    """Visão geral (2 primeiras páginas) e resumo (da página com "Summary" até o fim)."""
+    textos = [pagina.extract_text() or '' for pagina in leitor.pages]
+    resumo = next((i for i, t in enumerate(textos) if 'Summary' in t and 'Trends' in t), len(textos) - 2)
+    return sorted(set(range(min(2, len(textos)))) | set(range(resumo, len(textos))))
+
+
+def capa_do_anexo(letra, titulo):
+    return ('<!DOCTYPE html><html><head><meta charset="utf-8"><style>@page { size: A4; margin: 0; }'
+            'body { font-family: "Segoe UI", Arial, sans-serif; display: flex; height: 96vh; margin: 0;'
+            ' align-items: center; justify-content: center; flex-direction: column; color: #1d2433; }'
+            'h1 { font-size: 26pt; margin: 0; } p { color: #5b6475; }</style></head><body>'
+            f'<h1>Anexo {letra} — {titulo}</h1><p>Relatório gerado pelo k6: visão geral e resumo</p></body></html>')
+
+
 def main():
+    from pypdf import PdfReader, PdfWriter
+
     html = PASTA / 'Relatorio-de-testes-CuidaMed.html'
     pdf = PASTA / 'Relatorio-de-testes-CuidaMed.pdf'
     html.write_text(montar_html(), encoding='utf-8')
-    navegadores = [r'C:\Program Files\Google\Chrome\Application\chrome.exe',
-                   r'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe']
-    navegador = next((n for n in navegadores if pathlib.Path(n).exists()), None)
+    navegador = next((n for n in NAVEGADORES if pathlib.Path(n).exists()), None)
     if not navegador:
         print(f'HTML gerado em {html}; abra no navegador e imprima em PDF.')
         return
-    subprocess.run([navegador, '--headless', '--disable-gpu', '--no-pdf-header-footer',
-                    f'--print-to-pdf={pdf}', html.resolve().as_uri()], check=True, capture_output=True)
-    print(f'PDF gerado em {pdf}')
+
+    with tempfile.TemporaryDirectory() as temporaria:
+        temp = pathlib.Path(temporaria)
+        saida = PdfWriter()
+        imprimir(navegador, html, temp / 'principal.pdf')
+        saida.append(PdfReader(temp / 'principal.pdf'))
+        for letra, chave, titulo in ANEXOS:
+            capa = temp / f'capa-{chave}.html'
+            capa.write_text(capa_do_anexo(letra, titulo), encoding='utf-8')
+            imprimir(navegador, capa, temp / f'capa-{chave}.pdf')
+            imprimir(navegador, PASTA / f'{chave}.html', temp / f'{chave}.pdf', esperar_ms=15000)
+            leitor = PdfReader(temp / f'{chave}.pdf')
+            saida.append(PdfReader(temp / f'capa-{chave}.pdf'))
+            saida.append(leitor, pages=paginas_do_k6(leitor))
+        with open(pdf, 'wb') as arquivo:
+            saida.write(arquivo)
+    print(f'PDF gerado em {pdf} ({len(PdfReader(pdf).pages)} páginas)')
 
 
 if __name__ == '__main__':

@@ -15,9 +15,20 @@
               * default: 1 iterations shared among 1 VUs (maxDuration: 10m0s, gracefulStop: 30s)
 
 
-Run       [ 100% ] setup()
-default   [   0% ]
-time="2026-11-07T18:11:09-03:00" level=warning msg="The test run was short, report generation was skipped (not enough data)"
+running (00m01.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+default   [   0% ] 1 VUs  00m00.1s/10m0s  0/1 shared iters
+
+running (00m02.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+default   [   0% ] 1 VUs  00m01.1s/10m0s  0/1 shared iters
+
+running (00m03.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+default   [   0% ] 1 VUs  00m02.1s/10m0s  0/1 shared iters
+
+running (00m04.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+default   [   0% ] 1 VUs  00m03.1s/10m0s  0/1 shared iters
+
+running (00m05.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+default   [   0% ] 1 VUs  00m04.1s/10m0s  0/1 shared iters
 
 
   █ THRESHOLDS 
@@ -31,7 +42,7 @@ time="2026-11-07T18:11:09-03:00" level=warning msg="The test run was short, repo
 
   █ TOTAL RESULTS 
 
-    checks_total.......: 34      18.79265/s
+    checks_total.......: 34      5.942427/s
     checks_succeeded...: 100.00% 34 out of 34
     checks_failed......: 0.00%   0 out of 34
 
@@ -68,23 +79,23 @@ time="2026-11-07T18:11:09-03:00" level=warning msg="The test run was short, repo
     ✓ paciente não cadastra remédio para outro: 403
 
     HTTP
-    http_req_duration..............: avg=28.16ms  min=1.63ms   med=5.89ms   max=370.03ms p(90)=101.75ms p(95)=135.55ms
-      { expected_response:true }...: avg=28.16ms  min=1.63ms   med=5.89ms   max=370.03ms p(90)=101.75ms p(95)=135.55ms
+    http_req_duration..............: avg=27.5ms min=1.49ms med=12.78ms max=274.7ms p(90)=99.29ms p(95)=107.56ms
+      { expected_response:true }...: avg=27.5ms min=1.49ms med=12.78ms max=274.7ms p(90)=99.29ms p(95)=107.56ms
     http_req_failed................: 0.00% 0 out of 60
-    http_reqs......................: 60    33.163499/s
+    http_reqs......................: 60    10.486637/s
 
     EXECUTION
-    iteration_duration.............: avg=528.54ms min=528.54ms med=528.54ms max=528.54ms p(90)=528.54ms p(95)=528.54ms
-    iterations.....................: 1     0.552725/s
-    vus............................: 0     min=0       max=0
+    iteration_duration.............: avg=4.82s  min=4.82s  med=4.82s   max=4.82s   p(90)=4.82s   p(95)=4.82s   
+    iterations.....................: 1     0.174777/s
+    vus............................: 1     min=1       max=1
     vus_max........................: 1     min=1       max=1
 
     NETWORK
-    data_received..................: 40 kB 22 kB/s
-    data_sent......................: 23 kB 13 kB/s
+    data_received..................: 40 kB 7.0 kB/s
+    data_sent......................: 23 kB 4.0 kB/s
 
 
 
 
-running (00m01.8s), 0/1 VUs, 1 complete and 0 interrupted iterations
-default ✓ [ 100% ] 1 VUs  00m00.5s/10m0s  1/1 shared iters
+running (00m05.7s), 0/1 VUs, 1 complete and 0 interrupted iterations
+default ✓ [ 100% ] 1 VUs  00m04.8s/10m0s  1/1 shared iters
