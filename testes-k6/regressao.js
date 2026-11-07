@@ -2,7 +2,7 @@
 // Confere, uma a uma, regras de segurança e de negócio do app. Rodar depois
 // de cada mudança mostra se algo que funcionava quebrou.
 //   k6 run regressao.js
-import { check, group } from 'k6'
+import { check, group, sleep } from 'k6'
 import http from 'k6/http'
 import {
   API, apagar, apagarPacientes, buscar, criarPacienteComRemedio, dados, diaDeBrasilia, entrar, EXECUCAO, postar, SENHA, telefoneDeTeste,
@@ -27,6 +27,8 @@ export function setup() {
   }
 }
 
+// Pausa de 1 s entre os grupos: sem ela o teste termina em menos de 2 s e o k6
+// não gera o relatório HTML ("not enough data").
 export default function ({ a, b, c }) {
   const hoje = diaDeBrasilia()
 
@@ -40,6 +42,7 @@ export default function ({ a, b, c }) {
     check(http.get(`${API}/actuator/health`), { 'saúde do servidor é pública: 200': (r) => r.status === 200 })
   })
 
+  sleep(1)
   group('Login e cadastro', () => {
     const errado = postar('/api/auth/login', { login: a.email, senha: 'senha-errada' }, null, {}, [400, 401])
     check(errado, { 'senha errada não entra': (r) => r.status === 401 || r.status === 400 })
@@ -55,6 +58,7 @@ export default function ({ a, b, c }) {
     })
   })
 
+  sleep(1)
   group('Doses e estoque', () => {
     const dose = { pacienteId: a.id, medicamentoId: a.medicamentoId, data: hoje, hora: '08:00', status: 'TOMADO' }
     const registro = postar('/api/historicos', dose, a.token)
@@ -84,6 +88,7 @@ export default function ({ a, b, c }) {
     check(amanha, { 'dose semanal em dia sem dose é recusada: 400': (r) => r.status === 400 })
   })
 
+  sleep(1)
   group('Histórico por período e compactação', () => {
     for (let dia = 2; dia <= 20; dia++) {
       postar('/api/historicos', {
@@ -103,6 +108,7 @@ export default function ({ a, b, c }) {
     check(compactada, { 'histórico grande vem compactado (gzip)': (r) => r.headers['Content-Encoding'] === 'gzip' })
   })
 
+  sleep(1)
   group('Remédios e permissões', () => {
     const lista = dados(buscar(`/api/pacientes/${a.id}/medicamentos`, a.token)) || []
     check(lista, { 'paciente sem cuidador pode cadastrar os próprios remédios': (l) => l.length === 2 })

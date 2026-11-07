@@ -22,6 +22,7 @@ Gera o relatório HTML do k6 na pasta `relatorios`:
 ```powershell
 cd testes-k6
 $env:K6_WEB_DASHBOARD = "true"
+$env:K6_WEB_DASHBOARD_PERIOD = "1s"   # sem isso, o k6 não gera o HTML de testes curtos
 
 $env:K6_WEB_DASHBOARD_EXPORT = "relatorios/carga.html";      k6 run --summary-export relatorios/carga-resumo.json carga.js
 $env:K6_WEB_DASHBOARD_EXPORT = "relatorios/estresse.html";   k6 run --summary-export relatorios/estresse-resumo.json -e PICO=200 estresse.js

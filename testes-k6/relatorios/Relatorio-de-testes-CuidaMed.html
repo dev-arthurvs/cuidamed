@@ -18,6 +18,9 @@
   pre { background: #f3f4f6; padding: 8px 10px; border-radius: 6px; font-size: 8.6pt; white-space: pre-wrap; }
   code { font-size: 8.6pt; }
   .quebra { page-break-before: always; }
+  h3 { font-size: 11pt; margin: 14px 0 4px; }
+  .verificacoes td { white-space: normal; font-size: 8.2pt; padding: 4px; }
+  .anexos li { margin: 2px 0; }
 </style></head><body>
 <h1>Documentação da Suíte de Testes — CuidaMed API</h1>
 <p class="sub">Testes de carga, estresse, integração e regressão com k6 · 07/11/2026</p>
@@ -67,10 +70,10 @@ as apagam no fim: nenhum dado de paciente real é lido ou alterado.</p>
         <td class="cenario"><strong>Integração (E2E)</strong><span>Cadastro, login, vínculo, remédio, dose e estoque</span></td>
         <td>1</td>
         <td>19</td>
-        <td>14,3/s</td>
+        <td>9,4/s</td>
         <td>0,00%</td>
-        <td>67,25 ms</td>
-        <td>313,57 ms</td>
+        <td>105,12 ms</td>
+        <td>351,87 ms</td>
         <td>22/22</td>
         <td class="ok">APROVADO</td>
       </tr>
@@ -78,10 +81,10 @@ as apagam no fim: nenhum dado de paciente real é lido ou alterado.</p>
         <td class="cenario"><strong>Regressão</strong><span>34 regras de segurança e de negócio</span></td>
         <td>1</td>
         <td>60</td>
-        <td>33,2/s</td>
+        <td>10,5/s</td>
         <td>0,00%</td>
-        <td>28,16 ms</td>
-        <td>135,55 ms</td>
+        <td>27,51 ms</td>
+        <td>107,56 ms</td>
         <td>34/34</td>
         <td class="ok">APROVADO</td>
       </tr>
@@ -92,7 +95,7 @@ a regra exige (401, 403, 409 e 400) são marcadas como esperadas no script e nã
 <h2>Metas (thresholds)</h2>
 <table class="metas">
   <tr><th>Teste</th><th>Métrica</th><th>Meta</th><th>Resultado</th></tr>
-  <tr><td>Carga</td><td>Erros HTTP</td><td><code>rate<0.01</code></td><td class="ok">Atingida</td></tr><tr><td>Carga</td><td>Verificações</td><td><code>rate>0.99</code></td><td class="ok">Atingida</td></tr><tr><td>Carga</td><td>Tempo do histórico (31 dias)</td><td><code>p(95)<500</code></td><td class="ok">Atingida</td></tr><tr><td>Carga</td><td>Tempo de resposta</td><td><code>p(95)<500</code></td><td class="ok">Atingida</td></tr><tr><td>Carga</td><td>Tempo de registrar dose</td><td><code>p(95)<500</code></td><td class="ok">Atingida</td></tr><tr><td>Estresse</td><td>Tempo de resposta</td><td><code>p(95)<1500</code></td><td class="ok">Atingida</td></tr><tr><td>Estresse</td><td>Erros HTTP</td><td><code>rate<0.05</code></td><td class="ok">Atingida</td></tr><tr><td>Integração (E2E)</td><td>Verificações</td><td><code>rate==1.0</code></td><td class="ok">Atingida</td></tr><tr><td>Regressão</td><td>Verificações</td><td><code>rate==1.0</code></td><td class="ok">Atingida</td></tr><tr><td>Regressão</td><td>Erros HTTP</td><td><code>rate==0</code></td><td class="ok">Atingida</td></tr>
+  <tr><td>Carga</td><td>Erros HTTP</td><td><code>rate<0.01</code></td><td class="ok">Atingida</td></tr><tr><td>Carga</td><td>Verificações</td><td><code>rate>0.99</code></td><td class="ok">Atingida</td></tr><tr><td>Carga</td><td>Tempo do histórico (31 dias)</td><td><code>p(95)<500</code></td><td class="ok">Atingida</td></tr><tr><td>Carga</td><td>Tempo de resposta</td><td><code>p(95)<500</code></td><td class="ok">Atingida</td></tr><tr><td>Carga</td><td>Tempo de registrar dose</td><td><code>p(95)<500</code></td><td class="ok">Atingida</td></tr><tr><td>Estresse</td><td>Tempo de resposta</td><td><code>p(95)<1500</code></td><td class="ok">Atingida</td></tr><tr><td>Estresse</td><td>Erros HTTP</td><td><code>rate<0.05</code></td><td class="ok">Atingida</td></tr><tr><td>Integração (E2E)</td><td>Verificações</td><td><code>rate==1.0</code></td><td class="ok">Atingida</td></tr><tr><td>Regressão</td><td>Erros HTTP</td><td><code>rate==0</code></td><td class="ok">Atingida</td></tr><tr><td>Regressão</td><td>Verificações</td><td><code>rate==1.0</code></td><td class="ok">Atingida</td></tr>
 </table>
 <p class="nota">No estresse, as metas servem de referência para mostrar em que ponto a API deixaria de atender bem.</p>
 
@@ -102,13 +105,15 @@ a regra exige (401, 403, 409 e 400) são marcadas como esperadas no script e nã
     14.310 requisições (50,0 por segundo) com
     0,00% de erros, latência média de 6,98 ms e
     p95 de 10,07 ms — muito abaixo da meta de 500 ms. Houve um máximo isolado de
-    1.402 ms, que não afetou o p95.</li>
+    1.402 ms, num pico de poucos segundos visível no gráfico do Anexo A; não
+    houve erros nesse momento e o p95 do teste não foi afetado. Como a API e o k6 dividem o mesmo notebook, a causa
+    pode ser o próprio notebook; ela não foi investigada.</li>
   <li><strong>Estresse sem queda:</strong> no topo de 200 usuários simultâneos a API
     manteve 0,00% de erros e p95 de 7,96 ms,
     com 45.400 requisições (104,4 por segundo) e recuperação
     normal na descida. O limite da API não foi alcançado com o volume que o notebook consegue gerar.</li>
   <li><strong>Integração completa:</strong> 22 de 22
-    verificações aprovadas. O p95 maior (313,57 ms) vem do cadastro e do login, que
+    verificações aprovadas. O p95 maior (351,87 ms) vem do cadastro e do login, que
     verificam a senha com BCrypt, um cálculo propositalmente lento para proteger as senhas.</li>
   <li><strong>Regressão:</strong> 34 de 34
     regras aprovadas, entre elas: um paciente não vê os dados de outro, a mesma dose não pode ser registrada duas vezes,
@@ -118,6 +123,57 @@ a regra exige (401, 403, 409 e 400) são marcadas como esperadas no script e nã
   <li><strong>Otimizações já aplicadas:</strong> respostas da API compactadas, histórico limitado aos últimos 31 dias
     no aplicativo, menos consultas ao banco e índices por paciente.</li>
 </ul>
+
+<h2 class="quebra">Detalhes por teste</h2>
+
+<h3>Carga</h3>
+<p>Sobe de 0 a 50 usuários em 1 minuto, mantém 50 por 3 minutos e desce em 30 segundos. Cada usuário tem a própria conta e repete: abrir o Início (dados, remédios e histórico de 31 dias), registrar a dose e desfazer, com pausas de 1 a 3 segundos, como uma pessoa usando o app.</p>
+<table class="metas">
+  <tr><th>Média</th><th>Mediana</th><th>p90</th><th>p95</th><th>Máxima</th><th>Iterações</th><th>Dados recebidos</th></tr>
+  <tr><td>6,98 ms</td><td>3,75 ms</td><td>7,68 ms</td>
+      <td>10,07 ms</td><td>1.402,14 ms</td><td>2.822</td>
+      <td>7,42 MB</td></tr>
+</table>
+<table class="metas verificacoes">
+  <tr><th>Etapa</th><th>Verificação</th><th>Aprovadas</th><th>Falhas</th></tr>
+  <tr><td>Preparação (contas de teste)</td><td>login aceito</td><td>50</td><td class="ok">0</td></tr><tr><td>Abrir o Início</td><td>dados do paciente: 200</td><td>2.822</td><td class="ok">0</td></tr><tr><td>Abrir o Início</td><td>remedios: 200</td><td>2.822</td><td class="ok">0</td></tr><tr><td>Abrir o Início</td><td>historico: 200</td><td>2.822</td><td class="ok">0</td></tr><tr><td>Registrar e desfazer a dose</td><td>registrar dose: 201</td><td>2.822</td><td class="ok">0</td></tr><tr><td>Registrar e desfazer a dose</td><td>desfazer dose: 204</td><td>2.822</td><td class="ok">0</td></tr>
+</table>
+<h3>Estresse</h3>
+<p>O mesmo uso da carga, em degraus de 1 minuto: 25, 50, 100 e 200 usuários, mais 1 minuto no topo de 200, descida para 25 (recuperação) e 30 segundos até zero.</p>
+<table class="metas">
+  <tr><th>Média</th><th>Mediana</th><th>p90</th><th>p95</th><th>Máxima</th><th>Iterações</th><th>Dados recebidos</th></tr>
+  <tr><td>4,95 ms</td><td>3,38 ms</td><td>5,97 ms</td>
+      <td>7,96 ms</td><td>275,05 ms</td><td>8.920</td>
+      <td>23,59 MB</td></tr>
+</table>
+<table class="metas verificacoes">
+  <tr><th>Etapa</th><th>Verificação</th><th>Aprovadas</th><th>Falhas</th></tr>
+  <tr><td>Preparação (contas de teste)</td><td>login aceito</td><td>200</td><td class="ok">0</td></tr><tr><td>Abrir o Início</td><td>dados do paciente: 200</td><td>8.920</td><td class="ok">0</td></tr><tr><td>Abrir o Início</td><td>remedios: 200</td><td>8.920</td><td class="ok">0</td></tr><tr><td>Abrir o Início</td><td>historico: 200</td><td>8.920</td><td class="ok">0</td></tr><tr><td>Registrar e desfazer a dose</td><td>registrar dose: 201</td><td>8.920</td><td class="ok">0</td></tr><tr><td>Registrar e desfazer a dose</td><td>desfazer dose: 204</td><td>8.920</td><td class="ok">0</td></tr>
+</table>
+<h3>Integração (E2E)</h3>
+<p>1 usuário virtual, 1 execução: o caminho completo entre cuidador e paciente, conferindo cada resposta.</p>
+<table class="metas">
+  <tr><th>Média</th><th>Mediana</th><th>p90</th><th>p95</th><th>Máxima</th><th>Iterações</th><th>Dados recebidos</th></tr>
+  <tr><td>105,12 ms</td><td>35,90 ms</td><td>179,80 ms</td>
+      <td>351,87 ms</td><td>873,25 ms</td><td>1</td>
+      <td>0,01 MB</td></tr>
+</table>
+<table class="metas verificacoes">
+  <tr><th>Etapa</th><th>Verificação</th><th>Aprovadas</th><th>Falhas</th></tr>
+  <tr><td>1. Cadastro e login</td><td>cuidador cadastrado: 201</td><td>1</td><td class="ok">0</td></tr><tr><td>1. Cadastro e login</td><td>paciente cadastrado: 201</td><td>1</td><td class="ok">0</td></tr><tr><td>1. Cadastro e login</td><td>login aceito</td><td>3</td><td class="ok">0</td></tr><tr><td>1. Cadastro e login</td><td>login identifica o cuidador</td><td>1</td><td class="ok">0</td></tr><tr><td>1. Cadastro e login</td><td>login identifica o paciente</td><td>1</td><td class="ok">0</td></tr><tr><td>1. Cadastro e login</td><td>login pelo telefone funciona</td><td>1</td><td class="ok">0</td></tr><tr><td>2. Vínculo entre paciente e cuidador</td><td>paciente pede o vínculo: 204</td><td>1</td><td class="ok">0</td></tr><tr><td>2. Vínculo entre paciente e cuidador</td><td>cuidador vê o pedido</td><td>1</td><td class="ok">0</td></tr><tr><td>2. Vínculo entre paciente e cuidador</td><td>cuidador aceita: 204</td><td>1</td><td class="ok">0</td></tr><tr><td>2. Vínculo entre paciente e cuidador</td><td>paciente aparece na lista do cuidador</td><td>1</td><td class="ok">0</td></tr><tr><td>2. Vínculo entre paciente e cuidador</td><td>ficha do paciente mostra o cuidador</td><td>1</td><td class="ok">0</td></tr><tr><td>3. Cuidador cadastra o remédio e o paciente vê</td><td>cuidador cadastra o remédio: 201</td><td>1</td><td class="ok">0</td></tr><tr><td>3. Cuidador cadastra o remédio e o paciente vê</td><td>paciente vê o remédio com o horário</td><td>1</td><td class="ok">0</td></tr><tr><td>4. Dose: registrar desconta o estoque e desfazer devolve</td><td>paciente registra a dose: 201</td><td>1</td><td class="ok">0</td></tr><tr><td>4. Dose: registrar desconta o estoque e desfazer devolve</td><td>estoque desconta a quantidade por dose (10 → 8)</td><td>1</td><td class="ok">0</td></tr><tr><td>4. Dose: registrar desconta o estoque e desfazer devolve</td><td>cuidador vê a dose no histórico</td><td>1</td><td class="ok">0</td></tr><tr><td>4. Dose: registrar desconta o estoque e desfazer devolve</td><td>paciente desfaz a dose: 204</td><td>1</td><td class="ok">0</td></tr><tr><td>4. Dose: registrar desconta o estoque e desfazer devolve</td><td>estoque volta (8 → 10)</td><td>1</td><td class="ok">0</td></tr><tr><td>4. Dose: registrar desconta o estoque e desfazer devolve</td><td>histórico de hoje fica vazio</td><td>1</td><td class="ok">0</td></tr><tr><td>5. Limpeza</td><td>cuidador exclui o paciente de teste: 204</td><td>1</td><td class="ok">0</td></tr>
+</table>
+<h3>Regressão</h3>
+<p>1 usuário virtual, 1 execução: 34 regras conferidas uma a uma. As recusas exigidas pelas regras são marcadas como esperadas.</p>
+<table class="metas">
+  <tr><th>Média</th><th>Mediana</th><th>p90</th><th>p95</th><th>Máxima</th><th>Iterações</th><th>Dados recebidos</th></tr>
+  <tr><td>27,51 ms</td><td>12,78 ms</td><td>99,29 ms</td>
+      <td>107,56 ms</td><td>274,70 ms</td><td>1</td>
+      <td>0,04 MB</td></tr>
+</table>
+<table class="metas verificacoes">
+  <tr><th>Etapa</th><th>Verificação</th><th>Aprovadas</th><th>Falhas</th></tr>
+  <tr><td>Preparação (contas de teste)</td><td>login aceito</td><td>3</td><td class="ok">0</td></tr><tr><td>Segurança: acesso</td><td>sem login, a API recusa: 401</td><td>1</td><td class="ok">0</td></tr><tr><td>Segurança: acesso</td><td>com token falso, a API recusa: 401</td><td>1</td><td class="ok">0</td></tr><tr><td>Segurança: acesso</td><td>paciente não vê outro paciente: 403</td><td>1</td><td class="ok">0</td></tr><tr><td>Segurança: acesso</td><td>paciente não vê histórico de outro: 403</td><td>1</td><td class="ok">0</td></tr><tr><td>Segurança: acesso</td><td>paciente não usa o chat de outro: 403</td><td>1</td><td class="ok">0</td></tr><tr><td>Segurança: acesso</td><td>chat sem login não chama a IA: 401</td><td>1</td><td class="ok">0</td></tr><tr><td>Segurança: acesso</td><td>saúde do servidor é pública: 200</td><td>1</td><td class="ok">0</td></tr><tr><td>Login e cadastro</td><td>senha errada não entra</td><td>1</td><td class="ok">0</td></tr><tr><td>Login e cadastro</td><td>login aceito</td><td>1</td><td class="ok">0</td></tr><tr><td>Login e cadastro</td><td>senha certa entra</td><td>1</td><td class="ok">0</td></tr><tr><td>Login e cadastro</td><td>senha com menos de 8 caracteres é recusada: 400</td><td>1</td><td class="ok">0</td></tr><tr><td>Login e cadastro</td><td>telefone já usado em outra conta é recusado</td><td>1</td><td class="ok">0</td></tr><tr><td>Login e cadastro</td><td>conta sem e-mail e sem telefone é recusada: 400</td><td>1</td><td class="ok">0</td></tr><tr><td>Doses e estoque</td><td>registrar dose: 201</td><td>1</td><td class="ok">0</td></tr><tr><td>Doses e estoque</td><td>estoque desconta (10 → 9)</td><td>1</td><td class="ok">0</td></tr><tr><td>Doses e estoque</td><td>mesma dose duas vezes é recusada: 409</td><td>1</td><td class="ok">0</td></tr><tr><td>Doses e estoque</td><td>desfazer a dose de hoje: 204</td><td>1</td><td class="ok">0</td></tr><tr><td>Doses e estoque</td><td>estoque volta (9 → 10)</td><td>1</td><td class="ok">0</td></tr><tr><td>Doses e estoque</td><td>dose antes do início do tratamento é recusada: 400</td><td>1</td><td class="ok">0</td></tr><tr><td>Doses e estoque</td><td>registrar dose de ontem: 201</td><td>1</td><td class="ok">0</td></tr><tr><td>Doses e estoque</td><td>dose de ontem não pode ser desfeita: 400</td><td>1</td><td class="ok">0</td></tr><tr><td>Doses e estoque</td><td>cadastrar remédio semanal: 201</td><td>1</td><td class="ok">0</td></tr><tr><td>Doses e estoque</td><td>remédio sem quantidade em estoque é recusado: 400</td><td>1</td><td class="ok">0</td></tr><tr><td>Doses e estoque</td><td>dose semanal em dia sem dose é recusada: 400</td><td>1</td><td class="ok">0</td></tr><tr><td>Histórico por período e compactação</td><td>histórico completo: 20 registros</td><td>1</td><td class="ok">0</td></tr><tr><td>Histórico por período e compactação</td><td>histórico desde 5 dias atrás: 5 registros</td><td>1</td><td class="ok">0</td></tr><tr><td>Histórico por período e compactação</td><td>histórico entre 20 e 11 dias atrás: 10 registros</td><td>1</td><td class="ok">0</td></tr><tr><td>Histórico por período e compactação</td><td>período vem do mais recente ao mais antigo</td><td>1</td><td class="ok">0</td></tr><tr><td>Histórico por período e compactação</td><td>histórico grande vem compactado (gzip)</td><td>1</td><td class="ok">0</td></tr><tr><td>Remédios e permissões</td><td>paciente sem cuidador pode cadastrar os próprios remédios</td><td>1</td><td class="ok">0</td></tr><tr><td>Remédios e permissões</td><td>paciente não cadastra remédio para outro: 403</td><td>1</td><td class="ok">0</td></tr>
+</table>
 
 <h2>Limitações</h2>
 <ul>
@@ -129,11 +185,23 @@ a regra exige (401, 403, 409 e 400) são marcadas como esperadas no script e nã
 <h2>Como executar</h2>
 <pre>cd testes-k6
 $env:K6_WEB_DASHBOARD = "true"
+$env:K6_WEB_DASHBOARD_PERIOD = "1s"
 $env:K6_WEB_DASHBOARD_EXPORT = "relatorios/carga.html";      k6 run --summary-export relatorios/carga-resumo.json carga.js
 $env:K6_WEB_DASHBOARD_EXPORT = "relatorios/estresse.html";   k6 run --summary-export relatorios/estresse-resumo.json -e PICO=200 estresse.js
 $env:K6_WEB_DASHBOARD_EXPORT = "relatorios/integracao.html"; k6 run --summary-export relatorios/integracao-resumo.json integracao.js
 $env:K6_WEB_DASHBOARD_EXPORT = "relatorios/regressao.html";  k6 run --summary-export relatorios/regressao-resumo.json regressao.js
 py gerar-relatorio.py</pre>
 <p class="nota">Por padrão os testes usam a API de testes em <code>http://localhost:8081</code>. Para outro servidor:
-<code>k6 run -e API=https://endereco-da-api carga.js</code>. Os relatórios HTML de cada teste, gerados pelo k6, estão na pasta <code>relatorios</code>.</p>
+<code>k6 run -e API=https://endereco-da-api carga.js</code>. Os relatórios HTML completos de cada teste, gerados pelo k6,
+estão na pasta <code>relatorios</code>.</p>
+
+<h2>Anexos — relatórios gerados pelo k6</h2>
+<p>As páginas seguintes trazem, de cada teste, a visão geral e o resumo do relatório que o próprio k6 gerou (web dashboard),
+com os gráficos de requisições por segundo, usuários virtuais e tempo de resposta ao longo do teste.</p>
+<ul class="anexos">
+  <li>Anexo A — Teste de carga</li>
+  <li>Anexo B — Teste de estresse</li>
+  <li>Anexo C — Teste de integração</li>
+  <li>Anexo D — Teste de regressão</li>
+</ul>
 </body></html>
