@@ -1,0 +1,225 @@
+{
+  "root_group": {
+    "name": "",
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": {
+      "setup": {
+        "groups": {},
+        "checks": {
+          "login aceito": {
+            "name": "login aceito",
+            "path": "::setup::login aceito",
+            "id": "490980ecd51033823bf42ea1455a0a68",
+            "passes": 50,
+            "fails": 0
+          }
+        },
+        "name": "setup",
+        "path": "::setup",
+        "id": "5c0f8025f7e0b6654089e5b00e950f1a"
+      },
+      "Abrir o Início": {
+        "name": "Abrir o Início",
+        "path": "::Abrir o Início",
+        "id": "dce4606ee0589b09fcebd3c10b36c427",
+        "groups": {},
+        "checks": {
+          "dados do paciente: 200": {
+            "name": "dados do paciente: 200",
+            "path": "::Abrir o Início::dados do paciente: 200",
+            "id": "7f8a898d7e516da1fcb193b12060d501",
+            "passes": 2822,
+            "fails": 0
+          },
+          "remedios: 200": {
+            "fails": 0,
+            "name": "remedios: 200",
+            "path": "::Abrir o Início::remedios: 200",
+            "id": "70863afe3b9f05e663834dbe22482c91",
+            "passes": 2822
+          },
+          "historico: 200": {
+            "name": "historico: 200",
+            "path": "::Abrir o Início::historico: 200",
+            "id": "f4651855af305095379c60bd068eaade",
+            "passes": 2822,
+            "fails": 0
+          }
+        }
+      },
+      "Registrar e desfazer a dose": {
+        "groups": {},
+        "checks": {
+          "registrar dose: 201": {
+            "id": "93110635c558288cdff4014a83b6408c",
+            "passes": 2822,
+            "fails": 0,
+            "name": "registrar dose: 201",
+            "path": "::Registrar e desfazer a dose::registrar dose: 201"
+          },
+          "desfazer dose: 204": {
+            "passes": 2822,
+            "fails": 0,
+            "name": "desfazer dose: 204",
+            "path": "::Registrar e desfazer a dose::desfazer dose: 204",
+            "id": "716c75e45edab931cd01c8f8f98cf116"
+          }
+        },
+        "name": "Registrar e desfazer a dose",
+        "path": "::Registrar e desfazer a dose",
+        "id": "d72f8831aa2825e1ccb39d4ae5f85c50"
+      }
+    },
+    "checks": {}
+  },
+  "metrics": {
+    "http_req_failed": {
+      "fails": 14310,
+      "passes": 0,
+      "thresholds": {
+        "rate<0.01": false
+      },
+      "value": 0
+    },
+    "http_req_duration{expected_response:true}": {
+      "max": 1402.138,
+      "p(90)": 7.682270000000002,
+      "p(95)": 10.0726,
+      "avg": 6.979920810621927,
+      "min": 0.5018,
+      "med": 3.7494
+    },
+    "http_req_blocked": {
+      "min": 0,
+      "med": 0,
+      "max": 37.2238,
+      "p(90)": 0,
+      "p(95)": 0,
+      "avg": 0.023407288609364113
+    },
+    "checks": {
+      "passes": 14160,
+      "fails": 0,
+      "thresholds": {
+        "rate>0.99": false
+      },
+      "value": 1
+    },
+    "http_reqs": {
+      "count": 14310,
+      "rate": 50.042574183343646
+    },
+    "http_req_connecting": {
+      "p(95)": 0,
+      "avg": 0.010250174703004893,
+      "min": 0,
+      "med": 0,
+      "max": 18.313,
+      "p(90)": 0
+    },
+    "http_req_waiting": {
+      "med": 3.4061,
+      "max": 1402.138,
+      "p(90)": 7.1950400000000005,
+      "p(95)": 9.597104999999994,
+      "avg": 6.553818190076862,
+      "min": 0.5018
+    },
+    "group_duration": {
+      "avg": 16.150830793763287,
+      "min": 5.0334,
+      "med": 10.068449999999999,
+      "max": 1418.6733,
+      "p(90)": 16.788719999999994,
+      "p(95)": 22.420329999999982
+    },
+    "vus": {
+      "value": 1,
+      "min": 0,
+      "max": 50
+    },
+    "http_req_duration{nome:historico 31 dias}": {
+      "p(95)": 5.345249999999999,
+      "avg": 3.407931360737066,
+      "min": 0.5018,
+      "med": 2.2847,
+      "max": 786.4693,
+      "p(90)": 4.11474,
+      "thresholds": {
+        "p(95)<500": false
+      }
+    },
+    "http_req_tls_handshaking": {
+      "med": 0,
+      "max": 0,
+      "p(90)": 0,
+      "p(95)": 0,
+      "avg": 0,
+      "min": 0
+    },
+    "data_sent": {
+      "rate": 18526.16661876084,
+      "count": 5297678
+    },
+    "http_req_duration": {
+      "avg": 6.979920810621927,
+      "min": 0.5018,
+      "med": 3.7494,
+      "max": 1402.138,
+      "p(90)": 7.682270000000002,
+      "p(95)": 10.0726,
+      "thresholds": {
+        "p(95)<500": false
+      }
+    },
+    "iterations": {
+      "count": 2822,
+      "rate": 9.868633427351206
+    },
+    "http_req_receiving": {
+      "p(95)": 1.086655,
+      "avg": 0.39926674353598984,
+      "min": 0,
+      "med": 0.3231,
+      "max": 164.3738,
+      "p(90)": 0.996
+    },
+    "iteration_duration": {
+      "p(90)": 5125.66885,
+      "p(95)": 5380.294104999999,
+      "avg": 4030.222272997864,
+      "min": 2077.9632,
+      "med": 4041.3487999999998,
+      "max": 6407.4804
+    },
+    "http_req_sending": {
+      "avg": 0.026835877009084557,
+      "min": 0,
+      "med": 0,
+      "max": 70.4268,
+      "p(90)": 0,
+      "p(95)": 0
+    },
+    "data_received": {
+      "count": 7779387,
+      "rate": 27204.79042966032
+    },
+    "http_req_duration{nome:registrar dose}": {
+      "p(95)": 11.613039999999991,
+      "avg": 9.95195988660525,
+      "min": 2.5139,
+      "med": 5.8975,
+      "max": 1399.5624,
+      "p(90)": 10.230820000000003,
+      "thresholds": {
+        "p(95)<500": false
+      }
+    },
+    "vus_max": {
+      "min": 50,
+      "max": 50,
+      "value": 50
+    }
+  }
+}

@@ -1,0 +1,90 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: regressao.js
+ web dashboard: http://127.0.0.1:5665
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 1 max VUs, 10m30s max duration (incl. graceful stop):
+              * default: 1 iterations shared among 1 VUs (maxDuration: 10m0s, gracefulStop: 30s)
+
+
+Run       [ 100% ] setup()
+default   [   0% ]
+time="2026-11-07T18:11:09-03:00" level=warning msg="The test run was short, report generation was skipped (not enough data)"
+
+
+  █ THRESHOLDS 
+
+    checks
+    ✓ 'rate==1.0' rate=100.00%
+
+    http_req_failed
+    ✓ 'rate==0' rate=0.00%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 34      18.79265/s
+    checks_succeeded...: 100.00% 34 out of 34
+    checks_failed......: 0.00%   0 out of 34
+
+    ✓ login aceito
+    ✓ sem login, a API recusa: 401
+    ✓ com token falso, a API recusa: 401
+    ✓ paciente não vê outro paciente: 403
+    ✓ paciente não vê histórico de outro: 403
+    ✓ paciente não usa o chat de outro: 403
+    ✓ chat sem login não chama a IA: 401
+    ✓ saúde do servidor é pública: 200
+    ✓ senha errada não entra
+    ✓ senha certa entra
+    ✓ senha com menos de 8 caracteres é recusada: 400
+    ✓ telefone já usado em outra conta é recusado
+    ✓ conta sem e-mail e sem telefone é recusada: 400
+    ✓ registrar dose: 201
+    ✓ estoque desconta (10 → 9)
+    ✓ mesma dose duas vezes é recusada: 409
+    ✓ desfazer a dose de hoje: 204
+    ✓ estoque volta (9 → 10)
+    ✓ dose antes do início do tratamento é recusada: 400
+    ✓ registrar dose de ontem: 201
+    ✓ dose de ontem não pode ser desfeita: 400
+    ✓ cadastrar remédio semanal: 201
+    ✓ remédio sem quantidade em estoque é recusado: 400
+    ✓ dose semanal em dia sem dose é recusada: 400
+    ✓ histórico completo: 20 registros
+    ✓ histórico desde 5 dias atrás: 5 registros
+    ✓ histórico entre 20 e 11 dias atrás: 10 registros
+    ✓ período vem do mais recente ao mais antigo
+    ✓ histórico grande vem compactado (gzip)
+    ✓ paciente sem cuidador pode cadastrar os próprios remédios
+    ✓ paciente não cadastra remédio para outro: 403
+
+    HTTP
+    http_req_duration..............: avg=28.16ms  min=1.63ms   med=5.89ms   max=370.03ms p(90)=101.75ms p(95)=135.55ms
+      { expected_response:true }...: avg=28.16ms  min=1.63ms   med=5.89ms   max=370.03ms p(90)=101.75ms p(95)=135.55ms
+    http_req_failed................: 0.00% 0 out of 60
+    http_reqs......................: 60    33.163499/s
+
+    EXECUTION
+    iteration_duration.............: avg=528.54ms min=528.54ms med=528.54ms max=528.54ms p(90)=528.54ms p(95)=528.54ms
+    iterations.....................: 1     0.552725/s
+    vus............................: 0     min=0       max=0
+    vus_max........................: 1     min=1       max=1
+
+    NETWORK
+    data_received..................: 40 kB 22 kB/s
+    data_sent......................: 23 kB 13 kB/s
+
+
+
+
+running (00m01.8s), 0/1 VUs, 1 complete and 0 interrupted iterations
+default ✓ [ 100% ] 1 VUs  00m00.5s/10m0s  1/1 shared iters

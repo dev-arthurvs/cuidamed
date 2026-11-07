@@ -23,11 +23,18 @@ Gera o relatório HTML do k6 na pasta `relatorios`:
 cd testes-k6
 $env:K6_WEB_DASHBOARD = "true"
 
-$env:K6_WEB_DASHBOARD_EXPORT = "relatorios/carga.html";      k6 run carga.js
-$env:K6_WEB_DASHBOARD_EXPORT = "relatorios/estresse.html";   k6 run estresse.js
-$env:K6_WEB_DASHBOARD_EXPORT = "relatorios/integracao.html"; k6 run integracao.js
-$env:K6_WEB_DASHBOARD_EXPORT = "relatorios/regressao.html";  k6 run regressao.js
+$env:K6_WEB_DASHBOARD_EXPORT = "relatorios/carga.html";      k6 run --summary-export relatorios/carga-resumo.json carga.js
+$env:K6_WEB_DASHBOARD_EXPORT = "relatorios/estresse.html";   k6 run --summary-export relatorios/estresse-resumo.json -e PICO=200 estresse.js
+$env:K6_WEB_DASHBOARD_EXPORT = "relatorios/integracao.html"; k6 run --summary-export relatorios/integracao-resumo.json integracao.js
+$env:K6_WEB_DASHBOARD_EXPORT = "relatorios/regressao.html";  k6 run --summary-export relatorios/regressao-resumo.json regressao.js
+
+# Relatório em PDF, com os números dos resumos acima:
+py gerar-relatorio.py
 ```
+
+O relatório final fica em `relatorios/Relatorio-de-testes-CuidaMed.pdf`.
+O gerador também apaga dos resumos JSON os tokens de login das contas de teste,
+que o k6 grava junto: rode-o antes de enviar a pasta para o GitHub.
 
 Por padrão os testes usam a API de testes no PC (`http://localhost:8081`,
 banco `cuidamed_k6`). Para outro servidor, passe o endereço:
