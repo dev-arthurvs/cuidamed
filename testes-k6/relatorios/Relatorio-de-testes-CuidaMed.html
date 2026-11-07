@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Relatório de testes — CuidaMed</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; color: #1d2433; font-size: 10.5pt; line-height: 1.45; }
+  h1 { text-align: center; font-size: 19pt; margin: 0 0 4px; }
+  .sub { text-align: center; color: #5b6475; margin: 0 0 18px; }
+  h2 { font-size: 12.5pt; margin: 18px 0 6px; border-bottom: 2px solid #1d2433; padding-bottom: 3px; }
+  ul { margin: 4px 0; padding-left: 20px; } li { margin: 3px 0; }
+  table { width: 100%; border-collapse: separate; border-spacing: 3px; font-size: 8.6pt; }
+  th { background: #111; color: #fff; padding: 7px 4px; font-weight: 600; text-transform: uppercase; font-size: 7.6pt; }
+  td { border: 1px solid #222; padding: 7px 4px; text-align: center; white-space: nowrap; }
+  td.cenario { text-align: left; white-space: normal; } td.cenario span { display: block; color: #5b6475; font-size: 7.8pt; }
+  td.ok { font-weight: 700; color: #166534; } td.falhou { font-weight: 700; color: #b91c1c; }
+  .metas td, .metas th { text-align: left; }
+  h2 { page-break-after: avoid; } table, pre { page-break-inside: avoid; }
+  .nota { font-size: 8.4pt; color: #5b6475; margin-top: 4px; }
+  pre { background: #f3f4f6; padding: 8px 10px; border-radius: 6px; font-size: 8.6pt; white-space: pre-wrap; }
+  code { font-size: 8.6pt; }
+  .quebra { page-break-before: always; }
+</style></head><body>
+<h1>Documentação da Suíte de Testes — CuidaMed API</h1>
+<p class="sub">Testes de carga, estresse, integração e regressão com k6 · 07/11/2026</p>
+
+<p>Este documento apresenta os testes executados com o <strong>k6 v2.3.0</strong> na API do CuidaMed, aplicativo de
+lembretes de medicamentos para idosos e cuidadores. A API é feita em <strong>Java 25 com Spring Boot 4.1.1</strong> e
+usa <strong>PostgreSQL 18</strong>. Os testes acessam a API como o aplicativo faz, criam as próprias contas de teste e
+as apagam no fim: nenhum dado de paciente real é lido ou alterado.</p>
+<p><strong>Ambiente:</strong> Notebook Intel Core i3-1115G4, 3,7 GB de RAM, Windows 11. A API e o k6 rodaram na mesma máquina, com um banco PostgreSQL separado só para os testes (cuidamed_k6).</p>
+
+<h2>Estrutura dos scripts</h2>
+<ul>
+  <li><strong>carga.js</strong> — teste de carga: o uso normal do paciente (abrir o Início com dados, remédios e histórico; registrar e desfazer a dose).</li>
+  <li><strong>estresse.js</strong> — teste de estresse: o mesmo uso, em degraus acima do normal, para achar o limite e ver se a API se recupera.</li>
+  <li><strong>integracao.js</strong> — teste de integração (E2E): cadastro e login do cuidador e do paciente, vínculo entre os dois, remédio cadastrado pelo cuidador, dose registrada e desfeita pelo paciente, com o estoque conferido a cada passo.</li>
+  <li><strong>regressao.js</strong> — teste de regressão: 34 regras que já funcionavam (acesso, login, cadastro, doses, estoque, histórico por período e compactação) continuam funcionando.</li>
+  <li><strong>comum.js</strong> e <strong>uso-do-paciente.js</strong> — partes compartilhadas: endereço da API, contas de teste e o fluxo do paciente.</li>
+</ul>
+
+<h2>Resultados consolidados</h2>
+<table>
+  <tr><th>Cenário</th><th>VUs máx.</th><th>Requisições</th><th>Vazão</th><th>Taxa de erro</th><th>Latência média</th><th>Latência p95</th><th>Checks</th><th>Status</th></tr>
+  
+      <tr>
+        <td class="cenario"><strong>Carga</strong><span>Uso normal: até 50 pacientes ao mesmo tempo por 3 minutos</span></td>
+        <td>50</td>
+        <td>14.310</td>
+        <td>50,0/s</td>
+        <td>0,00%</td>
+        <td>6,98 ms</td>
+        <td>10,07 ms</td>
+        <td>14.160/14.160</td>
+        <td class="ok">APROVADO</td>
+      </tr>
+      <tr>
+        <td class="cenario"><strong>Estresse</strong><span>Degraus de 25, 50, 100 e 200 usuários, topo mantido e recuperação</span></td>
+        <td>200</td>
+        <td>45.400</td>
+        <td>104,4/s</td>
+        <td>0,00%</td>
+        <td>4,95 ms</td>
+        <td>7,96 ms</td>
+        <td>44.800/44.800</td>
+        <td class="ok">APROVADO</td>
+      </tr>
+      <tr>
+        <td class="cenario"><strong>Integração (E2E)</strong><span>Cadastro, login, vínculo, remédio, dose e estoque</span></td>
+        <td>1</td>
+        <td>19</td>
+        <td>14,3/s</td>
+        <td>0,00%</td>
+        <td>67,25 ms</td>
+        <td>313,57 ms</td>
+        <td>22/22</td>
+        <td class="ok">APROVADO</td>
+      </tr>
+      <tr>
+        <td class="cenario"><strong>Regressão</strong><span>34 regras de segurança e de negócio</span></td>
+        <td>1</td>
+        <td>60</td>
+        <td>33,2/s</td>
+        <td>0,00%</td>
+        <td>28,16 ms</td>
+        <td>135,55 ms</td>
+        <td>34/34</td>
+        <td class="ok">APROVADO</td>
+      </tr>
+</table>
+<p class="nota">VUs: usuários virtuais simultâneos. p95: 95% das respostas foram mais rápidas que esse valor. Na regressão, as recusas que
+a regra exige (401, 403, 409 e 400) são marcadas como esperadas no script e não contam como erro; qualquer outro status contaria.</p>
+
+<h2>Metas (thresholds)</h2>
+<table class="metas">
+  <tr><th>Teste</th><th>Métrica</th><th>Meta</th><th>Resultado</th></tr>
+  <tr><td>Carga</td><td>Erros HTTP</td><td><code>rate<0.01</code></td><td class="ok">Atingida</td></tr><tr><td>Carga</td><td>Verificações</td><td><code>rate>0.99</code></td><td class="ok">Atingida</td></tr><tr><td>Carga</td><td>Tempo do histórico (31 dias)</td><td><code>p(95)<500</code></td><td class="ok">Atingida</td></tr><tr><td>Carga</td><td>Tempo de resposta</td><td><code>p(95)<500</code></td><td class="ok">Atingida</td></tr><tr><td>Carga</td><td>Tempo de registrar dose</td><td><code>p(95)<500</code></td><td class="ok">Atingida</td></tr><tr><td>Estresse</td><td>Tempo de resposta</td><td><code>p(95)<1500</code></td><td class="ok">Atingida</td></tr><tr><td>Estresse</td><td>Erros HTTP</td><td><code>rate<0.05</code></td><td class="ok">Atingida</td></tr><tr><td>Integração (E2E)</td><td>Verificações</td><td><code>rate==1.0</code></td><td class="ok">Atingida</td></tr><tr><td>Regressão</td><td>Verificações</td><td><code>rate==1.0</code></td><td class="ok">Atingida</td></tr><tr><td>Regressão</td><td>Erros HTTP</td><td><code>rate==0</code></td><td class="ok">Atingida</td></tr>
+</table>
+<p class="nota">No estresse, as metas servem de referência para mostrar em que ponto a API deixaria de atender bem.</p>
+
+<h2>Destaques</h2>
+<ul>
+  <li><strong>Carga sem erros:</strong> com 50 pacientes simultâneos, a API atendeu
+    14.310 requisições (50,0 por segundo) com
+    0,00% de erros, latência média de 6,98 ms e
+    p95 de 10,07 ms — muito abaixo da meta de 500 ms. Houve um máximo isolado de
+    1.402 ms, que não afetou o p95.</li>
+  <li><strong>Estresse sem queda:</strong> no topo de 200 usuários simultâneos a API
+    manteve 0,00% de erros e p95 de 7,96 ms,
+    com 45.400 requisições (104,4 por segundo) e recuperação
+    normal na descida. O limite da API não foi alcançado com o volume que o notebook consegue gerar.</li>
+  <li><strong>Integração completa:</strong> 22 de 22
+    verificações aprovadas. O p95 maior (313,57 ms) vem do cadastro e do login, que
+    verificam a senha com BCrypt, um cálculo propositalmente lento para proteger as senhas.</li>
+  <li><strong>Regressão:</strong> 34 de 34
+    regras aprovadas, entre elas: um paciente não vê os dados de outro, a mesma dose não pode ser registrada duas vezes,
+    registrar a dose desconta o estoque e desfazer devolve, e o histórico grande vem compactado (gzip).</li>
+  <li><strong>Dados isolados:</strong> as contas de teste usam e-mails próprios (<code>k6.…@teste.cuidamed</code>) e são
+    apagadas no fim de cada teste; o script <code>limpar-dados-de-teste.sql</code> remove qualquer resto.</li>
+  <li><strong>Otimizações já aplicadas:</strong> respostas da API compactadas, histórico limitado aos últimos 31 dias
+    no aplicativo, menos consultas ao banco e índices por paciente.</li>
+</ul>
+
+<h2>Limitações</h2>
+<ul>
+  <li>A API e o k6 rodaram no mesmo notebook, sem a latência da internet: em produção os tempos tendem a ser maiores.</li>
+  <li>O estresse foi limitado a 200 usuários simultâneos pela memória do notebook (3,7 GB); o script aceita picos maiores (<code>-e PICO=400</code>).</li>
+  <li>O chat com a IA ficou fora da carga e do estresse, porque cada pergunta é uma chamada paga a um serviço externo.</li>
+</ul>
+
+<h2>Como executar</h2>
+<pre>cd testes-k6
+$env:K6_WEB_DASHBOARD = "true"
+$env:K6_WEB_DASHBOARD_EXPORT = "relatorios/carga.html";      k6 run --summary-export relatorios/carga-resumo.json carga.js
+$env:K6_WEB_DASHBOARD_EXPORT = "relatorios/estresse.html";   k6 run --summary-export relatorios/estresse-resumo.json -e PICO=200 estresse.js
+$env:K6_WEB_DASHBOARD_EXPORT = "relatorios/integracao.html"; k6 run --summary-export relatorios/integracao-resumo.json integracao.js
+$env:K6_WEB_DASHBOARD_EXPORT = "relatorios/regressao.html";  k6 run --summary-export relatorios/regressao-resumo.json regressao.js
+py gerar-relatorio.py</pre>
+<p class="nota">Por padrão os testes usam a API de testes em <code>http://localhost:8081</code>. Para outro servidor:
+<code>k6 run -e API=https://endereco-da-api carga.js</code>. Os relatórios HTML de cada teste, gerados pelo k6, estão na pasta <code>relatorios</code>.</p>
+</body></html>

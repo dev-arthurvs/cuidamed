@@ -1,0 +1,76 @@
+
+         /\      Grafana   /‾‾/  
+    /\  /  \     |\  __   /  /   
+   /  \/    \    | |/ /  /   ‾‾\ 
+  /          \   |   (  |  (‾)  |
+ / __________ \  |_|\_\  \_____/ 
+
+
+     execution: local
+        script: integracao.js
+ web dashboard: http://127.0.0.1:5665
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 1 max VUs, 10m30s max duration (incl. graceful stop):
+              * default: 1 iterations shared among 1 VUs (maxDuration: 10m0s, gracefulStop: 30s)
+
+
+running (00m01.0s), 1/1 VUs, 0 complete and 0 interrupted iterations
+default   [   0% ] 1 VUs  00m01.0s/10m0s  0/1 shared iters
+time="2026-11-07T18:11:11-03:00" level=warning msg="The test run was short, report generation was skipped (not enough data)"
+
+
+  █ THRESHOLDS 
+
+    checks
+    ✓ 'rate==1.0' rate=100.00%
+
+
+  █ TOTAL RESULTS 
+
+    checks_total.......: 22      16.609509/s
+    checks_succeeded...: 100.00% 22 out of 22
+    checks_failed......: 0.00%   0 out of 22
+
+    ✓ cuidador cadastrado: 201
+    ✓ paciente cadastrado: 201
+    ✓ login aceito
+    ✓ login identifica o cuidador
+    ✓ login identifica o paciente
+    ✓ login pelo telefone funciona
+    ✓ paciente pede o vínculo: 204
+    ✓ cuidador vê o pedido
+    ✓ cuidador aceita: 204
+    ✓ paciente aparece na lista do cuidador
+    ✓ ficha do paciente mostra o cuidador
+    ✓ cuidador cadastra o remédio: 201
+    ✓ paciente vê o remédio com o horário
+    ✓ paciente registra a dose: 201
+    ✓ estoque desconta a quantidade por dose (10 → 8)
+    ✓ cuidador vê a dose no histórico
+    ✓ paciente desfaz a dose: 204
+    ✓ estoque volta (8 → 10)
+    ✓ histórico de hoje fica vazio
+    ✓ cuidador exclui o paciente de teste: 204
+
+    HTTP
+    http_req_duration..............: avg=67.25ms min=2.14ms med=6.19ms max=435.9ms p(90)=232.24ms p(95)=313.57ms
+      { expected_response:true }...: avg=67.25ms min=2.14ms med=6.19ms max=435.9ms p(90)=232.24ms p(95)=313.57ms
+    http_req_failed................: 0.00%  0 out of 19
+    http_reqs......................: 19     14.344576/s
+
+    EXECUTION
+    iteration_duration.............: avg=1.32s   min=1.32s  med=1.32s  max=1.32s   p(90)=1.32s    p(95)=1.32s   
+    iterations.....................: 1      0.754978/s
+    vus............................: 1      min=1       max=1
+    vus_max........................: 1      min=1       max=1
+
+    NETWORK
+    data_received..................: 11 kB  8.4 kB/s
+    data_sent......................: 6.6 kB 5.0 kB/s
+
+
+
+
+running (00m01.3s), 0/1 VUs, 1 complete and 0 interrupted iterations
+default ✓ [ 100% ] 1 VUs  00m01.3s/10m0s  1/1 shared iters

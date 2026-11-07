@@ -18,16 +18,23 @@ export function cabecalhos(token, extras = {}) {
   return { headers: { ...JSON_HEADERS, ...(token ? { Authorization: `Bearer ${token}` } : {}), ...extras } }
 }
 
-export function postar(caminho, corpo, token, tags = {}) {
-  return http.post(`${API}${caminho}`, JSON.stringify(corpo), { ...cabecalhos(token), tags })
+// `esperado`: status de uma recusa esperada (ex.: 403). Sem ele, o k6 conta
+// qualquer resposta 4xx/5xx como erro; com ele, só conta se vier outro status.
+function opcoes(token, tags, esperado) {
+  const extra = esperado === undefined ? {} : { responseCallback: http.expectedStatuses(...[].concat(esperado)) }
+  return { ...cabecalhos(token), tags, ...extra }
 }
 
-export function buscar(caminho, token, tags = {}) {
-  return http.get(`${API}${caminho}`, { ...cabecalhos(token), tags })
+export function postar(caminho, corpo, token, tags = {}, esperado) {
+  return http.post(`${API}${caminho}`, JSON.stringify(corpo), opcoes(token, tags, esperado))
 }
 
-export function apagar(caminho, token, tags = {}) {
-  return http.del(`${API}${caminho}`, null, { ...cabecalhos(token), tags })
+export function buscar(caminho, token, tags = {}, esperado) {
+  return http.get(`${API}${caminho}`, opcoes(token, tags, esperado))
+}
+
+export function apagar(caminho, token, tags = {}, esperado) {
+  return http.del(`${API}${caminho}`, null, opcoes(token, tags, esperado))
 }
 
 export function dados(resposta) {
@@ -58,13 +65,14 @@ export function entrar(login, senha = SENHA) {
 /** Paciente de teste que cria a própria conta, com um remédio diário às 08:00. */
 export function criarPacienteComRemedio(numero, { estoque = 1000, inicio = diaDeBrasilia() } = {}) {
   const email = `k6.paciente.${EXECUCAO}.${numero}@teste.cuidamed`
+  const telefone = telefoneDeTeste(numero)
   const cadastro = postar('/api/pacientes', {
     nome: `K6 Paciente ${numero}`,
     email,
     senha: SENHA,
     dataNascimento: '1950-01-01',
     sexo: 'FEMININO',
-    telefone: telefoneDeTeste(numero),
+    telefone,
   }, null, { nome: 'cadastro' })
   if (cadastro.status !== 201) fail(`cadastro do paciente ${numero} falhou: ${cadastro.status} ${cadastro.body}`)
   const sessao = entrar(email)
@@ -81,7 +89,9 @@ export function criarPacienteComRemedio(numero, { estoque = 1000, inicio = diaDe
     quantidadePorDose: 1,
   }, sessao.token, { nome: 'cadastro' })
   if (remedio.status !== 201) fail(`remédio do paciente ${numero} falhou: ${remedio.status} ${remedio.body}`)
-  return { email, id: sessao.id, token: sessao.token, medicamentoId: dados(remedio).id }
+  // O telefone vai junto: o k6 roda a preparação em outro contexto, onde a
+  // marca da execução (EXECUCAO) é outra.
+  return { email, telefone, id: sessao.id, token: sessao.token, medicamentoId: dados(remedio).id }
 }
 
 export function apagarPacientes(contas) {

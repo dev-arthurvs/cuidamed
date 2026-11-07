@@ -1,0 +1,406 @@
+{
+  "root_group": {
+    "name": "",
+    "path": "",
+    "id": "d41d8cd98f00b204e9800998ecf8427e",
+    "groups": {
+      "setup": {
+        "name": "setup",
+        "path": "::setup",
+        "id": "5c0f8025f7e0b6654089e5b00e950f1a",
+        "groups": {},
+        "checks": {
+          "login aceito": {
+            "name": "login aceito",
+            "path": "::setup::login aceito",
+            "id": "490980ecd51033823bf42ea1455a0a68",
+            "passes": 3,
+            "fails": 0
+          }
+        }
+      },
+      "Segurança: acesso": {
+        "checks": {
+          "sem login, a API recusa: 401": {
+            "name": "sem login, a API recusa: 401",
+            "path": "::Segurança: acesso::sem login, a API recusa: 401",
+            "id": "844a483b11897e15a2192b797737c6d5",
+            "passes": 1,
+            "fails": 0
+          },
+          "com token falso, a API recusa: 401": {
+            "name": "com token falso, a API recusa: 401",
+            "path": "::Segurança: acesso::com token falso, a API recusa: 401",
+            "id": "6718f92923393ad2a8684f8c9e34cb5b",
+            "passes": 1,
+            "fails": 0
+          },
+          "paciente não vê outro paciente: 403": {
+            "name": "paciente não vê outro paciente: 403",
+            "path": "::Segurança: acesso::paciente não vê outro paciente: 403",
+            "id": "d205bf2f517469f966a918c2cf912885",
+            "passes": 1,
+            "fails": 0
+          },
+          "paciente não vê histórico de outro: 403": {
+            "name": "paciente não vê histórico de outro: 403",
+            "path": "::Segurança: acesso::paciente não vê histórico de outro: 403",
+            "id": "daa4bc7f492c09c68fff3849ae046f6f",
+            "passes": 1,
+            "fails": 0
+          },
+          "paciente não usa o chat de outro: 403": {
+            "name": "paciente não usa o chat de outro: 403",
+            "path": "::Segurança: acesso::paciente não usa o chat de outro: 403",
+            "id": "5690e8fd67978925d3bf5da2802e161e",
+            "passes": 1,
+            "fails": 0
+          },
+          "chat sem login não chama a IA: 401": {
+            "id": "7ba5585e6a4a5663fb7ab0ceb5c53f5a",
+            "passes": 1,
+            "fails": 0,
+            "name": "chat sem login não chama a IA: 401",
+            "path": "::Segurança: acesso::chat sem login não chama a IA: 401"
+          },
+          "saúde do servidor é pública: 200": {
+            "name": "saúde do servidor é pública: 200",
+            "path": "::Segurança: acesso::saúde do servidor é pública: 200",
+            "id": "0f9e728aee1feb186f7856b08ae30590",
+            "passes": 1,
+            "fails": 0
+          }
+        },
+        "name": "Segurança: acesso",
+        "path": "::Segurança: acesso",
+        "id": "a901b017e7aab5241146c42fde794f3b",
+        "groups": {}
+      },
+      "Login e cadastro": {
+        "groups": {},
+        "checks": {
+          "senha errada não entra": {
+            "name": "senha errada não entra",
+            "path": "::Login e cadastro::senha errada não entra",
+            "id": "428b7b7af2d48a076b56c4db6e42d936",
+            "passes": 1,
+            "fails": 0
+          },
+          "login aceito": {
+            "fails": 0,
+            "name": "login aceito",
+            "path": "::Login e cadastro::login aceito",
+            "id": "69e5fb5c76450d8067bd77b91b8f0414",
+            "passes": 1
+          },
+          "senha certa entra": {
+            "path": "::Login e cadastro::senha certa entra",
+            "id": "a356fed8e75578ec5e5b12eeb0f27ab2",
+            "passes": 1,
+            "fails": 0,
+            "name": "senha certa entra"
+          },
+          "senha com menos de 8 caracteres é recusada: 400": {
+            "id": "7367f4ca8a46c8bcc7e0bcf2c367f0f3",
+            "passes": 1,
+            "fails": 0,
+            "name": "senha com menos de 8 caracteres é recusada: 400",
+            "path": "::Login e cadastro::senha com menos de 8 caracteres é recusada: 400"
+          },
+          "telefone já usado em outra conta é recusado": {
+            "name": "telefone já usado em outra conta é recusado",
+            "path": "::Login e cadastro::telefone já usado em outra conta é recusado",
+            "id": "3c527b6f9a23a0f4146c736f1816ee7f",
+            "passes": 1,
+            "fails": 0
+          },
+          "conta sem e-mail e sem telefone é recusada: 400": {
+            "passes": 1,
+            "fails": 0,
+            "name": "conta sem e-mail e sem telefone é recusada: 400",
+            "path": "::Login e cadastro::conta sem e-mail e sem telefone é recusada: 400",
+            "id": "318cad636f043f1265e36f0ffb0f7547"
+          }
+        },
+        "name": "Login e cadastro",
+        "path": "::Login e cadastro",
+        "id": "470c90060252b5155aff2c97e37d41be"
+      },
+      "Doses e estoque": {
+        "path": "::Doses e estoque",
+        "id": "a869317bc9d8e9a0b9d6bd0357d9e842",
+        "groups": {},
+        "checks": {
+          "registrar dose: 201": {
+            "id": "b98332b59ad48e6d3df6d4330e46aad4",
+            "passes": 1,
+            "fails": 0,
+            "name": "registrar dose: 201",
+            "path": "::Doses e estoque::registrar dose: 201"
+          },
+          "estoque desconta (10 → 9)": {
+            "path": "::Doses e estoque::estoque desconta (10 → 9)",
+            "id": "534798e7b302f65c6858f3140831d40e",
+            "passes": 1,
+            "fails": 0,
+            "name": "estoque desconta (10 → 9)"
+          },
+          "mesma dose duas vezes é recusada: 409": {
+            "name": "mesma dose duas vezes é recusada: 409",
+            "path": "::Doses e estoque::mesma dose duas vezes é recusada: 409",
+            "id": "e1e07fdf6601b4307276cccd7e018aff",
+            "passes": 1,
+            "fails": 0
+          },
+          "desfazer a dose de hoje: 204": {
+            "id": "4087554058b8efc9ff81341815c6d603",
+            "passes": 1,
+            "fails": 0,
+            "name": "desfazer a dose de hoje: 204",
+            "path": "::Doses e estoque::desfazer a dose de hoje: 204"
+          },
+          "estoque volta (9 → 10)": {
+            "name": "estoque volta (9 → 10)",
+            "path": "::Doses e estoque::estoque volta (9 → 10)",
+            "id": "d5ce9b9aa2b0024012110884f7e5014f",
+            "passes": 1,
+            "fails": 0
+          },
+          "dose antes do início do tratamento é recusada: 400": {
+            "name": "dose antes do início do tratamento é recusada: 400",
+            "path": "::Doses e estoque::dose antes do início do tratamento é recusada: 400",
+            "id": "64af7d331b759b4ce8bab03325a4231c",
+            "passes": 1,
+            "fails": 0
+          },
+          "registrar dose de ontem: 201": {
+            "passes": 1,
+            "fails": 0,
+            "name": "registrar dose de ontem: 201",
+            "path": "::Doses e estoque::registrar dose de ontem: 201",
+            "id": "7e0df575dba3d20a3a7cf4062cd4e1d4"
+          },
+          "dose de ontem não pode ser desfeita: 400": {
+            "id": "ad849c678b156eeb631b0c4dce6d0b9b",
+            "passes": 1,
+            "fails": 0,
+            "name": "dose de ontem não pode ser desfeita: 400",
+            "path": "::Doses e estoque::dose de ontem não pode ser desfeita: 400"
+          },
+          "cadastrar remédio semanal: 201": {
+            "path": "::Doses e estoque::cadastrar remédio semanal: 201",
+            "id": "5d68d1240f35b6453524aa3fba985b78",
+            "passes": 1,
+            "fails": 0,
+            "name": "cadastrar remédio semanal: 201"
+          },
+          "remédio sem quantidade em estoque é recusado: 400": {
+            "id": "54063384082a58be774466c2d7737abd",
+            "passes": 1,
+            "fails": 0,
+            "name": "remédio sem quantidade em estoque é recusado: 400",
+            "path": "::Doses e estoque::remédio sem quantidade em estoque é recusado: 400"
+          },
+          "dose semanal em dia sem dose é recusada: 400": {
+            "id": "11bf3149235a47791e330c2d0e715f44",
+            "passes": 1,
+            "fails": 0,
+            "name": "dose semanal em dia sem dose é recusada: 400",
+            "path": "::Doses e estoque::dose semanal em dia sem dose é recusada: 400"
+          }
+        },
+        "name": "Doses e estoque"
+      },
+      "Histórico por período e compactação": {
+        "checks": {
+          "histórico completo: 20 registros": {
+            "name": "histórico completo: 20 registros",
+            "path": "::Histórico por período e compactação::histórico completo: 20 registros",
+            "id": "cafeaa6160ef9aee0712e421d7c1e43c",
+            "passes": 1,
+            "fails": 0
+          },
+          "histórico desde 5 dias atrás: 5 registros": {
+            "fails": 0,
+            "name": "histórico desde 5 dias atrás: 5 registros",
+            "path": "::Histórico por período e compactação::histórico desde 5 dias atrás: 5 registros",
+            "id": "fe5da4716f4335cf3cb9047d1129620d",
+            "passes": 1
+          },
+          "histórico entre 20 e 11 dias atrás: 10 registros": {
+            "passes": 1,
+            "fails": 0,
+            "name": "histórico entre 20 e 11 dias atrás: 10 registros",
+            "path": "::Histórico por período e compactação::histórico entre 20 e 11 dias atrás: 10 registros",
+            "id": "22c199652e7ad49307a0f72040c5cef7"
+          },
+          "período vem do mais recente ao mais antigo": {
+            "fails": 0,
+            "name": "período vem do mais recente ao mais antigo",
+            "path": "::Histórico por período e compactação::período vem do mais recente ao mais antigo",
+            "id": "3767b15c4f89859d4883e51c3d81c3f1",
+            "passes": 1
+          },
+          "histórico grande vem compactado (gzip)": {
+            "id": "caac5373e8f90223a3934e18d73e2f51",
+            "passes": 1,
+            "fails": 0,
+            "name": "histórico grande vem compactado (gzip)",
+            "path": "::Histórico por período e compactação::histórico grande vem compactado (gzip)"
+          }
+        },
+        "name": "Histórico por período e compactação",
+        "path": "::Histórico por período e compactação",
+        "id": "3a1d4c18fdd280daacc28c8ae193bcac",
+        "groups": {}
+      },
+      "Remédios e permissões": {
+        "name": "Remédios e permissões",
+        "path": "::Remédios e permissões",
+        "id": "bfbd7c8c267ba574ddedcbf7a35e04dc",
+        "groups": {},
+        "checks": {
+          "paciente sem cuidador pode cadastrar os próprios remédios": {
+            "path": "::Remédios e permissões::paciente sem cuidador pode cadastrar os próprios remédios",
+            "id": "d5c4922abb22ee5870c14e683b06b2ca",
+            "passes": 1,
+            "fails": 0,
+            "name": "paciente sem cuidador pode cadastrar os próprios remédios"
+          },
+          "paciente não cadastra remédio para outro: 403": {
+            "path": "::Remédios e permissões::paciente não cadastra remédio para outro: 403",
+            "id": "3db6abff7bebcc225fcb43e080b461ba",
+            "passes": 1,
+            "fails": 0,
+            "name": "paciente não cadastra remédio para outro: 403"
+          }
+        }
+      }
+    },
+    "checks": {}
+  },
+  "metrics": {
+    "http_req_receiving": {
+      "max": 2.7449,
+      "p(90)": 1.1623700000000001,
+      "p(95)": 1.5433399999999997,
+      "avg": 0.457475,
+      "min": 0,
+      "med": 0.40035
+    },
+    "vus": {
+      "min": 0,
+      "max": 0,
+      "value": 0
+    },
+    "http_req_connecting": {
+      "avg": 0.025218333333333336,
+      "min": 0,
+      "med": 0,
+      "max": 0.5078,
+      "p(90)": 0,
+      "p(95)": 0.02510999999999857
+    },
+    "data_sent": {
+      "rate": 12504.850161782604,
+      "count": 22624
+    },
+    "checks": {
+      "fails": 0,
+      "passes": 34,
+      "thresholds": {
+        "rate==1.0": false
+      },
+      "value": 1
+    },
+    "vus_max": {
+      "value": 1,
+      "min": 1,
+      "max": 1
+    },
+    "iteration_duration": {
+      "avg": 528.5425,
+      "min": 528.5425,
+      "med": 528.5425,
+      "max": 528.5425,
+      "p(90)": 528.5425,
+      "p(95)": 528.5425
+    },
+    "http_req_failed": {
+      "passes": 0,
+      "fails": 60,
+      "thresholds": {
+        "rate==0": false
+      },
+      "value": 0
+    },
+    "http_req_blocked": {
+      "p(90)": 0.05022000000000071,
+      "p(95)": 0.5038649999999999,
+      "avg": 0.6375400000000001,
+      "min": 0,
+      "med": 0,
+      "max": 35.2033
+    },
+    "iterations": {
+      "count": 1,
+      "rate": 0.5527249894705889
+    },
+    "http_reqs": {
+      "count": 60,
+      "rate": 33.163499368235335
+    },
+    "http_req_tls_handshaking": {
+      "avg": 0,
+      "min": 0,
+      "med": 0,
+      "max": 0,
+      "p(90)": 0,
+      "p(95)": 0
+    },
+    "http_req_sending": {
+      "p(90)": 0,
+      "p(95)": 0.5145699999999999,
+      "avg": 0.07227000000000001,
+      "min": 0,
+      "med": 0,
+      "max": 1.9939
+    },
+    "data_received": {
+      "count": 40161,
+      "rate": 22197.988302128324
+    },
+    "http_req_duration{expected_response:true}": {
+      "avg": 28.164158333333322,
+      "min": 1.6362,
+      "med": 5.89145,
+      "max": 370.0316,
+      "p(90)": 101.75416000000001,
+      "p(95)": 135.55058499999996
+    },
+    "http_req_waiting": {
+      "max": 368.0882,
+      "p(90)": 101.75416000000001,
+      "p(95)": 135.52276499999994,
+      "avg": 27.634413333333328,
+      "min": 1.6362,
+      "med": 5.5024999999999995
+    },
+    "group_duration": {
+      "med": 90.7527,
+      "max": 221.156,
+      "p(90)": 183.55468000000002,
+      "p(95)": 202.35533999999998,
+      "avg": 105.29968,
+      "min": 11.7012
+    },
+    "http_req_duration": {
+      "med": 5.89145,
+      "max": 370.0316,
+      "p(90)": 101.75416000000001,
+      "p(95)": 135.55058499999996,
+      "avg": 28.164158333333322,
+      "min": 1.6362
+    }
+  }
+}

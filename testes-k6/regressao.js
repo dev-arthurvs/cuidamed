@@ -11,8 +11,10 @@ import {
 export const options = {
   vus: 1,
   iterations: 1,
+  // Todas as regras precisam passar, e nenhuma resposta fora do esperado.
   thresholds: {
     checks: ['rate==1.0'],
+    http_req_failed: ['rate==0'],
   },
 }
 
@@ -29,27 +31,27 @@ export default function ({ a, b, c }) {
   const hoje = diaDeBrasilia()
 
   group('Segurança: acesso', () => {
-    check(buscar(`/api/pacientes/${a.id}`, null), { 'sem login, a API recusa: 401': (r) => r.status === 401 })
-    check(buscar(`/api/pacientes/${a.id}`, 'token-invalido'), { 'com token falso, a API recusa: 401': (r) => r.status === 401 })
-    check(buscar(`/api/pacientes/${b.id}`, a.token), { 'paciente não vê outro paciente: 403': (r) => r.status === 403 })
-    check(buscar(`/api/pacientes/${b.id}/historicos`, a.token), { 'paciente não vê histórico de outro: 403': (r) => r.status === 403 })
-    check(postar(`/api/chat/${b.id}`, { mensagem: 'oi' }, a.token), { 'paciente não usa o chat de outro: 403': (r) => r.status === 403 })
-    check(postar(`/api/chat/${a.id}`, { mensagem: 'oi' }, null), { 'chat sem login não chama a IA: 401': (r) => r.status === 401 })
+    check(buscar(`/api/pacientes/${a.id}`, null, {}, 401), { 'sem login, a API recusa: 401': (r) => r.status === 401 })
+    check(buscar(`/api/pacientes/${a.id}`, 'token-invalido', {}, 401), { 'com token falso, a API recusa: 401': (r) => r.status === 401 })
+    check(buscar(`/api/pacientes/${b.id}`, a.token, {}, 403), { 'paciente não vê outro paciente: 403': (r) => r.status === 403 })
+    check(buscar(`/api/pacientes/${b.id}/historicos`, a.token, {}, 403), { 'paciente não vê histórico de outro: 403': (r) => r.status === 403 })
+    check(postar(`/api/chat/${b.id}`, { mensagem: 'oi' }, a.token, {}, 403), { 'paciente não usa o chat de outro: 403': (r) => r.status === 403 })
+    check(postar(`/api/chat/${a.id}`, { mensagem: 'oi' }, null, {}, 401), { 'chat sem login não chama a IA: 401': (r) => r.status === 401 })
     check(http.get(`${API}/actuator/health`), { 'saúde do servidor é pública: 200': (r) => r.status === 200 })
   })
 
   group('Login e cadastro', () => {
-    const errado = postar('/api/auth/login', { login: a.email, senha: 'senha-errada' })
+    const errado = postar('/api/auth/login', { login: a.email, senha: 'senha-errada' }, null, {}, [400, 401])
     check(errado, { 'senha errada não entra': (r) => r.status === 401 || r.status === 400 })
     check(entrar(a.email), { 'senha certa entra': (s) => s && s.id === a.id })
-    const curta = postar('/api/pacientes', { nome: 'K6 Curta', email: `k6.curta.${EXECUCAO}@teste.cuidamed`, senha: '123' })
+    const curta = postar('/api/pacientes', { nome: 'K6 Curta', email: `k6.curta.${EXECUCAO}@teste.cuidamed`, senha: '123' }, null, {}, 400)
     check(curta, { 'senha com menos de 8 caracteres é recusada: 400': (r) => r.status === 400 })
     const repetido = postar('/api/pacientes', {
-      nome: 'K6 Repetido', email: `k6.repetido.${EXECUCAO}@teste.cuidamed`, senha: SENHA, telefone: telefoneDeTeste(1),
-    })
-    check(repetido, { 'telefone já usado em outra conta é recusado': (r) => r.status >= 400 && r.status < 500 })
-    check(postar('/api/pacientes', { nome: 'K6 Sem contato', senha: SENHA }), {
-      'conta sem e-mail e sem telefone é recusada': (r) => r.status >= 400 && r.status < 500,
+      nome: 'K6 Repetido', email: `k6.repetido.${EXECUCAO}@teste.cuidamed`, senha: SENHA, telefone: a.telefone,
+    }, null, {}, [400, 409])
+    check(repetido, { 'telefone já usado em outra conta é recusado': (r) => r.status === 400 || r.status === 409 })
+    check(postar('/api/pacientes', { nome: 'K6 Sem contato', senha: SENHA }, null, {}, 400), {
+      'conta sem e-mail e sem telefone é recusada: 400': (r) => r.status === 400,
     })
   })
 
@@ -58,27 +60,27 @@ export default function ({ a, b, c }) {
     const registro = postar('/api/historicos', dose, a.token)
     check(registro, { 'registrar dose: 201': (r) => r.status === 201 })
     check(dados(buscar(`/api/medicamentos/${a.medicamentoId}`, a.token)), { 'estoque desconta (10 → 9)': (m) => m && m.quantidadeEstoque === 9 })
-    check(postar('/api/historicos', dose, a.token), { 'mesma dose duas vezes é recusada: 409': (r) => r.status === 409 })
+    check(postar('/api/historicos', dose, a.token, {}, 409), { 'mesma dose duas vezes é recusada: 409': (r) => r.status === 409 })
     check(apagar(`/api/historicos/${dados(registro).id}`, a.token), { 'desfazer a dose de hoje: 204': (r) => r.status === 204 })
     check(dados(buscar(`/api/medicamentos/${a.medicamentoId}`, a.token)), { 'estoque volta (9 → 10)': (m) => m && m.quantidadeEstoque === 10 })
 
-    const antes = postar('/api/historicos', { ...dose, data: diaDeBrasilia(-1) }, a.token)
+    const antes = postar('/api/historicos', { ...dose, data: diaDeBrasilia(-1) }, a.token, {}, 400)
     check(antes, { 'dose antes do início do tratamento é recusada: 400': (r) => r.status === 400 })
 
     const ontem = postar('/api/historicos', { ...dose, pacienteId: c.id, medicamentoId: c.medicamentoId, data: diaDeBrasilia(-1) }, c.token)
     check(ontem, { 'registrar dose de ontem: 201': (r) => r.status === 201 })
-    check(apagar(`/api/historicos/${dados(ontem).id}`, c.token), { 'dose de ontem não pode ser desfeita: 400': (r) => r.status === 400 })
+    check(apagar(`/api/historicos/${dados(ontem).id}`, c.token, {}, 400), { 'dose de ontem não pode ser desfeita: 400': (r) => r.status === 400 })
 
     const semanal = postar('/api/medicamentos', {
       pacienteId: a.id, nome: 'Semanal K6', forma: 'COMPRIMIDO', frequencia: 'SEMANAL', dataInicio: hoje, horarios: ['09:00'], quantidadeEstoque: 4, quantidadePorDose: 1,
     }, a.token)
     check(semanal, { 'cadastrar remédio semanal: 201': (r) => r.status === 201 })
-    check(postar('/api/medicamentos', { pacienteId: a.id, nome: 'Sem estoque K6', forma: 'COMPRIMIDO', frequencia: 'UMA_VEZ_AO_DIA', dataInicio: hoje, horarios: ['11:00'] }, a.token), {
+    check(postar('/api/medicamentos', { pacienteId: a.id, nome: 'Sem estoque K6', forma: 'COMPRIMIDO', frequencia: 'UMA_VEZ_AO_DIA', dataInicio: hoje, horarios: ['11:00'] }, a.token, {}, 400), {
       'remédio sem quantidade em estoque é recusado: 400': (r) => r.status === 400,
     })
     const amanha = postar('/api/historicos', {
       pacienteId: a.id, medicamentoId: dados(semanal).id, data: diaDeBrasilia(1), hora: '09:00', status: 'TOMADO',
-    }, a.token)
+    }, a.token, {}, 400)
     check(amanha, { 'dose semanal em dia sem dose é recusada: 400': (r) => r.status === 400 })
   })
 
@@ -106,7 +108,7 @@ export default function ({ a, b, c }) {
     check(lista, { 'paciente sem cuidador pode cadastrar os próprios remédios': (l) => l.length === 2 })
     const outro = postar('/api/medicamentos', {
       pacienteId: b.id, nome: 'Invasor K6', forma: 'COMPRIMIDO', frequencia: 'UMA_VEZ_AO_DIA', dataInicio: hoje, horarios: ['10:00'], quantidadeEstoque: 4, quantidadePorDose: 1,
-    }, a.token)
+    }, a.token, {}, 403)
     check(outro, { 'paciente não cadastra remédio para outro: 403': (r) => r.status === 403 })
   })
 }

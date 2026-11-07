@@ -1,0 +1,311 @@
+{
+    "metrics": {
+        "iteration_duration": {
+            "p(90)": 1323.6134,
+            "p(95)": 1323.6134,
+            "avg": 1323.6134,
+            "min": 1323.6134,
+            "med": 1323.6134,
+            "max": 1323.6134
+        },
+        "group_duration": {
+            "p(95)": 996.0313999999996,
+            "avg": 264.62198,
+            "min": 3.8143,
+            "med": 22.5931,
+            "max": 1232.062,
+            "p(90)": 760.0008
+        },
+        "http_req_blocked": {
+            "p(90)": 0,
+            "p(95)": 2.112709999999955,
+            "avg": 1.1119526315789472,
+            "min": 0,
+            "med": 0,
+            "max": 21.1271
+        },
+        "http_req_connecting": {
+            "p(90)": 0,
+            "p(95)": 0.05020999999999893,
+            "avg": 0.026426315789473683,
+            "min": 0,
+            "med": 0,
+            "max": 0.5021
+        },
+        "http_req_sending": {
+            "avg": 0.1586421052631579,
+            "min": 0,
+            "med": 0,
+            "max": 2.5119,
+            "p(90)": 0.10045999999999963,
+            "p(95)": 0.7032599999999957
+        },
+        "http_req_duration": {
+            "avg": 67.25201578947367,
+            "min": 2.1455,
+            "med": 6.1941,
+            "max": 435.902,
+            "p(90)": 232.24941999999993,
+            "p(95)": 313.5749899999997
+        },
+        "data_sent": {
+            "count": 6574,
+            "rate": 4963.223150635031
+        },
+        "vus": {
+            "value": 1,
+            "min": 1,
+            "max": 1
+        },
+        "http_req_tls_handshaking": {
+            "max": 0,
+            "p(90)": 0,
+            "p(95)": 0,
+            "avg": 0,
+            "min": 0,
+            "med": 0
+        },
+        "vus_max": {
+            "value": 1,
+            "min": 1,
+            "max": 1
+        },
+        "http_req_receiving": {
+            "avg": 0.2545210526315789,
+            "min": 0,
+            "med": 0,
+            "max": 1.0809,
+            "p(90)": 0.7553799999999999,
+            "p(95)": 0.8018999999999994
+        },
+        "iterations": {
+            "count": 1,
+            "rate": 0.7549776620984227
+        },
+        "checks": {
+            "passes": 22,
+            "fails": 0,
+            "thresholds": {
+                "rate==1.0": false
+            },
+            "value": 1
+        },
+        "http_reqs": {
+            "count": 19,
+            "rate": 14.344575579870032
+        },
+        "data_received": {
+            "count": 11061,
+            "rate": 8350.807920470654
+        },
+        "http_req_failed": {
+            "passes": 0,
+            "fails": 19,
+            "value": 0
+        },
+        "http_req_waiting": {
+            "avg": 66.83885263157894,
+            "min": 1.6917,
+            "med": 6.1941,
+            "max": 435.902,
+            "p(90)": 231.64821999999995,
+            "p(95)": 313.5749899999997
+        },
+        "http_req_duration{expected_response:true}": {
+            "p(90)": 232.24941999999993,
+            "p(95)": 313.5749899999997,
+            "avg": 67.25201578947367,
+            "min": 2.1455,
+            "med": 6.1941,
+            "max": 435.902
+        }
+    },
+    "root_group": {
+        "name": "",
+        "path": "",
+        "id": "d41d8cd98f00b204e9800998ecf8427e",
+        "groups": {
+            "1. Cadastro e login": {
+                "name": "1. Cadastro e login",
+                "path": "::1. Cadastro e login",
+                "id": "88c097bb3826f66ac980d382a6b576d0",
+                "groups": {},
+                "checks": {
+                        "cuidador cadastrado: 201": {
+                            "name": "cuidador cadastrado: 201",
+                            "path": "::1. Cadastro e login::cuidador cadastrado: 201",
+                            "id": "a12b1ecc58676ef223be39bf173cdd01",
+                            "passes": 1,
+                            "fails": 0
+                        },
+                        "paciente cadastrado: 201": {
+                            "name": "paciente cadastrado: 201",
+                            "path": "::1. Cadastro e login::paciente cadastrado: 201",
+                            "id": "bc427c1ae535cedc8288e2ea3ba82d4b",
+                            "passes": 1,
+                            "fails": 0
+                        },
+                        "login aceito": {
+                            "id": "7785860e81ef99298d8e33375e9e58c9",
+                            "passes": 3,
+                            "fails": 0,
+                            "name": "login aceito",
+                            "path": "::1. Cadastro e login::login aceito"
+                        },
+                        "login identifica o cuidador": {
+                            "name": "login identifica o cuidador",
+                            "path": "::1. Cadastro e login::login identifica o cuidador",
+                            "id": "483967d0ba9dedc06ec531830e0507b7",
+                            "passes": 1,
+                            "fails": 0
+                        },
+                        "login identifica o paciente": {
+                            "passes": 1,
+                            "fails": 0,
+                            "name": "login identifica o paciente",
+                            "path": "::1. Cadastro e login::login identifica o paciente",
+                            "id": "cd8ab2448fa6d94f4e609ed95f6b0969"
+                        },
+                        "login pelo telefone funciona": {
+                            "name": "login pelo telefone funciona",
+                            "path": "::1. Cadastro e login::login pelo telefone funciona",
+                            "id": "af11f8da4e45ae5c183f9863461ffe51",
+                            "passes": 1,
+                            "fails": 0
+                        }
+                    }
+            },
+            "2. Vínculo entre paciente e cuidador": {
+                "path": "::2. Vínculo entre paciente e cuidador",
+                "id": "4771ee0bc519a095ae33f5343b80f43a",
+                "groups": {},
+                "checks": {
+                        "paciente pede o vínculo: 204": {
+                            "passes": 1,
+                            "fails": 0,
+                            "name": "paciente pede o vínculo: 204",
+                            "path": "::2. Vínculo entre paciente e cuidador::paciente pede o vínculo: 204",
+                            "id": "d6479f82faad0ded20d29c2f9354151f"
+                        },
+                        "cuidador vê o pedido": {
+                            "name": "cuidador vê o pedido",
+                            "path": "::2. Vínculo entre paciente e cuidador::cuidador vê o pedido",
+                            "id": "f86c93d2ec0c7e3916e4cba6c91b15bc",
+                            "passes": 1,
+                            "fails": 0
+                        },
+                        "cuidador aceita: 204": {
+                            "name": "cuidador aceita: 204",
+                            "path": "::2. Vínculo entre paciente e cuidador::cuidador aceita: 204",
+                            "id": "a67594544bd05d4d90bc9010163f8262",
+                            "passes": 1,
+                            "fails": 0
+                        },
+                        "paciente aparece na lista do cuidador": {
+                            "id": "c6a8c8fb1c01e9b14d37b4b1290841cb",
+                            "passes": 1,
+                            "fails": 0,
+                            "name": "paciente aparece na lista do cuidador",
+                            "path": "::2. Vínculo entre paciente e cuidador::paciente aparece na lista do cuidador"
+                        },
+                        "ficha do paciente mostra o cuidador": {
+                            "fails": 0,
+                            "name": "ficha do paciente mostra o cuidador",
+                            "path": "::2. Vínculo entre paciente e cuidador::ficha do paciente mostra o cuidador",
+                            "id": "6ed936c1e46db174415c20c1d99b6e8d",
+                            "passes": 1
+                        }
+                    },
+                "name": "2. Vínculo entre paciente e cuidador"
+            },
+            "3. Cuidador cadastra o remédio e o paciente vê": {
+                "name": "3. Cuidador cadastra o remédio e o paciente vê",
+                "path": "::3. Cuidador cadastra o remédio e o paciente vê",
+                "id": "e8c71e5b59f14432d878e3cb7b10ca41",
+                "groups": {},
+                "checks": {
+                        "cuidador cadastra o remédio: 201": {
+                            "name": "cuidador cadastra o remédio: 201",
+                            "path": "::3. Cuidador cadastra o remédio e o paciente vê::cuidador cadastra o remédio: 201",
+                            "id": "976fdd8fb9098d68090ae3efbcd90709",
+                            "passes": 1,
+                            "fails": 0
+                        },
+                        "paciente vê o remédio com o horário": {
+                            "fails": 0,
+                            "name": "paciente vê o remédio com o horário",
+                            "path": "::3. Cuidador cadastra o remédio e o paciente vê::paciente vê o remédio com o horário",
+                            "id": "2ebb2b11637a7476e2d339109db07cbb",
+                            "passes": 1
+                        }
+                    }
+            },
+            "4. Dose: registrar desconta o estoque e desfazer devolve": {
+                "path": "::4. Dose: registrar desconta o estoque e desfazer devolve",
+                "id": "5bbbb6d765c301cc3eff3c5a197f5c8d",
+                "groups": {},
+                "checks": {
+                        "paciente registra a dose: 201": {
+                            "name": "paciente registra a dose: 201",
+                            "path": "::4. Dose: registrar desconta o estoque e desfazer devolve::paciente registra a dose: 201",
+                            "id": "89a37b86effea068d67507780b647f65",
+                            "passes": 1,
+                            "fails": 0
+                        },
+                        "estoque desconta a quantidade por dose (10 → 8)": {
+                            "passes": 1,
+                            "fails": 0,
+                            "name": "estoque desconta a quantidade por dose (10 → 8)",
+                            "path": "::4. Dose: registrar desconta o estoque e desfazer devolve::estoque desconta a quantidade por dose (10 → 8)",
+                            "id": "e9b68a134f904be617e37694ff2bb572"
+                        },
+                        "cuidador vê a dose no histórico": {
+                            "name": "cuidador vê a dose no histórico",
+                            "path": "::4. Dose: registrar desconta o estoque e desfazer devolve::cuidador vê a dose no histórico",
+                            "id": "8d80e61201cc574e347e75673a583fe4",
+                            "passes": 1,
+                            "fails": 0
+                        },
+                        "paciente desfaz a dose: 204": {
+                            "name": "paciente desfaz a dose: 204",
+                            "path": "::4. Dose: registrar desconta o estoque e desfazer devolve::paciente desfaz a dose: 204",
+                            "id": "3ff580f11dcb187645a1ced9075c8d26",
+                            "passes": 1,
+                            "fails": 0
+                        },
+                        "estoque volta (8 → 10)": {
+                            "name": "estoque volta (8 → 10)",
+                            "path": "::4. Dose: registrar desconta o estoque e desfazer devolve::estoque volta (8 → 10)",
+                            "id": "e70748425c79566195a88e7390db7c3c",
+                            "passes": 1,
+                            "fails": 0
+                        },
+                        "histórico de hoje fica vazio": {
+                            "passes": 1,
+                            "fails": 0,
+                            "name": "histórico de hoje fica vazio",
+                            "path": "::4. Dose: registrar desconta o estoque e desfazer devolve::histórico de hoje fica vazio",
+                            "id": "5f7795dbcfb02eb143092bb4eaf38453"
+                        }
+                    },
+                "name": "4. Dose: registrar desconta o estoque e desfazer devolve"
+            },
+            "5. Limpeza": {
+                "path": "::5. Limpeza",
+                "id": "1f5a8f7d25586435c3c3adf8bf19c4d6",
+                "groups": {},
+                "checks": {
+                        "cuidador exclui o paciente de teste: 204": {
+                            "name": "cuidador exclui o paciente de teste: 204",
+                            "path": "::5. Limpeza::cuidador exclui o paciente de teste: 204",
+                            "id": "c3efe152116bedda25fa60e074e83008",
+                            "passes": 1,
+                            "fails": 0
+                        }
+                    },
+                "name": "5. Limpeza"
+            }
+        },
+        "checks": {}
+    }
+}
