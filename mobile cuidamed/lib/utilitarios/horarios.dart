@@ -35,10 +35,13 @@ String dataAtualISO([DateTime? data]) {
 
 /// Monta a lista de "doses de hoje" cruzando os horários de cada medicamento
 /// ativo com o histórico já registrado hoje.
-List<Dose> construirDosesHoje(List<Medicamento> medicamentosAtivos, List<Historico> historicoHoje, {String? hojeIso}) {
+/// Recebe todos os remédios: entra quem tem dose hoje, inclusive o que termina
+/// hoje (na Agenda ele já vai para "Encerrados" quando a última dose é
+/// registrada, mas no Início a dose tomada continua aparecendo).
+List<Dose> construirDosesHoje(List<Medicamento> medicamentos, List<Historico> historicoHoje, {String? hojeIso}) {
   final hoje = hojeIso ?? dataAtualISO();
   final doses = <Dose>[];
-  for (final medicamento in medicamentosAtivos) {
+  for (final medicamento in medicamentos) {
     // Só entra se hoje é dia de dose: tratamento que ainda não começou não tem
     // dose (antes aparecia como "perdido"), e "Dias alternados"/"Semanal" só
     // têm dose a cada 2/7 dias (antes geravam dose todo dia).
@@ -65,6 +68,16 @@ List<Dose> construirDosesHoje(List<Medicamento> medicamentosAtivos, List<Histori
 }
 
 const int diasJanelaAdesao = 30;
+
+/// Web e mobile mantêm só os últimos dias do histórico, o suficiente para o
+/// Início, o estoque e a adesão (um dia a mais, por segurança). Períodos mais
+/// antigos são buscados pela tela de Histórico.
+const int diasJanelaHistorico = diasJanelaAdesao + 1;
+
+DateTime inicioJanelaHistorico([DateTime? hoje]) {
+  final dia = hoje ?? DateTime.now();
+  return DateTime(dia.year, dia.month, dia.day - diasJanelaHistorico);
+}
 
 /// Adesão dos últimos 30 dias (hoje incluso) — é o período que as telas
 /// anunciam ("Adesão média (30 dias)"). Antes considerava o histórico inteiro.

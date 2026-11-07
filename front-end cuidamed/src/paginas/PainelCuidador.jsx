@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import AcessoPaciente from '../componentes/AcessoPaciente'
@@ -234,7 +234,7 @@ export default function PainelCuidador() {
               <div className="painel-cuidador__grade-pacientes">
                 <AnimatePresence>
                 {solicitacoes.map((paciente) => (
-                  <motion.div
+                  <m.div
                     key={paciente.id}
                     className="painel-cuidador__solicitacao"
                     layout
@@ -256,7 +256,7 @@ export default function PainelCuidador() {
                         Recusar
                       </Botao>
                     </div>
-                  </motion.div>
+                  </m.div>
                 ))}
                 </AnimatePresence>
               </div>
@@ -276,7 +276,7 @@ export default function PainelCuidador() {
             <div className="painel-cuidador__grade-pacientes">
               <AnimatePresence>
               {pacientesComResumo.map((paciente) => (
-                <motion.div
+                <m.div
                   key={paciente.id}
                   layout
                   initial={VARIANTES_ITEM_LISTA.initial}
@@ -322,7 +322,7 @@ export default function PainelCuidador() {
                       <div className="painel-cuidador__paciente-pct">{paciente.pct}%</div>
                     </div>
                   </Link>
-                </motion.div>
+                </m.div>
               ))}
               </AnimatePresence>
             </div>

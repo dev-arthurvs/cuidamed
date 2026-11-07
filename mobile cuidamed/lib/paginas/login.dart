@@ -82,6 +82,7 @@ class _LoginState extends State<Login> {
             const SizedBox(height: 22),
             CampoTexto(
               rotulo: 'E-mail ou telefone',
+              emailOuTelefone: true,
               icone: Icons.person_outline,
               fundoBranco: true,
               rotuloExterno: true,

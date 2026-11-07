@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import Botao from '../componentes/Botao'
@@ -138,7 +138,7 @@ export default function AgendaMedicamentos() {
               const iniciado = medicamentoIniciado(medicamento)
               const proximaDose = iniciado && !temDoseNoDia(medicamento) ? proximoDiaDeDose(medicamento) : null
               return (
-              <motion.div
+              <m.div
                 className="agenda__cartao"
                 key={medicamento.id}
                 layout
@@ -203,7 +203,7 @@ export default function AgendaMedicamentos() {
                     </Botao>
                   </div>
                 )}
-              </motion.div>
+              </m.div>
               )
             })}
             </AnimatePresence>

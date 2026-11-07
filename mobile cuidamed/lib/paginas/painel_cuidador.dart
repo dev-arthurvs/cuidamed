@@ -268,7 +268,7 @@ class _Estatisticas extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final emAtencao = pacientes.where((dados) {
-      final doses = construirDosesHoje(dados.medicamentosAtivos(), dados.historicoHoje());
+      final doses = construirDosesHoje(dados.medicamentos, dados.historicoHoje());
       return doses.any((dose) => dose.status == 'atrasado' || dose.status == 'perdido');
     }).length;
     // Só os ativos: medicamentos de tratamentos encerrados não estão mais sendo monitorados.

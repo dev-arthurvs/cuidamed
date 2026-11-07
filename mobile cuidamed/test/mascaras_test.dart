@@ -17,6 +17,29 @@ void main() {
     });
   });
 
+  group('MascaraEmailOuTelefone (digitação)', () {
+    const mascara = MascaraEmailOuTelefone();
+    String digitar(String texto) {
+      var valor = TextEditingValue.empty;
+      for (final letra in texto.split('')) {
+        valor = mascara.formatEditUpdate(valor, TextEditingValue(text: valor.text + letra));
+      }
+      return valor.text;
+    }
+
+    test('só números viram telefone com máscara', () {
+      expect(digitar('79999998888'), '(79) 99999-8888');
+    });
+
+    test('e-mail fica como foi digitado', () {
+      expect(digitar('maria-souza@email.com'), 'maria-souza@email.com');
+    });
+
+    test('e-mail que começa com números perde a máscara ao virar e-mail', () {
+      expect(digitar('123abc@x.com'), '123abc@x.com');
+    });
+  });
+
   group('MascaraTelefone (digitação)', () {
     const mascara = MascaraTelefone();
     TextEditingValue valor(String texto) => TextEditingValue(text: texto);

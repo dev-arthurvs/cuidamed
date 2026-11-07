@@ -3,19 +3,18 @@ import { Navigate, Route, Routes, useParams } from 'react-router-dom'
 import LayoutApp from './componentes/LayoutApp'
 import RotaProtegida from './componentes/RotaProtegida'
 import { useApp } from './contexto/useApp'
-import AgendaMedicamentos from './paginas/AgendaMedicamentos'
 import Login from './paginas/Login'
-import PainelCuidador from './paginas/PainelCuidador'
-import PainelIdoso from './paginas/PainelIdoso'
 
-// Telas carregadas só quando abertas (o primeiro acesso baixa menos): as
-// menos usadas no dia a dia.
+// Telas carregadas só quando abertas: quem está no login não baixa os painéis.
 const Acessibilidade = lazy(() => import('./paginas/Acessibilidade'))
+const AgendaMedicamentos = lazy(() => import('./paginas/AgendaMedicamentos'))
 const Cadastro = lazy(() => import('./paginas/Cadastro'))
 const Chat = lazy(() => import('./paginas/Chat'))
 const DefinirSenha = lazy(() => import('./paginas/DefinirSenha'))
 const EdicaoPerfil = lazy(() => import('./paginas/EdicaoPerfil'))
 const Historico = lazy(() => import('./paginas/Historico'))
+const PainelCuidador = lazy(() => import('./paginas/PainelCuidador'))
+const PainelIdoso = lazy(() => import('./paginas/PainelIdoso'))
 
 // O antigo "Painel do paciente" agora faz parte dos detalhes do paciente.
 function RedirecionarParaDetalhes() {

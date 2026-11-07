@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import Botao from '../componentes/Botao'
@@ -86,7 +86,7 @@ export default function Cadastro() {
   )
 
   return (
-    <motion.div
+    <m.div
       className="autenticacao"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
@@ -96,7 +96,7 @@ export default function Cadastro() {
         <LogoMarca tamanho={84} tamanhoTexto={48} corTexto="claro" fundo="transparente" />
 
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div
+          <m.div
             key={tipo}
             className="autenticacao__hero-texto"
             variants={variantesCampos}
@@ -107,7 +107,7 @@ export default function Cadastro() {
           >
             <p className="autenticacao__hero-titulo">{FRASES_IMPACTO[tipo].titulo}</p>
             <p className="autenticacao__hero-subtitulo">{FRASES_IMPACTO[tipo].subtitulo}</p>
-          </motion.div>
+          </m.div>
         </AnimatePresence>
 
         <div className="autenticacao__hero-rodape">© 2026 CuidaMed</div>
@@ -139,7 +139,7 @@ export default function Cadastro() {
 
           <AnimatePresence mode="wait" initial={false}>
             {tipo === 'paciente' ? (
-              <motion.div
+              <m.div
                 key="paciente"
                 variants={variantesCampos}
                 initial="initial"
@@ -181,9 +181,9 @@ export default function Cadastro() {
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
                 />
-              </motion.div>
+              </m.div>
             ) : (
-              <motion.div
+              <m.div
                 key="cuidador"
                 variants={variantesCampos}
                 initial="initial"
@@ -211,7 +211,7 @@ export default function Cadastro() {
                   value={senha}
                   onChange={(e) => setSenha(e.target.value)}
                 />
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
 
@@ -230,6 +230,6 @@ export default function Cadastro() {
         </form>
       </div>
       <Toast />
-    </motion.div>
+    </m.div>
   )
 }

@@ -37,9 +37,11 @@ public class HistoricoController {
     public List<HistoricoRespostaDTO> listarPorPaciente(
             @PathVariable Long pacienteId,
             @RequestParam(required = false) LocalDate data,
-            @RequestParam(required = false) Long medicamentoId) {
+            @RequestParam(required = false) Long medicamentoId,
+            @RequestParam(required = false) LocalDate de,
+            @RequestParam(required = false) LocalDate ate) {
         autorizacao.exigirAcessoAoPaciente(pacienteId);
-        return historicoService.listarPorPaciente(pacienteId, data, medicamentoId);
+        return historicoService.listarPorPaciente(pacienteId, data, medicamentoId, de, ate);
     }
 
     /** "Desfazer" uma dose registrada por engano (só as de hoje). */

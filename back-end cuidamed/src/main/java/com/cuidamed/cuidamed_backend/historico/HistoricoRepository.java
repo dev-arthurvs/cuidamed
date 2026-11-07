@@ -16,5 +16,7 @@ public interface HistoricoRepository extends JpaRepository<Historico, Long> {
 
     List<Historico> findByPacienteIdAndDataAndMedicamentoIdOrderByHoraDesc(Long pacienteId, LocalDate data, Long medicamentoId);
 
+    List<Historico> findByPacienteIdAndDataBetweenOrderByDataDescHoraDesc(Long pacienteId, LocalDate de, LocalDate ate);
+
     boolean existsByMedicamentoIdAndDataAndHora(Long medicamentoId, LocalDate data, LocalTime hora);
 }

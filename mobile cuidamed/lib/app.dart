@@ -143,10 +143,14 @@ class _CuidaMedAppState extends State<CuidaMedApp> {
     _estado.restaurarSessao();
     // Voltou pro app (ou pra aba do navegador): vê se passou dos 7 dias sem uso
     // e, se continua logado, sincroniza na hora.
-    _ciclo = AppLifecycleListener(onResume: () async {
-      await _estado.verificarInatividade();
-      if (_estado.autenticado) await _estado.sincronizarDados();
-    });
+    _ciclo = AppLifecycleListener(
+      onHide: () => _estado.emSegundoPlano = true,
+      onShow: () => _estado.emSegundoPlano = false,
+      onResume: () async {
+        await _estado.verificarInatividade();
+        if (_estado.autenticado) await _estado.sincronizarDados();
+      },
+    );
     // Com o app aberto o tempo todo, confere também de tempos em tempos.
     _relogioInatividade = Timer.periodic(const Duration(minutes: 10), (_) => _estado.verificarInatividade());
   }

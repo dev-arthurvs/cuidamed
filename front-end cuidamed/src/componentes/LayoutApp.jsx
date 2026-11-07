@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { Suspense } from 'react'
 import { useLocation, useOutlet } from 'react-router-dom'
 import BarraSuperior from './BarraSuperior'
@@ -21,7 +21,7 @@ export default function LayoutApp() {
       <div className="layout-app__conteudo">
         <BarraSuperior />
         <AnimatePresence mode="popLayout" initial={false}>
-          <motion.div
+          <m.div
             key={location.pathname}
             className="layout-app__transicao"
             variants={variantesPagina}
@@ -32,7 +32,7 @@ export default function LayoutApp() {
           >
             {/* Telas carregadas sob demanda: a barra continua na tela enquanto baixam. */}
             <Suspense fallback={null}>{outlet}</Suspense>
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       </div>
       <BotaoChatFlutuante />

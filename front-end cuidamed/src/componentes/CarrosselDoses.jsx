@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import Botao from './Botao'
@@ -129,7 +129,7 @@ export default function CarrosselDoses({ doses, aoRegistrar, aoDesfazer }) {
 
       <div className="carrossel-doses__janela">
         <AnimatePresence mode="wait" initial={false} custom={direcao}>
-          <motion.div
+          <m.div
             key={atual.id}
             className="carrossel-doses__trilho"
             custom={direcao}
@@ -193,7 +193,7 @@ export default function CarrosselDoses({ doses, aoRegistrar, aoDesfazer }) {
             <div className="carrossel-doses__linha-proxima">
               <LinhaDose dose={proxima} posicao="proxima" />
             </div>
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       </div>
 
@@ -215,7 +215,7 @@ export default function CarrosselDoses({ doses, aoRegistrar, aoDesfazer }) {
       {createPortal(
         <AnimatePresence>
           {registrada && (
-            <motion.div
+            <m.div
               key={registrada.id}
               className="carrossel-doses__popup"
               role="status"
@@ -233,7 +233,7 @@ export default function CarrosselDoses({ doses, aoRegistrar, aoDesfazer }) {
               <div className="carrossel-doses__popup-barra" aria-hidden="true">
                 <div className="carrossel-doses__popup-tempo" style={{ animationDuration: `${TEMPO_DESFAZER_MS}ms` }} />
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>,
         document.body,

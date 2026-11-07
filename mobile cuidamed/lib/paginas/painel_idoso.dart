@@ -30,7 +30,7 @@ class PainelIdoso extends StatelessWidget {
       );
     }
 
-    final doses = construirDosesHoje(pacienteFoco.medicamentosAtivos(), pacienteFoco.historicoHoje())
+    final doses = construirDosesHoje(pacienteFoco.medicamentos, pacienteFoco.historicoHoje())
       ..sort((a, b) => a.horario.compareTo(b.horario));
     final primeiroNome = estado.usuario!.nome.split(' ').first;
     // Largura útil do card de doses (lista com padding 20; lado a lado com o

@@ -19,6 +19,13 @@ export function formatarTelefone(valor, anterior = '') {
   return `(${ddd}) ${numero.slice(0, tamanhoInicio)}-${numero.slice(tamanhoInicio)}`
 }
 
+// Campo "E-mail ou telefone": só com números vira telefone com máscara; com
+// letra ou @ fica como foi digitado (e sai a máscara, se ela já tinha entrado).
+export function formatarEmailOuTelefone(valor, anterior = '') {
+  if (/[^\d\s()-]/.test(valor)) return /^\(\d/.test(anterior) ? valor.replace(/[()\s-]/g, '') : valor
+  return formatarTelefone(valor, anterior)
+}
+
 // Tem DDD + número? (10 dígitos no fixo, 11 no celular.)
 export function telefoneCompleto(valor) {
   const tamanho = apenasDigitos(valor).length

@@ -22,6 +22,7 @@ import com.cuidamed.cuidamed_backend.paciente.PacienteRepository;
 public class HistoricoService {
 
     private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final LocalDate DATA_MAIS_ANTIGA = LocalDate.of(1900, 1, 1);
 
 
     private static final DateTimeFormatter FORMATO_HORA = DateTimeFormatter.ofPattern("HH:mm");
@@ -118,9 +119,12 @@ public class HistoricoService {
         historicoRepository.delete(historico);
     }
 
-    public List<HistoricoRespostaDTO> listarPorPaciente(Long pacienteId, LocalDate data, Long medicamentoId) {
+    public List<HistoricoRespostaDTO> listarPorPaciente(Long pacienteId, LocalDate data, Long medicamentoId, LocalDate de, LocalDate ate) {
         List<Historico> resultado;
-        if (data != null && medicamentoId != null) {
+        if (de != null || ate != null) {
+            resultado = historicoRepository.findByPacienteIdAndDataBetweenOrderByDataDescHoraDesc(
+                    pacienteId, de != null ? de : DATA_MAIS_ANTIGA, ate != null ? ate : FusoHorario.hoje().plusDays(1));
+        } else if (data != null && medicamentoId != null) {
             resultado = historicoRepository.findByPacienteIdAndDataAndMedicamentoIdOrderByHoraDesc(pacienteId, data, medicamentoId);
         } else if (data != null) {
             resultado = historicoRepository.findByPacienteIdAndDataOrderByHoraDesc(pacienteId, data);

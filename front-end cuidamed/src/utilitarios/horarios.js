@@ -67,7 +67,7 @@ function diasEntre(deIso, ateIso) {
   return Math.round((new Date(`${ateIso}T00:00:00Z`) - new Date(`${deIso}T00:00:00Z`)) / 86400000)
 }
 
-function somarDias(dataIso, dias) {
+export function somarDias(dataIso, dias) {
   const data = new Date(`${dataIso}T00:00:00Z`)
   data.setUTCDate(data.getUTCDate() + dias)
   return data.toISOString().slice(0, 10)
@@ -209,6 +209,15 @@ export function dosesSemRegistro(medicamentos, historico, deIso, ateIso, agora =
 }
 
 export const DIAS_JANELA_ADESAO = 30
+
+// Web e mobile mantêm só os últimos dias do histórico, o suficiente para o Início,
+// o estoque e a adesão (um dia a mais, por segurança). Períodos mais antigos são
+// buscados pela tela de Histórico.
+export const DIAS_JANELA_HISTORICO = DIAS_JANELA_ADESAO + 1
+
+export function inicioJanelaHistorico(hojeIso = dataAtualISO()) {
+  return somarDias(hojeIso, -DIAS_JANELA_HISTORICO)
+}
 
 // Adesão dos últimos 30 dias (hoje incluso) — é o período que as telas anunciam
 // ("Adesão média (30 dias)"). Dose que passou do limite sem registro conta como

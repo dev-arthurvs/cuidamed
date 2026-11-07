@@ -15,6 +15,7 @@ import {
   calcularStatusAtual,
   construirDosesHoje,
   dataAtualISO,
+  inicioJanelaHistorico,
   medicamentoEncerrado,
   minutosAgora,
   obterIniciais,
@@ -88,10 +89,15 @@ function mapearHistoricoDaApi(historico) {
   }
 }
 
+async function carregarHistoricoAntigo(pacienteId, de, ate) {
+  const historicoApi = await api.get(`/api/pacientes/${pacienteId}/historicos?de=${de}&ate=${ate}`)
+  return historicoApi.map(mapearHistoricoDaApi)
+}
+
 async function hidratarPaciente(pacienteBase) {
   const [medicamentosApi, historicoApi] = await Promise.all([
     api.get(`/api/pacientes/${pacienteBase.id}/medicamentos`),
-    api.get(`/api/pacientes/${pacienteBase.id}/historicos`),
+    api.get(`/api/pacientes/${pacienteBase.id}/historicos?de=${inicioJanelaHistorico()}`),
   ])
   return {
     ...mapearPacienteDaApi(pacienteBase),
@@ -172,7 +178,10 @@ export function ProvedorApp({ children }) {
         ...paciente,
         idade: calcularIdade(paciente.dataNascimento),
         medicamentosAtivos,
-        dosesHoje: construirDosesHoje(medicamentosAtivos, historicoHoje),
+        // Todos os remédios com dose hoje, inclusive o que termina hoje: na Agenda
+        // ele já vai para "Encerrados" quando a última dose é registrada, mas no
+        // Início a dose tomada continua aparecendo (e pode ser desfeita).
+        dosesHoje: construirDosesHoje(paciente.medicamentos, historicoHoje),
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -686,6 +695,7 @@ export function ProvedorApp({ children }) {
       excluirMedicamento,
       marcarDoseComoTomada,
       desfazerDose,
+      carregarHistoricoAntigo,
       gerarCodigoNovaSenha,
       atualizarPerfil,
       alterarSenha,

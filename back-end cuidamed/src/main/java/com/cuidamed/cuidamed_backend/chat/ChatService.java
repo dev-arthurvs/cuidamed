@@ -15,6 +15,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
@@ -82,6 +84,7 @@ public class ChatService {
     private final HistoricoRepository historicoRepository;
     private final VinculoRepository vinculoRepository;
     private final RestTemplate restTemplate;
+    private final TransactionTemplate transacaoDeLeitura;
 
     @Value("${anthropic.api.key}")
     private String chaveApi;
@@ -97,12 +100,15 @@ public class ChatService {
             MedicamentoRepository medicamentoRepository,
             HistoricoRepository historicoRepository,
             VinculoRepository vinculoRepository,
-            RestTemplate restTemplate) {
+            RestTemplate restTemplate,
+            PlatformTransactionManager gerenciadorDeTransacao) {
         this.pacienteRepository = pacienteRepository;
         this.medicamentoRepository = medicamentoRepository;
         this.historicoRepository = historicoRepository;
         this.vinculoRepository = vinculoRepository;
         this.restTemplate = restTemplate;
+        this.transacaoDeLeitura = new TransactionTemplate(gerenciadorDeTransacao);
+        this.transacaoDeLeitura.setReadOnly(true);
     }
 
     public ChatRespostaDTO perguntar(Long pacienteId, ChatMensagemDTO dto) {
@@ -110,10 +116,10 @@ public class ChatService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe a mensagem.");
         }
 
-        Paciente paciente = pacienteRepository.findById(pacienteId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado."));
-
-        String contexto = montarContexto(paciente);
+        // Lê tudo do banco antes de chamar a IA: a resposta leva segundos e, nesse
+        // tempo, a conexão fica livre para as outras telas.
+        String contexto = transacaoDeLeitura.execute(status -> montarContexto(pacienteRepository.findById(pacienteId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado."))));
         String conteudoUsuario = contexto + "\nAPARELHO: " + descreverAparelho(dto.plataforma())
                 + "\n\nPERGUNTA DO PACIENTE: " + dto.mensagem();
 
@@ -179,11 +185,13 @@ public class ChatService {
                 .findFirstByPacienteIdAndSituacao(paciente.getId(), SituacaoVinculo.ATIVO)
                 .map(vinculo -> vinculo.getCuidador().getNome())
                 .orElse(null);
+        LocalDateTime agora = LocalDateTime.now(FusoHorario.BRASIL);
         return ContextoDoChat.montar(
                 paciente,
                 nomeCuidador,
                 medicamentoRepository.findByPacienteId(paciente.getId()),
-                historicoRepository.findByPacienteIdOrderByDataDescHoraDesc(paciente.getId()),
-                LocalDateTime.now(FusoHorario.BRASIL));
+                historicoRepository.findByPacienteIdAndDataBetweenOrderByDataDescHoraDesc(
+                        paciente.getId(), agora.toLocalDate().minusDays(ContextoDoChat.DIAS_DE_HISTORICO), agora.toLocalDate()),
+                agora);
     }
 }

@@ -191,6 +191,7 @@ export default function EdicaoPerfil() {
             </p>
             <Campo
               rotulo="E-mail ou telefone do cuidador"
+            tipo="email-ou-telefone"
               placeholder="cuidador@email.com ou (79) 99999-9999"
               value={emailCuidadorSolicitado}
               onChange={(e) => setEmailCuidadorSolicitado(e.target.value)}

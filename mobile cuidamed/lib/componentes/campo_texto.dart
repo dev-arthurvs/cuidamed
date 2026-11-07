@@ -26,6 +26,9 @@ class CampoTexto extends StatefulWidget {
   /// do azul-claro padrão do tema.
   final bool fundoBranco;
 
+  /// Campo "E-mail ou telefone": só números ganham a máscara de telefone.
+  final bool emailOuTelefone;
+
   const CampoTexto({
     super.key,
     required this.rotulo,
@@ -41,6 +44,7 @@ class CampoTexto extends StatefulWidget {
     this.icone,
     this.alternarSenha = false,
     this.fundoBranco = false,
+    this.emailOuTelefone = false,
   });
 
   @override
@@ -65,7 +69,11 @@ class _CampoTextoState extends State<CampoTexto> {
       obscureText: widget.senha && !_senhaVisivel,
       keyboardType: widget.tipoTeclado,
       // Teclado de telefone = campo de telefone: máscara "(79) 99999-9999".
-      inputFormatters: widget.tipoTeclado == TextInputType.phone ? const [MascaraTelefone()] : null,
+      inputFormatters: widget.emailOuTelefone
+          ? const [MascaraEmailOuTelefone()]
+          : widget.tipoTeclado == TextInputType.phone
+              ? const [MascaraTelefone()]
+              : null,
       validator: widget.validador,
       onChanged: widget.onChanged,
       onFieldSubmitted: widget.onSubmitted,

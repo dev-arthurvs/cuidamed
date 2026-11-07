@@ -1,4 +1,5 @@
 import '../modelos/historico.dart';
+import '../utilitarios/horarios.dart';
 import 'api_cliente.dart';
 
 class HistoricoServico {
@@ -7,8 +8,10 @@ class HistoricoServico {
   /// "Desfazer": apaga o registro de hoje; o servidor devolve o estoque descontado.
   Future<void> desfazer(int id) => _api.delete('/api/historicos/$id');
 
-  Future<List<Historico>> listarPorPaciente(int pacienteId, {DateTime? data, int? medicamentoId}) async {
+  Future<List<Historico>> listarPorPaciente(int pacienteId, {DateTime? data, int? medicamentoId, DateTime? de, DateTime? ate}) async {
     final query = <String, dynamic>{};
+    if (de != null) query['de'] = dataAtualISO(de);
+    if (ate != null) query['ate'] = dataAtualISO(ate);
     if (data != null) {
       query['data'] =
           '${data.year.toString().padLeft(4, '0')}-${data.month.toString().padLeft(2, '0')}-${data.day.toString().padLeft(2, '0')}';
