@@ -1,9 +1,3 @@
-// TESTE DE INTEGRAÇÃO: as partes do app funcionam juntas, de ponta a ponta?
-// Um cuidador e um paciente de teste passam pelo caminho completo: cadastro,
-// login, vínculo, remédio cadastrado pelo cuidador, dose registrada pelo
-// paciente (o estoque desconta), desfazer (o estoque volta) e o cuidador vendo
-// tudo. Todas as verificações precisam passar.
-//   k6 run integracao.js
 import { check, fail, group } from 'k6'
 import { apagar, buscar, dados, diaDeBrasilia, entrar, EXECUCAO, postar, SENHA, telefoneDeTeste } from './comum.js'
 
@@ -42,7 +36,6 @@ export default function () {
     exigir(cuidador && paciente, 'login do cuidador ou do paciente falhou')
     check(cuidador, { 'login identifica o cuidador': (s) => s.tipo === 'CUIDADOR' })
     check(paciente, { 'login identifica o paciente': (s) => s.tipo === 'PACIENTE' })
-    // Login também pelo telefone (só os dígitos contam).
     check(entrar(telefoneDeTeste(91).replace(/\D/g, '')), { 'login pelo telefone funciona': (s) => s && s.id === paciente.id })
   })
 

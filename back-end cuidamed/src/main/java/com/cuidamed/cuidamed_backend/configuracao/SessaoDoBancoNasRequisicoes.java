@@ -7,11 +7,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import jakarta.persistence.EntityManagerFactory;
 
-/**
- * Mantém a sessão do banco aberta durante a requisição, como o padrão do Spring,
- * menos no chat: lá a resposta da IA leva segundos e seguraria uma conexão do banco
- * sem usar, deixando as outras telas lentas com vários chats ao mesmo tempo.
- */
 @Configuration
 public class SessaoDoBancoNasRequisicoes implements WebMvcConfigurer {
 
@@ -25,6 +20,7 @@ public class SessaoDoBancoNasRequisicoes implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registro) {
         OpenEntityManagerInViewInterceptor sessao = new OpenEntityManagerInViewInterceptor();
         sessao.setEntityManagerFactory(fabrica);
+        // No chat a resposta da IA demora e seguraria uma conexão do banco.
         registro.addWebRequestInterceptor(sessao).excludePathPatterns("/api/chat/**");
     }
 }

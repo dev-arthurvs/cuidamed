@@ -1,7 +1,3 @@
-// Notificações do dispositivo via Web Notifications API. Funciona enquanto o
-// app estiver aberto em alguma aba (mesmo em segundo plano) — não funciona
-// com o navegador totalmente fechado (isso exigiria Web Push + Service Worker).
-
 export function notificacaoDisponivel() {
   return typeof window !== 'undefined' && 'Notification' in window
 }
@@ -24,6 +20,6 @@ export function notificarDose(titulo, corpo) {
   try {
     new Notification(titulo, { body: corpo, tag: titulo })
   } catch {
-    // Alguns navegadores mobile não suportam o construtor direto — ignora.
+    // navegador recusou a notificação
   }
 }

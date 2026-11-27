@@ -1,6 +1,5 @@
 .painel-idoso {
   display: grid;
-  /* Cartão do paciente e "Próximo medicamento" lado a lado, mesma altura. */
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 22px;
   align-items: stretch;
@@ -44,7 +43,6 @@
 .painel-idoso__proximo {
   border-radius: var(--raio-grande);
   padding: 28px;
-  /* Cor oposta ao fundo da tela (escura no modo claro, clara no escuro). */
   background: var(--fundo-card-dose);
   color: #fff;
   box-shadow: 0 14px 32px rgba(11, 47, 99, 0.3);

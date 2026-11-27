@@ -1,9 +1,6 @@
-// Alerta sintetizado via Web Audio API — sem precisar de nenhum arquivo de
-// áudio. Campainha "ding-dong" (duas notas em onda senoidal com decaimento
-// tipo sino), repetida algumas vezes pra garantir que o paciente perceba.
 const VOLUME = 0.8
-const FREQ_DING_HZ = 1319 // E6
-const FREQ_DONG_HZ = 988 // B5
+const FREQ_DING_HZ = 1319
+const FREQ_DONG_HZ = 988
 const DURACAO_NOTA_S = 0.6
 const INTERVALO_ENTRE_NOTAS_S = 0.45
 const NUMERO_DE_REPETICOES = 3
@@ -42,6 +39,6 @@ export function tocarAlertaSonoro() {
       tocarNota(contexto, FREQ_DONG_HZ, inicioRepeticao + INTERVALO_ENTRE_NOTAS_S, DURACAO_NOTA_S)
     }
   } catch {
-    // Navegador sem suporte a Web Audio — ignora silenciosamente.
+    // navegador sem áudio: o aviso na tela continua
   }
 }

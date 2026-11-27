@@ -1,11 +1,3 @@
-// Teste de integração contra o back-end real.
-// Só roda com a URL explícita, pra não quebrar o `flutter test` comum:
-//   flutter test test/integracao --dart-define=API_BASE_URL=http://localhost:8080
-// Usa `test()` puro (sem testWidgets) porque o binding de widget test bloqueia HTTP.
-// Cria um paciente e um cuidador descartáveis; o paciente é excluído no fim
-// (a API não tem endpoint de exclusão de cuidador).
-// A API exige o token do login: como o app guarda um token por vez (uma pessoa
-// por aparelho), _como() entra com o usuário certo antes de cada ação.
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -21,12 +13,10 @@ import 'package:cuidamed_mobile/servicos/paciente_servico.dart';
 
 const _url = String.fromEnvironment('API_BASE_URL');
 
-/// Passa a agir como esse usuário (troca o token do ApiCliente).
 Future<void> _como(String email, String senha) async {
   ApiCliente.instancia.token = (await AuthServico().login(email, senha)).token;
 }
 
-/// Telefone diferente a cada execução: a API não aceita o mesmo número em duas contas.
 String _fone(int carimbo, int n) {
   final oito = ((carimbo % 10000000) * 10 + n).toString().padLeft(8, '0');
   return '(79) 9${oito.substring(0, 4)}-${oito.substring(4)}';
@@ -40,7 +30,7 @@ void main() {
   late int cuidadorId;
 
   setUpAll(() async {
-    if (_url.isEmpty) return; // testes pulados — não toca na rede
+    if (_url.isEmpty) return;
     SharedPreferences.setMockInitialValues({});
     final cuidador = await CuidadorServico().criar(
       nome: 'Cuidador Teste Integração',
@@ -54,7 +44,7 @@ void main() {
   tearDownAll(() async {
     if (_url.isEmpty) return;
     try {
-      await _como(emailPaciente, 'novaSenha99'); // o próprio paciente apaga a conta
+      await _como(emailPaciente, 'novaSenha99');
       await PacienteServico().excluir(pacienteId);
     } catch (_) {}
   });
@@ -99,14 +89,12 @@ void main() {
     await estadoCuidador.entrar(emailCuidador, 'senha1234');
     expect(estadoCuidador.usuario!.profissao, 'Enfermeiro');
     expect(estadoCuidador.pacientes.map((p) => p.paciente.id), contains(pacienteId));
-    // Vínculo ativo ganha um código ("nº do cartão"), o mesmo para paciente e cuidador.
     final codigo = estadoCuidador.pacientes.firstWhere((p) => p.paciente.id == pacienteId).paciente.codigoVinculo;
     expect(codigo, isNotNull);
     await _como(emailPaciente, 'novaSenha99');
     expect((await PacienteServico().buscarPorId(pacienteId)).codigoVinculo, codigo);
     await _como(emailCuidador, 'senha1234');
 
-    // Perfil do cuidador (profissão/telefone) também persiste.
     await estadoCuidador.atualizarPerfil(
       nome: 'Cuidador Teste Integração',
       email: emailCuidador,
@@ -121,7 +109,6 @@ void main() {
 
     await estadoCuidador.desvincularPaciente(pacienteId);
     expect(estadoCuidador.pacientes.where((p) => p.paciente.id == pacienteId), isEmpty);
-    // Desvinculado, o cuidador perde o acesso aos dados do paciente.
     await expectLater(
       PacienteServico().buscarPorId(pacienteId),
       throwsA(isA<ApiExcecao>().having((e) => e.mensagem, 'mensagem', contains('não tem acesso'))),
@@ -129,7 +116,7 @@ void main() {
     await _como(emailPaciente, 'novaSenha99');
     final desvinculado = await PacienteServico().buscarPorId(pacienteId);
     expect(desvinculado.cuidadorId, isNull);
-    expect(desvinculado.codigoVinculo, isNull); // sem cuidador, sem nº do cartão
+    expect(desvinculado.codigoVinculo, isNull);
   }, skip: _url.isEmpty ? 'defina --dart-define=API_BASE_URL' : null);
 
   test('Cuidador cadastra paciente sem senha e o paciente ativa o acesso', () async {
@@ -150,9 +137,7 @@ void main() {
       expect(novo.cuidadorId, cuidadorId);
       expect(novo.sexo, 'FEMININO');
       expect(novo.enfermidade, 'Hipertensão');
-      // Sem senha ainda: login falha até o paciente ativar o acesso.
       await expectLater(AuthServico().login(emailNovo, 'qualquer123'), throwsA(isA<ApiExcecao>()));
-      // O cuidador vê o código de ativação; só o e-mail não basta mais.
       final codigo = novo.codigoAtivacao!;
       expect(codigo, hasLength(6));
       await expectLater(
@@ -164,10 +149,9 @@ void main() {
         throwsA(isA<ApiExcecao>()),
       );
       await ApiCliente.instancia.post('/api/pacientes/definir-senha',
-          {'email': emailNovo, 'codigo': codigo.toLowerCase(), 'novaSenha': 'minhasenha1'}); // maiúscula/minúscula tanto faz
+          {'email': emailNovo, 'codigo': codigo.toLowerCase(), 'novaSenha': 'minhasenha1'});
       expect((await AuthServico().login(emailNovo, 'minhasenha1')).id, novo.id);
-      expect((await PacienteServico().buscarPorId(novo.id)).codigoAtivacao, isNull); // usado, some
-      // Não dá para "reativar" (trocar a senha de quem já ativou) com o mesmo código.
+      expect((await PacienteServico().buscarPorId(novo.id)).codigoAtivacao, isNull);
       await expectLater(
         ApiCliente.instancia.post('/api/pacientes/definir-senha', {'email': emailNovo, 'codigo': codigo, 'novaSenha': 'outra12345'}),
         throwsA(isA<ApiExcecao>()),
@@ -197,7 +181,7 @@ void main() {
         buscarPaciente: servico.buscarPorId,
         confirmarAlertaManual: servico.confirmarAlertaManual,
         aoAlertar: recebidos.add,
-        agora: () => DateTime(2000, 1, 1, 3), // sem doses: isola o "Lembrar agora"
+        agora: () => DateTime(2000, 1, 1, 3),
       );
       await monitor.verificarAgora();
       expect(recebidos, isEmpty);
@@ -210,10 +194,10 @@ void main() {
       await monitor.verificarAgora();
       expect(recebidos.single.titulo, 'Lembrete do seu cuidador 💊');
       expect(recebidos.single.mensagem, 'Hora do remédio, vó!');
-      expect((await servico.buscarPorId(novo.id)).alertaManualPendente, isFalse); // confirmado no servidor
+      expect((await servico.buscarPorId(novo.id)).alertaManualPendente, isFalse);
 
       await monitor.verificarAgora();
-      expect(recebidos, hasLength(1)); // não repete
+      expect(recebidos, hasLength(1));
     } finally {
       monitor?.dispose();
       await PacienteServico().excluir(novo.id);
@@ -233,7 +217,6 @@ void main() {
       await estadoPaciente.entrar(emailSync, 'sync12345');
       expect(estadoPaciente.pacienteFoco!.medicamentos, isEmpty);
 
-      // 1) Cuidador cadastra um remédio (como se fosse pelo web)...
       final hoje = DateTime.now();
       await _como(emailCuidador, 'senha1234');
       await estadoCuidador.adicionarMedicamento(
@@ -244,19 +227,17 @@ void main() {
           horarios: const ['23:59'], quantidadeEstoque: 10, quantidadePorDose: 1,
         ),
       );
-      // ...e o app do paciente, já aberto, recebe na sincronização automática.
       await _como(emailSync, 'sync12345');
       await estadoPaciente.sincronizarDados();
       final remedio = estadoPaciente.pacienteFoco!.medicamentos.single;
       expect(remedio.nome, 'Sincronil');
 
-      // 2) Paciente registra a dose; o app do cuidador vê na sincronização.
       await estadoPaciente.marcarDoseComoTomada(novo.id, remedio.id, '23:59', 'pendente');
       await _como(emailCuidador, 'senha1234');
       await estadoCuidador.sincronizarDados();
       final visto = estadoCuidador.pacientes.firstWhere((p) => p.paciente.id == novo.id);
       expect(visto.historico.single.status, 'TOMADO');
-      expect(visto.medicamentos.single.quantidadeEstoque, 9); // estoque descontado
+      expect(visto.medicamentos.single.quantidadeEstoque, 9);
     } finally {
       await PacienteServico().excluir(novo.id);
     }
@@ -280,12 +261,10 @@ void main() {
         ),
       );
       final med = estadoCuidador.pacientes.firstWhere((p) => p.paciente.id == novo.id).medicamentos.single;
-      // Começou ontem (dia de dose); hoje não é dia de dose.
       await expectLater(
         estadoCuidador.marcarDoseComoTomada(novo.id, med.id, '09:00', 'pendente'),
         throwsA(isA<ApiExcecao>().having((e) => e.mensagem, 'mensagem', contains('não tem dose'))),
       );
-      // E o app não mostra dose hoje pra esse remédio.
       expect(construirDosesHoje([med], const []), isEmpty);
     } finally {
       await PacienteServico().excluir(novo.id);
@@ -312,11 +291,9 @@ void main() {
       expect(depois.enfermidade, 'Diabetes');
       expect(depois.telefone, antes.telefone);
       expect(depois.endereco, antes.endereco);
-      expect(depois.cuidadorId, cuidadorId); // vínculo preservado
-      // E o estado local já reflete o valor salvo.
+      expect(depois.cuidadorId, cuidadorId);
       expect(estadoCuidador.pacientes.firstWhere((p) => p.paciente.id == antes.id).paciente.observacoesClinicas,
           'Alergia a dipirona.');
-      // Apagar o texto limpa o campo no servidor.
       await estadoCuidador.atualizarObservacoesClinicas(antes.id, '   ');
       expect((await PacienteServico().buscarPorId(antes.id)).observacoesClinicas, isNull);
     } finally {
@@ -333,9 +310,8 @@ void main() {
     ApiCliente.instancia.token = 'token.falso.qualquer';
     await expectLater(PacienteServico().buscarPorId(pacienteId), throwsA(isA<ApiExcecao>()));
 
-    // Um paciente não acessa os dados nem o chat de outro.
     final emailOutro = 'paciente.outro.$carimbo@email.com';
-    ApiCliente.instancia.token = null; // cadastro é público (um token inválido seria recusado)
+    ApiCliente.instancia.token = null;
     await ApiCliente.instancia.post('/api/pacientes', {'nome': 'Outro Paciente', 'email': emailOutro, 'senha': 'outro1234'});
     await _como(emailOutro, 'outro1234');
     try {

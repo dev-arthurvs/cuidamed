@@ -20,14 +20,13 @@
 }
 
 .agenda__topo-acoes {
-  margin-left: auto; /* sempre à direita, mesmo sem a descrição ao lado */
+  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 18px;
   flex-wrap: wrap;
 }
 
-/* Abas "Em uso" / "Encerrados": controle segmentado, com a contagem em cada. */
 .agenda__abas {
   display: inline-flex;
   gap: 4px;
@@ -184,8 +183,6 @@
   margin-top: auto;
 }
 
-/* Celular: abas e "+ Inserir medicamento" na largura toda, um embaixo do outro
-   (igual ao app mobile). */
 @media (max-width: 640px) {
   .agenda__abas {
     display: flex;

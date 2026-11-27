@@ -9,7 +9,6 @@ import '../estado/app_estado.dart';
 import '../servicos/api_cliente.dart';
 import '../utilitarios/tema.dart';
 
-/// Equivalente a paginas/Login.jsx do web.
 class Login extends StatefulWidget {
   const Login({super.key});
 
@@ -37,9 +36,7 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
     final estado = context.read<AppEstado>();
-    // Voltou para cá porque o token venceu: explica o motivo.
     _erro = estado.consumirAvisoSessao();
-    // "Lembrar de mim" da última vez: e-mail ou telefone preenchido e caixa já marcada.
     estado.loginLembrado().then((login) {
       if (!mounted || login == null || login.isEmpty || _loginController.text.isNotEmpty) return;
       setState(() {
@@ -65,7 +62,6 @@ class _LoginState extends State<Login> {
     }
   }
 
-  // Mesmo formulário de "Ativar meu acesso", com o código de nova senha.
   void _esqueciSenha() => context.push('/definir-senha?novaSenha=1');
 
   @override
@@ -88,8 +84,6 @@ class _LoginState extends State<Login> {
               rotuloExterno: true,
               placeholder: 'seu@email.com ou (79) 99999-9999',
               controller: _loginController,
-              // Teclado de e-mail (tem letras, números e @). O de telefone aplicaria a
-              // máscara, e aqui a pessoa pode digitar qualquer um dos dois.
               tipoTeclado: TextInputType.emailAddress,
               validador: (valor) => (valor == null || valor.trim().isEmpty) ? 'Informe o e-mail ou telefone.' : null,
             ),
@@ -107,8 +101,6 @@ class _LoginState extends State<Login> {
               validador: (valor) => (valor == null || valor.isEmpty) ? 'Informe a senha.' : null,
             ),
             const SizedBox(height: 4),
-            // "Lembrar de mim" à esquerda e "Esqueci minha senha" à direita, como
-            // no web; em tela muito estreita um fica embaixo do outro.
             Wrap(
               alignment: WrapAlignment.spaceBetween,
               crossAxisAlignment: WrapCrossAlignment.center,
@@ -134,7 +126,6 @@ class _LoginState extends State<Login> {
                     ],
                   ),
                 ),
-                // Direto o link (o LinkEsqueciSenha se estica na linha toda).
                 LinkAutenticacao(texto: 'Esqueci minha senha', peso: FontWeight.w600, onTap: _esqueciSenha),
               ],
             ),

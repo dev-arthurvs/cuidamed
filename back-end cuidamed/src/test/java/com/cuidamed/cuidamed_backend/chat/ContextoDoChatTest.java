@@ -17,7 +17,6 @@ import com.cuidamed.cuidamed_backend.medicamento.Horario;
 import com.cuidamed.cuidamed_backend.medicamento.Medicamento;
 import com.cuidamed.cuidamed_backend.paciente.Paciente;
 
-/** O que a IA recebe: as contas de dose e estoque, com o relógio fixo. Não usa banco. */
 class ContextoDoChatTest {
 
     private static final LocalDate HOJE = LocalDate.of(2026, 11, 2);

@@ -26,7 +26,6 @@ public class PacienteController {
     private final Autorizacao autorizacao;
     private final LimitadorDeTentativas limitador;
 
-    // "Ativar meu acesso": até 5 códigos errados por e-mail a cada 15 minutos.
     static final int MAXIMO_ERROS_ATIVACAO = 5;
     private static final Duration JANELA_ERROS_ATIVACAO = Duration.ofMinutes(15);
     private static final String MUITAS_TENTATIVAS_ATIVACAO =
@@ -38,11 +37,6 @@ public class PacienteController {
         this.limitador = limitador;
     }
 
-    /**
-     * Duas situações: o próprio paciente se cadastrando (sem login — precisa de
-     * senha e nasce sem cuidador) ou um cuidador logado cadastrando um paciente
-     * (fica vinculado a esse cuidador, qualquer que seja o cuidadorId enviado).
-     */
     @PostMapping("/api/pacientes")
     @ResponseStatus(HttpStatus.CREATED)
     public PacienteRespostaDTO criar(@RequestBody PacienteCriacaoDTO dto) {
@@ -77,7 +71,6 @@ public class PacienteController {
     @DeleteMapping("/api/pacientes/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void excluir(@PathVariable Long id) {
-        // O cuidador vinculado ou o próprio paciente (direito de apagar os próprios dados).
         autorizacao.exigirAcessoAoPaciente(id);
         pacienteService.excluir(id);
     }
@@ -122,10 +115,6 @@ public class PacienteController {
         return pacienteService.listarSolicitacoes(cuidadorId);
     }
 
-    // Nas ações abaixo, o cuidador é sempre o do token (o "cuidadorId" do corpo
-    // é ignorado); o serviço confere se ele é mesmo o vinculado/solicitado.
-
-    /** Só o cuidador vinculado: o paciente esqueceu a senha e não está logado. */
     @PostMapping("/api/pacientes/{id}/codigo-nova-senha")
     public PacienteRespostaDTO gerarCodigoNovaSenha(@PathVariable Long id) {
         return pacienteService.gerarCodigoNovaSenha(id, autorizacao.exigirCuidador());

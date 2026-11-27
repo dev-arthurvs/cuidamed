@@ -19,9 +19,6 @@
   line-height: 1.4;
 }
 
-/* Grade fixa de 3 por linha: cada card ocupa 1/3 mesmo quando é o único (antes
-   um card sozinho esticava na largura toda). 2 por linha em telas médias e 1
-   no celular, onde 3 lado a lado ficariam ilegíveis. */
 .tratamentos-encerrados__grade {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }

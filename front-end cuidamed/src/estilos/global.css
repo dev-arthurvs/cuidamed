@@ -6,22 +6,16 @@
   --azul-texto: #0f4c9e;
   --gradiente-azul: linear-gradient(135deg, var(--azul-claro), var(--azul));
   --gradiente-hero: linear-gradient(150deg, #4aa8f0 0%, #1560c4 60%, #0f3f80 100%);
-  /* Tela inicial do paciente: o card da dose ("Próximo medicamento") fica com a
-     cor oposta ao fundo da tela, para chamar a atenção; o Cartão do paciente
-     fica com a outra. No modo claro: dose escura e cartão claro; no escuro,
-     o inverso (ver :root[data-tema='escuro']). */
   --gradiente-cartao-escuro: linear-gradient(135deg, #0b2f63 0%, #11458f 55%, #1b62c0 100%);
   --gradiente-cartao-claro: linear-gradient(135deg, #4aa8f0 0%, #2a85df 55%, #1560c4 100%);
   --fundo-card-dose: var(--gradiente-cartao-escuro);
   --fundo-cartao-paciente: var(--gradiente-cartao-claro);
-  /* Fundo das telas de login, cadastro e ativação (mais escuro que o hero). */
   --gradiente-autenticacao: linear-gradient(150deg, #1b62c0 0%, #0f4594 48%, #0a2a5c 100%);
 
   --fundo: #eef4fb;
   --fundo-input: #fbfdff;
   --fundo-destaque: #f4f9ff;
   --fundo-card: #fff;
-  /* Cinza-azulado bem claro (pílulas, divisões, áreas neutras). */
   --fundo-suave: #eef3f9;
   --borda-suave: #eef3f9;
 
@@ -60,14 +54,11 @@
   --sombra-grande: 0 18px 40px rgba(19, 58, 110, 0.08);
   --sombra-botao: 0 10px 22px rgba(21, 96, 196, 0.24);
 
-  /* Source Sans 3: sem serifa, formal e feita para leitura longa. */
   --fonte: 'Source Sans 3', 'Segoe UI', Helvetica, Arial, sans-serif;
 
   color-scheme: light;
 }
 
-/* Modo escuro (chave no menu). Só os tons mudam; os nomes das variáveis são os
-   mesmos, então as telas acompanham sozinhas. */
 :root[data-tema='escuro'] {
   --azul-claro: #5fb3f5;
   --azul: #3d8ef0;

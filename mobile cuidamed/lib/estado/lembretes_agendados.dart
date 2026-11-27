@@ -3,8 +3,6 @@ import '../modelos/medicamento.dart';
 import '../utilitarios/horarios.dart';
 import 'app_estado.dart';
 
-/// Um lembrete de "Hora do remédio" agendado no próprio celular: toca mesmo com
-/// o app fechado.
 class LembreteAgendado {
   final int id;
   final DateTime quando;
@@ -13,9 +11,6 @@ class LembreteAgendado {
   const LembreteAgendado({required this.id, required this.quando, required this.titulo, required this.corpo});
 }
 
-/// Doses dos próximos [dias] que ainda vão acontecer e não foram registradas,
-/// da mais próxima para a mais distante. O [limite] existe porque o sistema
-/// aceita um número máximo de agendamentos por app.
 List<LembreteAgendado> lembretesParaAgendar(
   List<Medicamento> medicamentos,
   List<Historico> historico, {
@@ -43,7 +38,7 @@ List<LembreteAgendado> lembretesParaAgendar(
   return [
     for (final (indice, dose) in doses.take(limite).indexed)
       LembreteAgendado(
-        id: 100000 + indice, // longe dos ids das notificações imediatas
+        id: 100000 + indice,
         quando: dose.quando,
         titulo: 'Hora do remédio 💊',
         corpo: dose.medicamento.dosagem.isEmpty
@@ -53,8 +48,6 @@ List<LembreteAgendado> lembretesParaAgendar(
   ];
 }
 
-/// Mantém os lembretes do celular iguais à agenda do paciente logado: reagenda
-/// quando a agenda ou o histórico mudam e cancela tudo ao sair da conta.
 class LembretesAgendados {
   final AppEstado estado;
   final Future<void> Function(List<LembreteAgendado> lembretes) agendar;

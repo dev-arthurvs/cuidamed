@@ -40,7 +40,6 @@ export default function EdicaoPerfil() {
   const [semEmail, setSemEmail] = useState(!usuario.email)
   const [dataNascimento, setDataNascimento] = useState(pacienteFoco?.dataNascimento || '')
   const [sexo, setSexo] = useState(pacienteFoco?.sexo || OPCOES_SEXO[0])
-  // Telefones salvos antes da máscara aparecem já formatados.
   const [telefone, setTelefone] = useState(() => formatarTelefone((ehPaciente ? pacienteFoco?.telefone : usuario.telefone) || ''))
   const [profissao, setProfissao] = useState(usuario.profissao || '')
   const [senhaAtual, setSenhaAtual] = useState('')
@@ -144,8 +143,6 @@ export default function EdicaoPerfil() {
     navegar('/login')
   }
 
-  // Paciente: card do cuidador (vinculado, pedido pendente ou formulário de
-  // vínculo), ao lado da Aparência.
   let cartaoCuidador = null
   if (ehPaciente) {
     if (cuidadorResponsavel) {

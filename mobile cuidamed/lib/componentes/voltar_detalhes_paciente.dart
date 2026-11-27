@@ -4,14 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../estado/app_estado.dart';
 
-/// Caminho da rota dos detalhes do paciente. O go_router usa o caminho como
-/// nome da página quando a rota não tem nome, e é assim que o botão abaixo
-/// encontra os detalhes na pilha de telas.
 const rotaDetalhesPaciente = '/cuidador/paciente/:pacienteId';
 
-/// "‹ Voltar para os detalhes do paciente" — no topo das telas abertas a partir
-/// dos detalhes do paciente (agenda e histórico de doses), como no VoltarDetalhesPaciente.jsx do web. Só para o cuidador: o
-/// paciente não tem a tela de detalhes.
 class VoltarDetalhesPaciente extends StatelessWidget {
   final int? pacienteId;
   const VoltarDetalhesPaciente({super.key, required this.pacienteId});
@@ -35,9 +29,6 @@ class VoltarDetalhesPaciente extends StatelessWidget {
     );
   }
 
-  /// Se os detalhes já estão na pilha (caminho normal: detalhes → agenda →
-  /// aba de encerrados), volta até eles, mantendo o painel embaixo. Se a tela
-  /// foi aberta por outro caminho (ex.: barra inferior), abre os detalhes por cima.
   static void voltar(BuildContext context, int pacienteId) {
     final roteador = GoRouter.of(context);
     var encontrouDetalhes = false;

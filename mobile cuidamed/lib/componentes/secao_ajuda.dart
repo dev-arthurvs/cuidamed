@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../utilitarios/ajuda_conteudo.dart';
 import '../utilitarios/tema.dart';
 
-/// "Para que serve" + passo a passo numerado — equivalente a SecaoAjuda.jsx.
 class SecaoAjudaConteudo extends StatelessWidget {
   final SecaoAjuda secao;
   final bool mostrarTitulo;
@@ -44,7 +43,6 @@ class SecaoAjudaConteudo extends StatelessWidget {
   }
 }
 
-/// Abre a ajuda da tela atual numa folha inferior (botão "?" do cabeçalho).
 void mostrarAjudaDaTela(BuildContext context, SecaoAjuda secao) {
   showModalBottomSheet(
     context: context,

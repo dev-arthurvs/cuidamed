@@ -12,7 +12,7 @@ void main() {
       expect(formatarTelefone('79991234567'), '(79) 99123-4567');
       expect(formatarTelefone('7933334444'), '(79) 3333-4444');
       expect(formatarTelefone('(79) 9 9912-3456'), '(79) 99912-3456');
-      expect(formatarTelefone('799912345678999'), '(79) 99123-4567'); // para no 11º dígito
+      expect(formatarTelefone('799912345678999'), '(79) 99123-4567');
       expect(formatarTelefone(''), '');
     });
   });
@@ -50,20 +50,20 @@ void main() {
         atual = mascara.formatEditUpdate(atual, valor(atual.text + d));
       }
       expect(atual.text, '(79) 99123-4567');
-      expect(atual.selection.baseOffset, atual.text.length); // cursor no fim
+      expect(atual.selection.baseOffset, atual.text.length);
       final extra = mascara.formatEditUpdate(atual, valor('${atual.text}8'));
-      expect(extra.text, '(79) 99123-4567'); // 12º dígito ignorado
+      expect(extra.text, '(79) 99123-4567');
     });
 
     test('Backspace no hífen apaga o dígito anterior (não trava)', () {
       final antes = valor('(79) 9912-3456');
-      final depois = mascara.formatEditUpdate(antes, valor(antes.text.replaceFirst('-', ''))); // removeu só o "-"
+      final depois = mascara.formatEditUpdate(antes, valor(antes.text.replaceFirst('-', '')));
       expect(depois.text, '(79) 9912-345');
       var atual = valor('(79) 99123-4567');
       for (var i = 0; i < 20 && atual.text.isNotEmpty; i++) {
         atual = mascara.formatEditUpdate(atual, valor(atual.text.substring(0, atual.text.length - 1)));
       }
-      expect(atual.text, isEmpty); // apaga tudo só com Backspace
+      expect(atual.text, isEmpty);
     });
   });
 

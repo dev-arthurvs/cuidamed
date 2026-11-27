@@ -6,7 +6,6 @@ import 'package:cuidamed_mobile/utilitarios/whatsapp.dart';
 
 import 'apoio.dart';
 
-/// A dosagem saiu do formulário de medicamento e virou opcional na API.
 void main() {
   testWidgets('Formulário de medicamento não pede dosagem', (tester) async {
     await montarPagina(tester, estadoPaciente(), '/agenda/novo', (_) => const FormularioMedicamento());

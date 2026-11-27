@@ -1,10 +1,9 @@
-/// Espelha PacienteRespostaDTO (back-end cuidamed/.../paciente/PacienteRespostaDTO.java).
 class Paciente {
   final int id;
   final String nome;
   final String email;
   final DateTime? dataNascimento;
-  final String? sexo; // FEMININO | MASCULINO | OUTRO
+  final String? sexo;
   final String? enfermidade;
   final String? telefone;
   final String? endereco;
@@ -14,12 +13,9 @@ class Paciente {
   final bool alertaManualPendente;
   final String? alertaManualMensagem;
   final bool permiteAlteracoes;
-  /// Só enquanto o paciente cadastrado pelo cuidador não ativou o acesso.
   final String? codigoAtivacao;
 
-  /// true quando o código é de nova senha (a conta já tem senha).
   final bool codigoNovaSenha;
-  /// Id do vínculo ativo com o cuidador ("nº do cartão"); null sem cuidador.
   final int? codigoVinculo;
 
   Paciente({
@@ -46,7 +42,7 @@ class Paciente {
     return Paciente(
       id: json['id'] as int,
       nome: json['nome'] as String,
-      email: json['email'] as String? ?? '', // opcional: pode entrar pelo telefone
+      email: json['email'] as String? ?? '',
       dataNascimento: json['dataNascimento'] != null ? DateTime.parse(json['dataNascimento']) : null,
       sexo: json['sexo'] as String?,
       enfermidade: json['enfermidade'] as String?,

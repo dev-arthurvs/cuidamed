@@ -4,10 +4,6 @@ import { formatarNumeroCartao } from '../utilitarios/mascaras'
 import LogoMarca from './LogoMarca'
 import './CartaoPaciente.css'
 
-// "Cartão do paciente" da tela inicial, no formato de cartão de plano de
-// saúde: identifica o paciente (nome, nascimento, sexo) e resume o dia (doses
-// tomadas, a tomar e atrasadas), com o atalho para a agenda. O nº do cartão é o
-// código do vínculo com o cuidador: só aparece quando há cuidador vinculado.
 export default function CartaoPaciente({ paciente, contagem }) {
   return (
     <section className="cartao-paciente" aria-label="Cartão do paciente">

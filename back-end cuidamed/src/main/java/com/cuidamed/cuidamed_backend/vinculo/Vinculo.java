@@ -19,11 +19,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-/**
- * Vínculo entre um paciente e um cuidador (tabela pacientecuidador), com o
- * histórico do pedido, do início e do fim. Um paciente tem no máximo um
- * vínculo ATIVO por vez.
- */
 @Entity
 @Table(name = "pacientecuidador")
 public class Vinculo {
@@ -61,7 +56,6 @@ public class Vinculo {
     protected Vinculo() {
     }
 
-    /** Pedido do paciente, aguardando o cuidador aceitar ou recusar. */
     public static Vinculo pedido(Paciente paciente, Cuidador cuidador) {
         Vinculo vinculo = new Vinculo();
         vinculo.paciente = paciente;
@@ -71,7 +65,6 @@ public class Vinculo {
         return vinculo;
     }
 
-    /** Vínculo já em vigor (ex.: cuidador cadastrou o paciente). */
     public static Vinculo ativo(Paciente paciente, Cuidador cuidador) {
         Vinculo vinculo = new Vinculo();
         vinculo.paciente = paciente;
@@ -86,7 +79,6 @@ public class Vinculo {
         iniciadoEm = LocalDateTime.now();
     }
 
-    /** Fecha o vínculo/pedido com a situação final (RECUSADO, CANCELADO ou ENCERRADO). */
     public void encerrar(SituacaoVinculo situacaoFinal) {
         situacao = situacaoFinal;
         encerradoEm = LocalDateTime.now();

@@ -4,8 +4,6 @@ import './RelatorioDoses.css'
 
 const ROTULO_STATUS = { tomado: 'Tomada', atrasado: 'Atrasada', perdido: 'Perdida' }
 
-// Relatório para levar ao médico. Fica escondido na tela e é o único conteúdo
-// impresso: "Gerar relatório" abre a impressão do navegador, que salva em PDF.
 export default function RelatorioDoses({ paciente, entradas, dataInicio, dataFim }) {
   const contar = (status) => entradas.filter((item) => item.status === status).length
   const tomadas = contar('tomado')

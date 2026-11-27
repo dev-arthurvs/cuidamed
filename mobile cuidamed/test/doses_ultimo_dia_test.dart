@@ -42,11 +42,9 @@ void main() {
         nomeMedicamento: 'Antibiotico', dosagem: '', status: 'TOMADO',
       ));
 
-    // Na Agenda, a regra de "Em uso" e "Encerrados" continua a mesma.
     expect(dados.medicamentosAtivos().map((m) => m.nome), ['Vitamina']);
 
     await montarPagina(tester, estado, '/painel', (_) => const PainelIdoso());
-    // A dose tomada aparece como anterior no carrossel e dá para voltar até ela.
     final anterior = find.byWidgetPredicate((w) => w is RichText && w.text.toPlainText().contains('Antibiotico'));
     expect(anterior, findsWidgets);
     await tester.tap(find.byTooltip('Dose anterior'));

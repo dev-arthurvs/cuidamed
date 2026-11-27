@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
-/** O web e o mobile mostram a resposta da IA como texto puro: sem marcas de formatação. */
 class ChatServiceTest {
 
     @Test

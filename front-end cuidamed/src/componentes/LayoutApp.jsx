@@ -30,7 +30,6 @@ export default function LayoutApp() {
             exit="exit"
             transition={{ duration: 0.22, ease: 'easeInOut' }}
           >
-            {/* Telas carregadas sob demanda: a barra continua na tela enquanto baixam. */}
             <Suspense fallback={null}>{outlet}</Suspense>
           </m.div>
         </AnimatePresence>

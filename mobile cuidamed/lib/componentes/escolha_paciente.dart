@@ -11,24 +11,15 @@ import 'cabecalho.dart';
 import 'cartao.dart';
 import 'data_hora_atual.dart';
 
-/// Telas que mostram dados de um paciente só. Pelo menu ou pela barra inferior,
-/// o cuidador primeiro escolhe o paciente numa lista — antes elas abriam direto
-/// no último paciente acessado. Pelos detalhes do paciente, abrem direto.
 const _rotasPorPaciente = {'/agenda', '/historico'};
 
-/// Rota usada pelo menu lateral e pela barra inferior: para o cuidador, as
-/// telas por paciente abrem com "?escolher=1" (lista de pacientes primeiro).
 String rotaDoMenu(String rota, String? tipoUsuario) =>
     tipoUsuario == 'cuidador' && _rotasPorPaciente.contains(rota) ? '$rota?escolher=1' : rota;
 
-/// A tela deve mostrar a lista de pacientes em vez dos dados?
 bool deveEscolherPaciente(BuildContext context) =>
     context.read<AppEstado>().usuario?.tipo == 'cuidador' &&
     GoRouterState.of(context).uri.queryParameters['escolher'] == '1';
 
-/// Lista de pacientes vinculados para o cuidador escolher de quem ver a tela.
-/// Ao tocar, o paciente vira o "em foco" e a tela abre por cima da lista — o
-/// botão voltar retorna para cá.
 class EscolhaPaciente extends StatelessWidget {
   final String kicker;
   final String rotaDestino;

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Agrupa dois cards lado a lado quando há largura (tablet/web) e empilha no
-/// celular — equivalente ao `.edicao-perfil__linha-dupla` do web, pra nunca
-/// sobrar um card sozinho com espaço vazio ao lado.
 class LinhaDupla extends StatelessWidget {
   final Widget esquerda;
   final Widget direita;

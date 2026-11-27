@@ -29,7 +29,6 @@ public class CuidadorService {
         if (dto.nome() == null || dto.nome().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe o nome do cuidador.");
         }
-        // E-mail ou telefone: é com um deles que o cuidador entra no app.
         verificadorDeContato.exigirEmailOuTelefone(dto.email(), dto.telefone());
         if (dto.senha() == null || dto.senha().length() < 8) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A senha deve ter no mínimo 8 caracteres.");
@@ -58,8 +57,6 @@ public class CuidadorService {
         }
 
         verificadorDeContato.exigirEmailOuTelefone(dto.email(), dto.telefone());
-        // Só quando mudou: contas antigas podem ter telefone repetido ou incompleto
-        // e não devem ficar sem conseguir salvar os outros dados.
         if (!Contato.digitos(dto.telefone()).equals(Contato.digitos(cuidador.getTelefone()))) {
             verificadorDeContato.exigirTelefoneLivre(dto.telefone(), null, id);
         }

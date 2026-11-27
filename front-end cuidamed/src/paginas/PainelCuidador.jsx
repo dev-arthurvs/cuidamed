@@ -54,7 +54,6 @@ export default function PainelCuidador() {
 
   useEffect(() => {
     carregarSolicitacoes()
-    // Pedidos de vínculo feitos no app do paciente aparecem sozinhos (a cada 30 s).
     const intervalo = setInterval(() => {
       if (!document.hidden) carregarSolicitacoes()
     }, 30000)
@@ -191,7 +190,6 @@ export default function PainelCuidador() {
   }
 
   const emAtencao = pacientesComResumo.filter((paciente) => paciente.precisaAtencao).length
-  // Só os ativos: medicamentos de tratamentos encerrados não estão mais sendo monitorados.
   const totalMedicamentos = pacientesComResumo.reduce((soma, paciente) => soma + paciente.medicamentosAtivos.length, 0)
   const adesaoMedia = pacientesComResumo.length
     ? Math.round(pacientesComResumo.reduce((soma, paciente) => soma + paciente.pct, 0) / pacientesComResumo.length)

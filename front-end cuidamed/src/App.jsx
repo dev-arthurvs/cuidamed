@@ -5,7 +5,6 @@ import RotaProtegida from './componentes/RotaProtegida'
 import { useApp } from './contexto/useApp'
 import Login from './paginas/Login'
 
-// Telas carregadas só quando abertas: quem está no login não baixa os painéis.
 const Acessibilidade = lazy(() => import('./paginas/Acessibilidade'))
 const AgendaMedicamentos = lazy(() => import('./paginas/AgendaMedicamentos'))
 const Cadastro = lazy(() => import('./paginas/Cadastro'))
@@ -16,7 +15,6 @@ const Historico = lazy(() => import('./paginas/Historico'))
 const PainelCuidador = lazy(() => import('./paginas/PainelCuidador'))
 const PainelIdoso = lazy(() => import('./paginas/PainelIdoso'))
 
-// O antigo "Painel do paciente" agora faz parte dos detalhes do paciente.
 function RedirecionarParaDetalhes() {
   const { pacienteId } = useParams()
   return <Navigate to={`/cuidador/paciente/${pacienteId}`} replace />
@@ -30,7 +28,6 @@ function PainelPrincipal() {
 export default function App() {
   const { autenticado, carregandoSessao } = useApp()
 
-  // Recarregando a sessão salva: não decide ainda entre login e painel.
   if (carregandoSessao) return null
 
   return (
@@ -46,7 +43,6 @@ export default function App() {
           <Route path="/cuidador/paciente/:pacienteId" element={<PainelCuidador />} />
           <Route path="/cuidador/paciente/:pacienteId/painel" element={<RedirecionarParaDetalhes />} />
           <Route path="/agenda" element={<AgendaMedicamentos />} />
-          {/* Tratamentos encerrados viraram a aba "Encerrados" da Agenda. */}
           <Route path="/ciclos-encerrados" element={<Navigate to="/agenda?aba=encerrados" replace />} />
           <Route path="/historico" element={<Historico />} />
           <Route path="/historico/:pacienteId" element={<Historico />} />

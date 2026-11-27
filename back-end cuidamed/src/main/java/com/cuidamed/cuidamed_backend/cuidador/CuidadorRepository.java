@@ -11,7 +11,6 @@ public interface CuidadorRepository extends JpaRepository<Cuidador, Long> {
 
     Optional<Cuidador> findByEmail(String email);
 
-    /** Pelo telefone, comparando só os dígitos (o número fica salvo com máscara). */
     @Query(value = "SELECT * FROM cuidador WHERE regexp_replace(COALESCE(telefone_cui, ''), '[^0-9]', '', 'g') = :digitos",
             nativeQuery = true)
     List<Cuidador> findByTelefoneDigitos(@Param("digitos") String digitos);

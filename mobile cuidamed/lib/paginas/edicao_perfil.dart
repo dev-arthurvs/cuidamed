@@ -28,9 +28,6 @@ String _iniciais(String nome) {
 String _formatarData(DateTime data) =>
     '${data.day.toString().padLeft(2, '0')}/${data.month.toString().padLeft(2, '0')}/${data.year}';
 
-/// Tela de Configurações — equivalente a paginas/EdicaoPerfil.jsx do web: dados
-/// pessoais, senha, aparência (tamanho da fonte; o tema entra com o modo escuro
-/// do mobile) e (paciente) cuidador responsável/vínculo.
 class EdicaoPerfil extends StatefulWidget {
   const EdicaoPerfil({super.key});
 
@@ -218,8 +215,6 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
     final ehPaciente = usuario.tipo == 'paciente';
     final paciente = estado.pacienteFoco?.paciente;
 
-    // Paciente: card do cuidador (vinculado, pedido pendente ou formulário de
-    // vínculo), ao lado da Aparência.
     Widget? cartaoCuidador;
     if (ehPaciente) {
       if (_cuidadorResponsavel != null && paciente?.cuidadorId != null) {
@@ -468,7 +463,6 @@ class _EdicaoPerfilState extends State<EdicaoPerfil> {
   }
 }
 
-/// Botões Pequena / Média / Grande — reaproveitado na tela de Acessibilidade.
 class SeletorTamanhoFonte extends StatelessWidget {
   final AppEstado estado;
   const SeletorTamanhoFonte({super.key, required this.estado});
@@ -495,7 +489,6 @@ class SeletorTamanhoFonte extends StatelessWidget {
   }
 }
 
-/// Botões Claro / Escuro — mesma escolha da chave do menu (como no web).
 class _SeletorTema extends StatelessWidget {
   final AppEstado estado;
   const _SeletorTema({required this.estado});

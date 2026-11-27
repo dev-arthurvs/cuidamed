@@ -22,11 +22,6 @@ import com.cuidamed.cuidamed_backend.medicamento.Horario;
 import com.cuidamed.cuidamed_backend.medicamento.Medicamento;
 import com.cuidamed.cuidamed_backend.paciente.Paciente;
 
-/**
- * Monta o texto com os dados do paciente que vai para a IA. Próxima dose, doses
- * atrasadas/perdidas e estoque já vão calculados, para a IA não fazer contas.
- * Mesmas regras do web (utilitarios/horarios.js) e do mobile (utilitarios/horarios.dart).
- */
 final class ContextoDoChat {
 
     private static final int TOLERANCIA_ATRASO_MIN = 15;
@@ -48,7 +43,6 @@ final class ContextoDoChat {
     private ContextoDoChat() {
     }
 
-    /** @param nomeCuidador nome do cuidador do vínculo ativo; null se o paciente não tem cuidador. */
     static String montar(Paciente paciente, String nomeCuidador, List<Medicamento> medicamentos,
             List<Historico> historico, LocalDateTime agora) {
         LocalDate hoje = agora.toLocalDate();
@@ -69,8 +63,6 @@ final class ContextoDoChat {
                 .filter(medicamento -> !encerrados.contains(medicamento) && medicamento.getDataInicio() != null
                         && medicamento.getDataInicio().isAfter(hoje))
                 .toList();
-        // Tratamento com início no futuro ainda não é "ativo": sem essa separação
-        // a IA mandava tomar hoje um remédio que só começa amanhã.
         List<Medicamento> ativos = medicamentos.stream()
                 .filter(medicamento -> !encerrados.contains(medicamento) && !aIniciar.contains(medicamento))
                 .toList();
@@ -119,7 +111,6 @@ final class ContextoDoChat {
             texto.append("Observações clínicas: ").append(paciente.getObservacoesClinicas()).append('\n');
         }
         texto.append("Cuidador: ").append(nomeCuidador != null ? nomeCuidador : "não tem cuidador vinculado").append('\n');
-        // Mesma regra de Autorizacao: sem cuidador, o paciente altera os próprios remédios.
         boolean podeAlterar = nomeCuidador == null || paciente.isPermiteAlteracoes();
         texto.append("Pode inserir, editar e excluir os próprios remédios: ").append(podeAlterar ? "sim" : "não").append('\n');
     }
@@ -173,7 +164,6 @@ final class ContextoDoChat {
         }
     }
 
-    /** Doses de hoje e dos últimos dias: as registradas e as que passaram sem registro. */
     private static void escreverDoses(StringBuilder texto, List<Medicamento> medicamentos, List<Historico> historico,
             Set<String> registrados, LocalDateTime agora) {
         LocalDate hoje = agora.toLocalDate();
@@ -220,7 +210,6 @@ final class ContextoDoChat {
         }
     }
 
-    // Dose sem registro não é gravada: atrasada de 15 min a 3 h, perdida depois disso.
     private static String situacaoSemRegistro(LocalDate dia, LocalTime hora, LocalDateTime agora) {
         if (dia.isBefore(agora.toLocalDate())) {
             return "perdida (sem registro)";
@@ -250,7 +239,6 @@ final class ContextoDoChat {
         return dia == null ? Optional.empty() : Optional.of(new Dose(medicamento, dia, horarios.get(0)));
     }
 
-    /** Próximo dia (a partir de aPartirDe, inclusive) com dose; null se o tratamento acaba antes. */
     private static LocalDate proximoDiaDeDose(Medicamento medicamento, LocalDate aPartirDe) {
         LocalDate inicio = medicamento.getDataInicio();
         LocalDate dia = inicio != null && inicio.isAfter(aPartirDe) ? inicio : aPartirDe;
@@ -273,7 +261,6 @@ final class ContextoDoChat {
         }
         int dosesPorDia = Math.max(1, medicamento.getHorarios().size());
         int consumoPorDose = consumoPorDose(medicamento);
-        // Dias de calendário: em "Dias alternados"/"Semanal" cada dia de dose rende 2/7 dias.
         int diasRestantes = quantidade / (dosesPorDia * consumoPorDose) * intervaloEntreDiasDeDose(medicamento);
         Integer necessarias = unidadesAteOFim(medicamento, historico, hoje, dosesPorDia, consumoPorDose);
 
@@ -282,7 +269,6 @@ final class ContextoDoChat {
         if (quantidade <= 0 && (necessarias == null || necessarias != 0)) {
             return texto + " — esgotado, precisa repor" + compra;
         }
-        // Se o que tem cobre tudo o que falta tomar até a data final, não precisa comprar.
         if (necessarias != null && quantidade >= necessarias) {
             return texto + " — suficiente até o fim do tratamento";
         }
@@ -291,7 +277,6 @@ final class ContextoDoChat {
         return texto + " — " + (diasRestantes <= LIMIAR_DIAS_ESTOQUE_BAIXO ? "baixo, " : "") + duracao + compra;
     }
 
-    // Só existe com data final: em uso contínuo não há como saber o total do tratamento.
     private static String quantoComprar(Medicamento medicamento, int quantidade, Integer necessarias) {
         if (necessarias == null || necessarias <= quantidade) {
             return "";
@@ -299,7 +284,6 @@ final class ContextoDoChat {
         return " — para terminar o tratamento, precisa comprar " + quantidade(medicamento, necessarias - quantidade);
     }
 
-    // Unidades que ainda serão consumidas até o fim do tratamento. null em uso contínuo.
     private static Integer unidadesAteOFim(Medicamento medicamento, List<Historico> historico, LocalDate hoje,
             int dosesPorDia, int consumoPorDose) {
         LocalDate fim = medicamento.getDataFim();
@@ -339,7 +323,6 @@ final class ContextoDoChat {
                 : medicamento.getFrequencia() == FrequenciaMedicamento.SEMANAL ? 7 : 1;
     }
 
-    // Sem quantidade por dose (ou com zero, que dividiria por zero), conta 1 unidade.
     private static int consumoPorDose(Medicamento medicamento) {
         Integer porDose = medicamento.getQuantidadePorDose();
         return porDose == null || porDose <= 0 ? 1 : porDose;
@@ -367,7 +350,6 @@ final class ContextoDoChat {
         return data == null ? "não informado" : data.format(DATA_BR);
     }
 
-    // Dosagem é opcional: sem ela, só o nome (nada de "Losartana null").
     private static String nomeComDosagem(Medicamento medicamento) {
         String dosagem = medicamento.getDosagem();
         return dosagem == null || dosagem.isBlank() ? medicamento.getNome() : medicamento.getNome() + " " + dosagem;

@@ -20,21 +20,17 @@ import {
 import FormularioMedicamento from './FormularioMedicamento'
 import './AgendaMedicamentos.css'
 
-// "dura 3 dias" / "dura 1 dia" / "não dá para o dia todo" (antes: "dura ~0 dias").
 function descreverDuracao(dias) {
   if (dias <= 0) return 'não dá para o dia todo'
   return `dura ${dias} dia${dias === 1 ? '' : 's'}`
 }
 
-// "1 medicamento em uso" / "3 medicamentos em uso".
 function contar(quantidade, singular, plural) {
   return `${quantidade} ${quantidade === 1 ? singular : plural}`
 }
 
 export default function AgendaMedicamentos() {
   const { pacienteFoco, usuario, excluirMedicamento, mostrarToast } = useApp()
-  // Aba na URL (?aba=encerrados), para onde vai o endereço antigo
-  // /ciclos-encerrados. Sem ela, abre em "Em uso".
   const [parametros, setParametros] = useSearchParams()
   const aba = parametros.get('aba') === 'encerrados' ? 'encerrados' : 'em-uso'
 
@@ -65,7 +61,6 @@ export default function AgendaMedicamentos() {
     medicamentoEncerrado(medicamento, undefined, pacienteFoco.historico),
   )
   const kicker = usuario.tipo === 'cuidador' ? `Agenda de ${pacienteFoco.nome.split(' ')[0]}` : 'Agenda de medicamentos'
-  // Paciente sem cuidador cuida da própria agenda; com cuidador, só se ele liberou.
   const podeEditar = usuario.tipo === 'cuidador' || !pacienteFoco.cuidadorId || pacienteFoco.permiteAlteracoes
 
   async function confirmarExclusao() {

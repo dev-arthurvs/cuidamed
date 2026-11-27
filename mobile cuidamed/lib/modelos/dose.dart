@@ -1,9 +1,5 @@
-/// Modelo calculado no cliente (não vem direto da API) — uma linha de
-/// "doses de hoje", juntando um horário de um Medicamento com o status
-/// atual (calculado em utilitarios/horarios.dart) ou o registro já
-/// confirmado em Historico, quando existir.
 class Dose {
-  final String id; // "${medicamentoId}-${horario}"
+  final String id;
   final int medicamentoId;
   final String horario;
   final String nome;
@@ -11,7 +7,7 @@ class Dose {
   final String forma;
   final int? quantidadePorDose;
   final DateTime? dataFim;
-  final String status; // pendente | atrasado | perdido | tomado
+  final String status;
 
   Dose({
     required this.id,

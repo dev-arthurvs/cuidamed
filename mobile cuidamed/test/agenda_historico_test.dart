@@ -15,7 +15,7 @@ void main() {
     await montarPagina(tester, estadoPaciente(), '/agenda', (_) => const AgendaMedicamentos());
     expect(find.text('1 medicamento em uso'), findsOneWidget);
     expect(find.text('Losartana'), findsOneWidget);
-    expect(find.text('Amoxicilina'), findsNothing); // tratamento já encerrado
+    expect(find.text('Amoxicilina'), findsNothing);
     expect(find.text('Em uso'), findsOneWidget);
     expect(find.text('Encerrados'), findsOneWidget);
 
@@ -32,8 +32,8 @@ void main() {
     expect(find.text('Agenda de Maria'.toUpperCase()), findsOneWidget);
     final abas = tester.getRect(find.text('Encerrados'));
     final inserir = tester.getRect(find.text('+ Inserir medicamento'));
-    expect(inserir.top, greaterThan(abas.bottom)); // celular: empilhado abaixo das abas
-    expect(find.textContaining('Cadastre, edite ou remova'), findsNothing); // sem texto de finalidade
+    expect(inserir.top, greaterThan(abas.bottom));
+    expect(find.textContaining('Cadastre, edite ou remova'), findsNothing);
 
     await rolarAte(tester, find.text('Excluir'));
     await tester.tap(find.text('Excluir'));
@@ -45,7 +45,6 @@ void main() {
     expect(find.text('Excluir medicamento?'), findsNothing);
     expect(find.text('Losartana'), findsOneWidget);
 
-    // Tela larga: abas à esquerda e o botão na mesma linha, à direita, como no web.
     await montarPagina(tester, estadoCuidador(), '/agenda', (_) => const AgendaMedicamentos(), tamanho: const Size(1200, 900));
     final d = tester.getRect(find.text('Encerrados'));
     final b = tester.getRect(find.text('+ Inserir medicamento'));
@@ -79,7 +78,6 @@ void main() {
     expect(find.text('+ Inserir medicamento'), findsNothing);
     expect(find.text('Editar'), findsNothing);
 
-    // Volta para "Em uso".
     await tester.tap(find.text('Em uso'));
     await tester.pumpAndSettle();
     expect(find.text('Losartana'), findsOneWidget);
@@ -98,7 +96,7 @@ void main() {
     expect(find.text('Excluir'), findsNothing);
     final lista = tester.getSize(find.byType(LayoutBuilder).last).width;
     final card = tester.getSize(find.ancestor(of: find.text('Amoxicilina'), matching: find.byType(SizedBox)).last).width;
-    expect(card, closeTo((lista - 28) / 3, 1)); // um card só não estica na linha toda
+    expect(card, closeTo((lista - 28) / 3, 1));
   });
 
   testWidgets('Histórico filtra por datas De/Até (padrão: só hoje)', (tester) async {
@@ -111,26 +109,22 @@ void main() {
       nomeMedicamento: 'Amoxicilina', dosagem: '500mg', status: 'PERDIDO',
     ));
     await montarPagina(tester, estado, '/historico', (_) => const HistoricoPagina());
-    expect(find.text('7 dias'), findsNothing); // os botões de período saíram
+    expect(find.text('7 dias'), findsNothing);
     expect(find.text('De'), findsOneWidget);
     expect(find.text('Até'), findsOneWidget);
     expect(find.text('08:00'), findsOneWidget);
-    expect(find.text('06:00'), findsNothing); // registro de 10 dias atrás fora do padrão "hoje"
+    expect(find.text('06:00'), findsNothing);
 
-    // "De" = 10 dias atrás, digitada no calendário em português (dia/mês/ano).
     await tester.tap(find.text('De'));
     await tester.pumpAndSettle();
-    expect(find.text('Cancelar'), findsOneWidget); // calendário em português
-    await tester.tap(find.byIcon(Icons.edit_outlined)); // modo de digitação
+    expect(find.text('Cancelar'), findsOneWidget);
+    await tester.tap(find.byIcon(Icons.edit_outlined));
     await tester.pumpAndSettle();
     String dd(int n) => n.toString().padLeft(2, '0');
     await tester.enterText(find.byType(TextField).last, '${dd(antiga.day)}/${dd(antiga.month)}/${antiga.year}');
     await tester.tap(find.text('OK'));
     await tester.pumpAndSettle();
-    // O registro de 10 dias atrás aparece, junto com as doses daqueles dias que
-    // passaram sem registro (contam como perdidas, como no Início).
     expect(find.text('08:00'), findsWidgets);
-    // Os mais antigos ficam no fim da lista: rola até aparecerem.
     for (var i = 0; i < 40 && find.text('06:00').evaluate().isEmpty; i++) {
       await tester.drag(find.byType(ListView).first, const Offset(0, -400));
       await tester.pump();
@@ -169,7 +163,6 @@ void main() {
   });
 
   testWidgets('Card do próximo medicamento mostra a quantidade por dose (ou a dosagem, se não houver)', (tester) async {
-    // Dose às 23:59: é sempre a próxima, a qualquer hora que o teste rode.
     AppEstado estadoCom({int? porDose}) {
       final estado = estadoPaciente();
       final dados = estado.pacientes.first;
@@ -186,10 +179,9 @@ void main() {
     }
 
     await montarPagina(tester, estadoCom(porDose: 1), '/painel', (_) => const PainelIdoso());
-    expect(find.text('1 comp'), findsOneWidget); // 1 comprimido por dose
+    expect(find.text('1 comp'), findsOneWidget);
     expect(find.text('50mg'), findsNothing);
 
-    // Sem quantidade por dose cadastrada: mostra a dosagem, como o lembrete do WhatsApp.
     await montarPagina(tester, estadoCom(), '/painel', (_) => const PainelIdoso());
     expect(find.text('50mg'), findsOneWidget);
   });

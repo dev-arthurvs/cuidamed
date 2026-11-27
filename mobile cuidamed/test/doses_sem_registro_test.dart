@@ -29,7 +29,6 @@ Historico _registro(int medId, String nome, DateTime dia, String hora, String st
       status: status,
     );
 
-/// Mesmo caso da Margarida: 3 remédios, 7 doses no dia, só 2 registradas.
 void main() {
   final hoje = DateTime(2026, 10, 30);
   final agora = DateTime(2026, 10, 30, 7, 20);
@@ -45,7 +44,6 @@ void main() {
 
   test('Doses que passaram do horário sem registro entram no histórico', () {
     final semRegistro = dosesSemRegistro(1, medicamentos, historico, hoje, hoje, agora: agora);
-    // 02:00 e 03:00 do Teste 2; 01:30, 02:30 e 03:30 do Teste 3. O 09:00 ainda não chegou.
     expect(semRegistro.map((h) => '${h.nomeMedicamento} ${h.hora}'), [
       'Teste 2 02:00',
       'Teste 2 03:00',
@@ -53,7 +51,7 @@ void main() {
       'Teste 3 02:30',
       'Teste 3 03:30',
     ]);
-    expect(semRegistro.every((h) => h.status == 'PERDIDO'), isTrue); // mais de 3 h de atraso
+    expect(semRegistro.every((h) => h.status == 'PERDIDO'), isTrue);
   });
 
   test('Hoje, dose com menos de 3 h de atraso aparece como atrasada', () {
@@ -64,7 +62,7 @@ void main() {
   test('Dias anteriores sem registro: perdida; antes do início do tratamento: nada', () {
     final ontem = hoje.subtract(const Duration(days: 1));
     final semRegistro = dosesSemRegistro(1, medicamentos, const [], ontem, ontem, agora: agora);
-    expect(semRegistro, isEmpty); // os três começaram hoje
+    expect(semRegistro, isEmpty);
     final depois = dosesSemRegistro(1, medicamentos, const [], hoje, DateTime(2026, 10, 31),
         agora: DateTime(2026, 10, 31, 0, 30));
     expect(depois.where((h) => h.data == hoje).every((h) => h.status == 'PERDIDO'), isTrue);

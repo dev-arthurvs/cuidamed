@@ -9,10 +9,6 @@ import '../utilitarios/ajuda_conteudo.dart';
 import '../utilitarios/tema.dart';
 import 'data_hora_atual.dart';
 
-/// Ícone de comprimido estilizado ao lado do nome "CuidaMed", mesmo padrão
-/// de logo do front-end web (front-end cuidamed/src/componentes/LogoMarca.jsx).
-/// [claro]: versão sobre fundo azul — ícone quadrado translúcido e texto
-/// branco, como o `fundo="transparente" corTexto="claro"` do web.
 class LogoCuidaMed extends StatelessWidget {
   final double tamanho;
   final double tamanhoTexto;
@@ -31,10 +27,6 @@ class LogoCuidaMed extends StatelessWidget {
               ? BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(tamanho * 0.22))
               : BoxDecoration(gradient: CorApp.gradienteAzul, shape: BoxShape.circle),
           child: Center(
-            // Mesmo comprimido do web (.logo-marca__capsula): pílula branca girada
-            // 45°, com a metade esquerda em azul-claro recortada pelas bordas
-            // arredondadas (clip = o overflow: hidden do CSS). Sem o recorte, a
-            // metade colorida vazava como um retângulo escuro atrás da pílula.
             child: Transform.rotate(
               angle: -math.pi / 4,
               child: Container(
@@ -56,8 +48,6 @@ class LogoCuidaMed extends StatelessWidget {
           ),
         ),
         SizedBox(width: tamanho * 0.32),
-        // Text.rich (e não RichText) pra herdar a fonte do tema. A logo é marca,
-        // não texto de leitura: não cresce com a opção "fonte grande".
         Text.rich(
           textScaler: TextScaler.noScaling,
           TextSpan(
@@ -73,17 +63,13 @@ class LogoCuidaMed extends StatelessWidget {
   }
 }
 
-/// AppBar padrão das telas internas: logo + título da seção (kicker) + título
-/// grande da página — equivalente a componentes/Cabecalho.jsx do web.
 class Cabecalho extends StatelessWidget implements PreferredSizeWidget {
   final String kicker;
   final String titulo;
   final List<Widget>? acoes;
 
-  /// Mostra, à direita, data/hora (só em tela larga, como o web) e o avatar do usuário.
   final bool mostrarUsuario;
 
-  /// Largura a partir da qual a data/hora cabe no cabeçalho (o web esconde abaixo de 640px).
   static const larguraComDataHora = 640.0;
 
   const Cabecalho({super.key, required this.kicker, required this.titulo, this.acoes, this.mostrarUsuario = false});
@@ -92,7 +78,6 @@ class Cabecalho extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       toolbarHeight: 72,
-      // O ☰ e o "?" ficam na faixa da logo, acima (ver BarraComLogo).
       automaticallyImplyLeading: false,
       titleSpacing: 20,
       title: Column(
@@ -132,13 +117,12 @@ class Cabecalho extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(73);
 }
 
-/// Seção do guia correspondente à rota atual (botão "?", como no web).
 SecaoAjuda? secaoAjudaDaRotaAtual(BuildContext context) {
   try {
     final rota = GoRouterState.of(context).matchedLocation;
     final tipo = context.read<AppEstado>().usuario?.tipo ?? 'paciente';
     return obterSecaoAjuda(rota, tipo);
   } catch (_) {
-    return null; // fora de uma rota do GoRouter (ex.: página empilhada via Navigator)
+    return null;
   }
 }

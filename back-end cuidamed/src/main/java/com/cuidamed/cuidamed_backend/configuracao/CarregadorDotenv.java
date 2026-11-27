@@ -11,11 +11,6 @@ import org.springframework.boot.env.EnvironmentPostProcessor;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.PropertiesPropertySource;
 
-/**
- * Lê o arquivo .env na raiz do projeto (se existir) e injeta suas chaves como
- * propriedades do Spring, do mesmo jeito que variáveis de ambiente reais
- * seriam lidas. Evita depender de uma lib externa de dotenv.
- */
 public class CarregadorDotenv implements EnvironmentPostProcessor {
 
     @Override

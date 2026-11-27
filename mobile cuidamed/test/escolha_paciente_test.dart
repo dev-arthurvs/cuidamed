@@ -9,7 +9,6 @@ import 'package:cuidamed_mobile/paginas/historico.dart';
 
 import 'apoio.dart';
 
-/// Cuidador com dois pacientes; o "em foco" (último acessado) é a Maria.
 AppEstado _cuidadorComDois() {
   final estado = estadoCuidador();
   final maria = estado.pacientes.first;

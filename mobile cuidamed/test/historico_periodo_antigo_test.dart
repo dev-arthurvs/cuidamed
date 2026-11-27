@@ -39,7 +39,7 @@ void main() {
             return resposta.future;
           },
         ));
-    expect(chamadas, isEmpty); // período padrão (hoje) não busca nada
+    expect(chamadas, isEmpty);
 
     await _escolherDe(tester, antiga);
     expect(chamadas.length, 1);
@@ -56,7 +56,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Carregando...'), findsNothing);
     expect(find.text('06:00'), findsOneWidget);
-    expect(chamadas.length, 1); // redesenhar a tela não busca de novo
+    expect(chamadas.length, 1);
   });
 
   testWidgets('Falha ao buscar o período antigo: avisa e não inventa doses perdidas', (tester) async {

@@ -23,8 +23,6 @@ public class Paciente {
     @Column(name = "id_pac")
     private Long id;
 
-    // O cuidador (e o pedido de vínculo) fica na tabela pacientecuidador — ver vinculo/Vinculo.
-
     @Column(name = "nome_pac", nullable = false, length = 150)
     private String nome;
 
@@ -62,12 +60,9 @@ public class Paciente {
     @Column(name = "permitealteracoes_pac", nullable = false)
     private boolean permiteAlteracoes = false;
 
-    // Existe enquanto o paciente cadastrado pelo cuidador não ativou o acesso, ou
-    // quando o cuidador gerou um código para ele criar uma senha nova.
     @Column(name = "codigoativacao_pac", length = 12)
     private String codigoAtivacao;
 
-    // Só no código de nova senha (a conta já tem senha); nulo = não expira.
     @Column(name = "codigoexpiraem_pac")
     private LocalDateTime codigoExpiraEm;
 
@@ -191,7 +186,6 @@ public class Paciente {
         this.codigoExpiraEm = codigoExpiraEm;
     }
 
-    /** O código que ainda pode ser usado; null se não há ou se já venceu. */
     public String getCodigoValido() {
         boolean vencido = codigoExpiraEm != null && !codigoExpiraEm.isAfter(LocalDateTime.now());
         return vencido ? null : codigoAtivacao;

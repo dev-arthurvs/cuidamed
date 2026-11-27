@@ -4,9 +4,6 @@ import '../utilitarios/animacoes.dart';
 import '../utilitarios/tema.dart';
 import 'botao.dart';
 
-/// Janela "Tem certeza?" — equivalente ao ModalConfirmacao.jsx do web: título,
-/// mensagem, "Cancelar" com contorno e o botão de confirmar vermelho cheio.
-/// Devolve true só quando o usuário confirma.
 Future<bool> confirmarAcao(
   BuildContext context, {
   required String titulo,

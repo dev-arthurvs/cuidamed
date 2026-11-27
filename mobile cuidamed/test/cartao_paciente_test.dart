@@ -8,7 +8,6 @@ import 'package:cuidamed_mobile/paginas/painel_idoso.dart';
 
 import 'apoio.dart';
 
-/// Paciente com cuidador vinculado (vínculo nº 12).
 AppEstado _comVinculo() {
   final estado = estadoPaciente(cuidadorId: 5);
   final d = estado.pacientes.first;
@@ -40,14 +39,14 @@ void main() {
   testWidgets('Tela inicial: cartão com dados do paciente, contadores e atalho da agenda', (tester) async {
     await montarPagina(tester, estadoPaciente(), '/painel', (_) => const PainelIdoso());
     expect(find.byType(CartaoPaciente), findsOneWidget);
-    expect(find.text('MARIA DA SILVA'), findsOneWidget); // nome completo em caixa alta
-    expect(find.text('10/03/1950'), findsOneWidget); // nascimento
-    expect(find.text('Feminino'), findsOneWidget); // sexo
-    expect(find.text('Nº DO CARTÃO'), findsNothing); // sem cuidador vinculado, sem número
+    expect(find.text('MARIA DA SILVA'), findsOneWidget);
+    expect(find.text('10/03/1950'), findsOneWidget);
+    expect(find.text('Feminino'), findsOneWidget);
+    expect(find.text('Nº DO CARTÃO'), findsNothing);
     for (final rotulo in ['Tomados', 'A tomar', 'Atrasados']) {
       expect(find.descendant(of: find.byType(CartaoPaciente), matching: find.text(rotulo)), findsOneWidget);
     }
-    await rolarAte(tester, find.text('Ver agenda completa ›')); // no celular, o cartão fica abaixo da dose
+    await rolarAte(tester, find.text('Ver agenda completa ›'));
     await tester.tap(find.text('Ver agenda completa ›'));
     await tester.pumpAndSettle();
     expect(find.text('rota /agenda'), findsOneWidget);
@@ -63,7 +62,7 @@ void main() {
     await montarPagina(tester, estadoPaciente(), '/painel', (_) => const PainelIdoso(), tamanho: const Size(1300, 900));
     final cartao = tester.getRect(find.byType(CartaoPaciente));
     final proximo = tester.getRect(find.text('Doses de hoje'));
-    expect(cartao.left, greaterThan(proximo.right)); // dose à esquerda, cartão à direita
+    expect(cartao.left, greaterThan(proximo.right));
 
     await montarPagina(tester, estadoPaciente(), '/painel', (_) => const PainelIdoso());
     expect(

@@ -1,8 +1,6 @@
 import { montarLinkWhatsApp } from '../utilitarios/whatsapp'
 import './BotaoWhatsApp.css'
 
-// Só faz sentido lembrar de uma dose que ainda pode ser tomada (ou que já foi
-// perdida, como reforço pra próxima) — não de uma que já foi tomada.
 const STATUS_VISIVEIS = new Set(['pendente', 'atrasado', 'perdido'])
 
 export default function BotaoWhatsApp({ nomePaciente, telefone, medicamento, dosagem, forma, quantidadePorDose, dataFim, horario, status }) {

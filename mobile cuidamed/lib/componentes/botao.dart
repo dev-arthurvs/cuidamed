@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import '../utilitarios/tema.dart';
 
-/// perigo = contorno vermelho (ex.: "Excluir" nos cards); perigoCheio = vermelho
-/// sólido com texto branco (botão de confirmar do ModalConfirmacao do web).
-/// sobreAzul = texto e contorno brancos, pra botões em cima de cards com o
-/// gradiente azul (ex.: "Registrar dose" no Início do paciente).
-/// solido = azul sólido e escuro (sem degradê), mais sóbrio — telas de login/cadastro.
 enum VarianteBotao { primario, solido, secundario, contorno, perigo, perigoCheio, sobreAzul }
 
 class Botao extends StatelessWidget {
@@ -16,8 +11,6 @@ class Botao extends StatelessWidget {
   final IconData? icone;
   final bool larguraTotal;
 
-  /// Versão menor (44 px, texto 15) — equivalente ao `tamanho="pequeno"` do web,
-  /// pra botões no cabeçalho de cards.
   final bool compacto;
 
   const Botao({
@@ -36,8 +29,6 @@ class Botao extends StatelessWidget {
     final desabilitado = onPressed == null || carregando;
     final altura = compacto ? 44.0 : 56.0;
     final tamanhoTexto = compacto ? 15.0 : 17.0;
-    // Respiro lateral quando o botão tem a largura do conteúdo — sem isso o
-    // texto encosta nas bordas (era o caso do "+ Cadastrar" no painel).
     final paddingLateral = EdgeInsets.symmetric(horizontal: compacto ? 16 : 22);
     final conteudo = carregando
         ? const SizedBox(
@@ -49,8 +40,6 @@ class Botao extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               if (icone != null) ...[Icon(icone, size: compacto ? 19 : 22), SizedBox(width: compacto ? 8 : 10)],
-              // Encolhe o texto em vez de estourar quando o botão é estreito
-              // (ex.: 3 botões lado a lado com fonte "Grande").
               Flexible(
                 child: FittedBox(
                   fit: BoxFit.scaleDown,
@@ -60,8 +49,6 @@ class Botao extends StatelessWidget {
             ],
           );
 
-    // Size.fromHeight = largura infinita: só serve quando o botão ocupa a
-    // linha toda; compacto (ex.: dentro de uma Row) precisa de largura finita.
     final tamanhoMinimo = larguraTotal ? Size.fromHeight(altura) : Size(64, altura);
 
     Widget botao;
@@ -87,7 +74,6 @@ class Botao extends StatelessWidget {
                 height: altura,
                 padding: larguraTotal ? null : paddingLateral,
                 alignment: Alignment.center,
-                // merge (e não DefaultTextStyle puro) pra manter a fonte do tema e só trocar a cor.
                 child: DefaultTextStyle.merge(style: const TextStyle(color: Colors.white), child: conteudo),
               ),
             ),
@@ -169,7 +155,6 @@ class Botao extends StatelessWidget {
   }
 }
 
-/// O botão "afunda" 1 px enquanto é pressionado — igual ao `.botao:active` do web.
 class _EfeitoPressionar extends StatefulWidget {
   final bool ativo;
   final Widget child;

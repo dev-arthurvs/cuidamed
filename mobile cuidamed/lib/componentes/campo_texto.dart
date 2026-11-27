@@ -12,21 +12,15 @@ class CampoTexto extends StatefulWidget {
   final Widget? sufixo;
   final String? Function(String?)? validador;
   final void Function(String)? onChanged;
-  /// Rótulo em negrito acima do campo (padrão do web), em vez de flutuante dentro dele.
   final bool rotuloExterno;
   final void Function(String)? onSubmitted;
 
-  /// Ícone dentro do campo, à esquerda (ex.: envelope no e-mail).
   final IconData? icone;
 
-  /// Em campos de senha: "olho" para mostrar/esconder o que foi digitado.
   final bool alternarSenha;
 
-  /// Fundo branco com borda fina (campos das telas de login/cadastro), em vez
-  /// do azul-claro padrão do tema.
   final bool fundoBranco;
 
-  /// Campo "E-mail ou telefone": só números ganham a máscara de telefone.
   final bool emailOuTelefone;
 
   const CampoTexto({
@@ -68,7 +62,6 @@ class _CampoTextoState extends State<CampoTexto> {
       controller: widget.controller,
       obscureText: widget.senha && !_senhaVisivel,
       keyboardType: widget.tipoTeclado,
-      // Teclado de telefone = campo de telefone: máscara "(79) 99999-9999".
       inputFormatters: widget.emailOuTelefone
           ? const [MascaraEmailOuTelefone()]
           : widget.tipoTeclado == TextInputType.phone

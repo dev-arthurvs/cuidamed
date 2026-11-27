@@ -15,7 +15,6 @@ export default function Login() {
   const navegar = useNavigate()
   const [login, setLogin] = useState(lerLoginLembrado)
   const [senha, setSenha] = useState('')
-  // Marcado por padrão quando a pessoa já tinha pedido para ser lembrada.
   const [lembrar, setLembrar] = useState(() => lerLoginLembrado() !== '')
   const [entrando, setEntrando] = useState(false)
 

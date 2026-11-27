@@ -13,23 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Limita quantas vezes algo pode acontecer numa janela de tempo, por chave
- * (ex.: "login:maria@email.com", "chat:12"). Protege contra quem tenta
- * adivinhar senhas/códigos e contra gasto descontrolado com a IA.
- *
- * <p>Os limites são por conta (e-mail ou paciente), não por endereço IP: no
- * Railway todas as requisições passam pelo proxy dele, e um limite por IP
- * bloquearia todo mundo junto ou poderia ser burlado com cabeçalhos falsos.
- *
- * <p>Fica em memória: vale para um servidor só (o caso do Railway) e zera
- * quando ele reinicia.
- */
 @Component
 public class LimitadorDeTentativas {
 
-    // Acima disso, limpa as chaves sem eventos recentes (evita crescer sem fim
-    // com e-mails inventados).
     private static final int LIMITE_DE_CHAVES = 10_000;
     private static final Duration JANELA_MAXIMA = Duration.ofDays(1);
 
@@ -45,7 +31,6 @@ public class LimitadorDeTentativas {
         this.relogio = relogio;
     }
 
-    /** Conta mais um uso; se já chegou ao limite na janela, recusa com 429. */
     public void consumir(String chave, int limite, Duration janela, String mensagem) {
         Deque<Instant> lista = eventos.computeIfAbsent(chave, k -> new ArrayDeque<>());
         synchronized (lista) {
@@ -58,7 +43,6 @@ public class LimitadorDeTentativas {
         limparSeNecessario();
     }
 
-    /** Só confere (não conta): usado antes de uma tentativa que pode falhar. */
     public void exigirDisponivel(String chave, int limite, Duration janela, String mensagem) {
         Deque<Instant> lista = eventos.get(chave);
         if (lista == null) {
@@ -72,7 +56,6 @@ public class LimitadorDeTentativas {
         }
     }
 
-    /** Registra uma falha (ex.: senha errada), sem recusar esta requisição. */
     public void registrar(String chave) {
         Deque<Instant> lista = eventos.computeIfAbsent(chave, k -> new ArrayDeque<>());
         synchronized (lista) {
@@ -81,7 +64,6 @@ public class LimitadorDeTentativas {
         limparSeNecessario();
     }
 
-    /** Zera a chave (ex.: login certo apaga as falhas anteriores). */
     public void limpar(String chave) {
         eventos.remove(chave);
     }

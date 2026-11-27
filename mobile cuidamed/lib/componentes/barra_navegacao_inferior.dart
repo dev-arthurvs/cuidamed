@@ -3,11 +3,8 @@ import 'package:go_router/go_router.dart';
 
 import 'escolha_paciente.dart';
 
-/// Bottom nav fixa com os acessos mais usados no dia a dia — ícones grandes
-/// + legenda em texto (não só ícone), pensando no público idoso. Configurações
-/// e Ajuda ficam na engrenagem e no "?" da faixa de cima.
 class BarraNavegacaoInferior extends StatelessWidget {
-  final String tipoUsuario; // 'paciente' | 'cuidador'
+  final String tipoUsuario;
   final String rotaAtual;
 
   const BarraNavegacaoInferior({

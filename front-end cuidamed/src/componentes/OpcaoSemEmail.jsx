@@ -1,7 +1,5 @@
 import './OpcaoSemEmail.css'
 
-// Caixa "Não tenho e-mail" dos cadastros: muitos idosos não têm e-mail. Marcada,
-// o campo de e-mail some e o telefone passa a ser o que permite entrar no app.
 export default function OpcaoSemEmail({ marcado, aoMudar }) {
   return (
     <div className="opcao-sem-email">

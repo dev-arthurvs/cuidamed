@@ -13,7 +13,6 @@ import '../estilos/autenticacao.css'
 export default function DefinirSenha() {
   const { mostrarToast } = useApp()
   const navegar = useNavigate()
-  // Veio de "Esqueci minha senha": mesmo formulário, com o código de nova senha.
   const [parametros] = useSearchParams()
   const ehRecuperacao = parametros.get('novaSenha') === '1'
   const [login, setLogin] = useState('')

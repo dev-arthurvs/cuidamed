@@ -58,7 +58,6 @@ void main() {
   });
 
   group('Estoque x fim do tratamento (mesmos cenários do web)', () {
-    // 2x/dia, 1 comp; de hoje (nenhuma tomada) até 03/10 = 10 dias = 20 comp.
     test('20 comp para 20 doses restantes: dura até o fim', () {
       final e = calcularEstoque(_med(estoque: 20), hojeIso: _hoje)!;
       expect(e.duraAteOFim, isTrue);
@@ -74,7 +73,7 @@ void main() {
     test('caso relatado: termina em 2 dias e o estoque cobre — não pede reposição', () {
       final e = calcularEstoque(_med(fim: '2026-09-26', estoque: 6), hojeIso: _hoje)!;
       expect(e.duraAteOFim, isTrue);
-      expect(e.baixo, isFalse); // antes: "Estoque baixo… Hora de repor."
+      expect(e.baixo, isFalse);
     });
     test('começa amanhã: conta o ciclo inteiro (3 dias x 2 = 6 comp)', () {
       final e = calcularEstoque(_med(inicio: '2026-09-25', fim: '2026-09-27', estoque: 6), hojeIso: _hoje)!;
@@ -118,7 +117,6 @@ void main() {
     });
 
     testWidgets('Agenda: estoque que cobre o tratamento diz que não precisa comprar', (tester) async {
-      // Termina depois de amanhã; 2 doses/dia -> no máximo 6 comp restantes; tem 6.
       await montarPagina(tester, estadoCom(_med(inicio: iso(diaRelativo(-3)), fim: iso(diaRelativo(2)), estoque: 6)),
           '/agenda', (_) => const AgendaMedicamentos());
       expect(find.textContaining('✅ Estoque suficiente — (até '), findsOneWidget);

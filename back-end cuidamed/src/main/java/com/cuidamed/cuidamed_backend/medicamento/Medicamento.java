@@ -168,11 +168,6 @@ public class Medicamento {
         return criadoEm;
     }
 
-    /**
-     * Tem dose nesse dia? Considera início, fim e a frequência: "Dias alternados" = a
-     * cada 2 dias e "Semanal" = a cada 7, contando da data de início; as demais, todo dia.
-     * Mesma regra do web (utilitarios/horarios.js) e do mobile (utilitarios/horarios.dart).
-     */
     public boolean temDoseEm(LocalDate dia) {
         if (dataInicio != null && dia.isBefore(dataInicio)) {
             return false;

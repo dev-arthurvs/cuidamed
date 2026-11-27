@@ -2,7 +2,6 @@ import { avisosEstoque } from '../utilitarios/horarios'
 import Cartao from './Cartao'
 import './AvisosEstoque.css'
 
-// Remédios com estoque baixo ou esgotado. Sem nenhum, o card não aparece.
 export default function AvisosEstoque({ paciente, className = '' }) {
   const avisos = avisosEstoque(paciente.medicamentosAtivos, paciente.historico)
   if (avisos.length === 0) return null

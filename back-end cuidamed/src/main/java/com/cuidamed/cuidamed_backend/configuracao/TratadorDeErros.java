@@ -15,13 +15,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
-/**
- * Garante que toda resposta de erro da API traga um campo "message" de
- * verdade. O mecanismo padrão do Spring Boot (server.error.include-message)
- * não está funcionando nesta versão — o corpo de erro vinha sem a mensagem
- * real, escondendo do front-end o motivo de cada falha (senha errada,
- * e-mail não encontrado, etc.).
- */
 @RestControllerAdvice
 public class TratadorDeErros {
 
@@ -39,8 +32,6 @@ public class TratadorDeErros {
         return construirResposta(HttpStatus.BAD_REQUEST, "Corpo da requisição inválido.");
     }
 
-    // Na internet, robôs varrem endereços aleatórios: isso é 404/405 comum, não
-    // "erro inesperado" com o rastro completo no log.
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErroRespostaDTO> tratarRotaInexistente(NoResourceFoundException erro) {
         return construirResposta(HttpStatus.NOT_FOUND, "Endereço não encontrado.");

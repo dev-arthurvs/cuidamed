@@ -22,7 +22,6 @@ final _doses = [
   _dose('15:00', 'Sinvastatina', 'pendente'),
 ];
 
-/// Texto completo de uma linha pequena (Text.rich com horário + nome).
 Finder _linha(String texto) => find.byWidgetPredicate((w) => w is RichText && w.text.toPlainText().contains(texto));
 
 final _desfeitas = <Dose>[];
@@ -56,18 +55,16 @@ Future<List<Dose>> _montar(WidgetTester tester, List<Dose> doses, {double largur
 void main() {
   testWidgets('Abre na dose da vez (atrasada) com a anterior e a próxima pequenas', (tester) async {
     final registradas = await _montar(tester, _doses);
-    expect(find.text('Metformina'), findsOneWidget); // em foco, grande
+    expect(find.text('Metformina'), findsOneWidget);
     expect(find.text('Atrasada'), findsOneWidget);
-    expect(_linha('Losartana'), findsOneWidget); // anterior, tomada
-    expect(_linha('Sinvastatina'), findsOneWidget); // próxima
-    expect(find.byIcon(Icons.check), findsOneWidget); // ✓ da tomada
+    expect(_linha('Losartana'), findsOneWidget);
+    expect(_linha('Sinvastatina'), findsOneWidget);
+    expect(find.byIcon(Icons.check), findsOneWidget);
 
     await tester.tap(find.text('Registrar dose'));
     await tester.pump();
     expect(registradas.single.nome, 'Metformina');
 
-    // Logo depois de registrar, um pop-up oferece "Desfazer", com a barrinha do
-    // tempo que resta, e some sozinho.
     expect(find.text('Dose das 13:00 registrada.'), findsOneWidget);
     expect(find.byType(LinearProgressIndicator), findsOneWidget);
     expect(tester.getTopLeft(find.text('Dose das 13:00 registrada.')).dy, greaterThan(tester.getBottomLeft(find.text('Registrar dose')).dy));
@@ -97,7 +94,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Metformina'), findsOneWidget);
 
-    // Seta ↑ no alto do card e seta ↓ no canto inferior, à direita das linhas.
     final cima = tester.getRect(find.byTooltip('Dose anterior'));
     final baixo = tester.getRect(find.byTooltip('Próxima dose'));
     final proxima = tester.getRect(_linha('Sinvastatina'));
@@ -114,9 +110,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Losartana'), findsOneWidget);
     expect(find.text('Tomada'), findsOneWidget);
-    expect(find.text('Registrar dose'), findsNothing); // só a dose da vez é registrada aqui
+    expect(find.text('Registrar dose'), findsNothing);
 
-    // Dose tomada em foco: dá para desfazer.
     await tester.tap(find.text('Desfazer'));
     await tester.pump();
     expect(_desfeitas.single.nome, 'Losartana');
@@ -125,7 +120,6 @@ void main() {
     expect(perdida.text.style?.decoration, TextDecoration.lineThrough);
     expect(find.byIcon(Icons.close), findsOneWidget);
 
-    // Seta ↓ volta para a dose da vez.
     await tester.tap(find.byTooltip('Próxima dose'));
     await tester.pumpAndSettle();
     expect(find.text('Metformina'), findsOneWidget);

@@ -6,8 +6,6 @@ import '../estado/app_estado.dart';
 import 'barra_logo.dart';
 import 'barra_navegacao_inferior.dart';
 
-/// Andaime comum de toda tela autenticada: AppBar (via [appBar]) + bottom
-/// nav fixa — equivalente a componentes/LayoutApp.jsx do web.
 class AndaimeApp extends StatelessWidget {
   final PreferredSizeWidget appBar;
   final Widget body;

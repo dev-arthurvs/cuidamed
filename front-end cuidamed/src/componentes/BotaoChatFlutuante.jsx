@@ -2,8 +2,6 @@ import { Link, useLocation } from 'react-router-dom'
 import { useApp } from '../contexto/useApp'
 import './BotaoChatFlutuante.css'
 
-// Chat é uma conversa sobre a própria rotina de remédios (primeira pessoa) —
-// só faz sentido pro paciente, não pro cuidador.
 export default function BotaoChatFlutuante() {
   const { usuario } = useApp()
   const location = useLocation()

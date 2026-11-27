@@ -1,6 +1,3 @@
-// Conversão dos valores em português usados nas telas para os enums em
-// inglês maiúsculo esperados pela API, e vice-versa.
-
 function inverterMapa(mapa) {
   return Object.fromEntries(Object.entries(mapa).map(([chave, valor]) => [valor, chave]))
 }

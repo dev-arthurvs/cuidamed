@@ -4,9 +4,6 @@ import '../modelos/medicamento.dart';
 import '../utilitarios/animacoes.dart';
 import '../utilitarios/tema.dart';
 
-/// Aba "Encerrados" da Agenda — equivalente a ListaTratamentosEncerrados.jsx
-/// do web: remédios cujo tratamento já terminou, só para consulta (sem editar
-/// nem excluir), com o período em que foram usados.
 class ListaTratamentosEncerrados extends StatelessWidget {
   final List<Medicamento> medicamentos;
   const ListaTratamentosEncerrados({super.key, required this.medicamentos});
@@ -19,8 +16,6 @@ class ListaTratamentosEncerrados extends StatelessWidget {
         child: Text('Nenhum tratamento encerrado até o momento.', style: TextStyle(color: CorApp.textoSuave)),
       );
     }
-    // Grade fixa: 3 por linha em tela larga, 2 em média, 1 no celular. Cada
-    // card tem a largura de uma "vaga", então um card sozinho não estica.
     return LayoutBuilder(
       builder: (context, restricoes) {
         final colunas = restricoes.maxWidth >= 1000 ? 3 : (restricoes.maxWidth >= 640 ? 2 : 1);

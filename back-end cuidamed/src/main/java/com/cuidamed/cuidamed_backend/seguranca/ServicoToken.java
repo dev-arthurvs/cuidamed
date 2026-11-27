@@ -11,11 +11,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
-/**
- * Gera o token entregue no login. Ele vale por alguns dias (o app fica logado
- * no aparelho, pensando no público idoso) e carrega só o tipo e o id do
- * usuário — nada de dado pessoal, já que o conteúdo do JWT é legível.
- */
 @Service
 public class ServicoToken {
 

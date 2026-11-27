@@ -102,7 +102,6 @@ public class HistoricoService {
         return HistoricoRespostaDTO.paraDTO(historicoRepository.save(historico));
     }
 
-    /** Apaga o registro de hoje e, se a dose tinha sido tomada, devolve o estoque descontado. */
     @Transactional
     public void desfazer(Long id) {
         Historico historico = historicoRepository.findById(id)

@@ -2,9 +2,6 @@ import '../modelos/dose.dart';
 import '../modelos/historico.dart';
 import '../modelos/medicamento.dart';
 
-/// Porta fiel de front-end cuidamed/src/utilitarios/horarios.js — mesma
-/// regra de negócio, mesmos limiares, calculados no cliente porque o
-/// back-end não persiste status "pendente"/"atrasado" em tempo real.
 const int toleranciaAtrasoMin = 15;
 const int limitePerdidaMin = 180;
 
@@ -18,8 +15,6 @@ int minutosAgora([DateTime? agora]) {
   return data.hour * 60 + data.minute;
 }
 
-/// [statusRegistrado] vem do histórico (TOMADO/ATRASADO/PERDIDO em minúsculo
-/// já convertido) quando a dose já foi confirmada; null quando ainda não foi.
 String calcularStatusAtual(String horario, String? statusRegistrado, {int? agoraEmMinutos}) {
   if (statusRegistrado == 'tomado') return 'tomado';
   final diferenca = (agoraEmMinutos ?? minutosAgora()) - paraMinutos(horario);
@@ -33,18 +28,10 @@ String dataAtualISO([DateTime? data]) {
   return '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
 }
 
-/// Monta a lista de "doses de hoje" cruzando os horários de cada medicamento
-/// ativo com o histórico já registrado hoje.
-/// Recebe todos os remédios: entra quem tem dose hoje, inclusive o que termina
-/// hoje (na Agenda ele já vai para "Encerrados" quando a última dose é
-/// registrada, mas no Início a dose tomada continua aparecendo).
 List<Dose> construirDosesHoje(List<Medicamento> medicamentos, List<Historico> historicoHoje, {String? hojeIso}) {
   final hoje = hojeIso ?? dataAtualISO();
   final doses = <Dose>[];
   for (final medicamento in medicamentos) {
-    // Só entra se hoje é dia de dose: tratamento que ainda não começou não tem
-    // dose (antes aparecia como "perdido"), e "Dias alternados"/"Semanal" só
-    // têm dose a cada 2/7 dias (antes geravam dose todo dia).
     if (!temDoseNoDia(medicamento, diaIso: hoje)) continue;
     for (final horario in medicamento.horarios) {
       final registrado = historicoHoje.where((h) => h.medicamentoId == medicamento.id && h.hora == horario);
@@ -69,9 +56,6 @@ List<Dose> construirDosesHoje(List<Medicamento> medicamentos, List<Historico> hi
 
 const int diasJanelaAdesao = 30;
 
-/// Web e mobile mantêm só os últimos dias do histórico, o suficiente para o
-/// Início, o estoque e a adesão (um dia a mais, por segurança). Períodos mais
-/// antigos são buscados pela tela de Histórico.
 const int diasJanelaHistorico = diasJanelaAdesao + 1;
 
 DateTime inicioJanelaHistorico([DateTime? hoje]) {
@@ -79,10 +63,6 @@ DateTime inicioJanelaHistorico([DateTime? hoje]) {
   return DateTime(dia.year, dia.month, dia.day - diasJanelaHistorico);
 }
 
-/// Adesão dos últimos 30 dias (hoje incluso) — é o período que as telas
-/// anunciam ("Adesão média (30 dias)"). Antes considerava o histórico inteiro.
-/// Dose que passou do limite sem registro conta como perdida, a mesma regra do
-/// Início e do Histórico; a atrasada ainda não conta, porque ainda pode ser tomada.
 int calcularAdesao(List<Historico> historico, {List<Medicamento> medicamentos = const [], String? hojeIso}) {
   final hoje = DateTime.parse(hojeIso ?? dataAtualISO());
   final inicioIso = dataAtualISO(hoje.subtract(const Duration(days: diasJanelaAdesao - 1)));
@@ -99,22 +79,18 @@ int calcularAdesao(List<Historico> historico, {List<Medicamento> medicamentos = 
   return ((tomados / recentes.length) * 100).round();
 }
 
-/// No próprio dia do "fim" do ciclo, só considera encerrado depois que todas
-/// as doses de hoje já foram registradas no histórico — senão o medicamento
-/// desapareceria da agenda antes do cuidador/paciente confirmar a última dose.
 bool medicamentoEncerrado(Medicamento medicamento, {String? hojeIso, List<Historico>? historico}) {
   if (medicamento.dataFim == null) return false;
   final hoje = hojeIso ?? dataAtualISO();
   final fimIso = dataAtualISO(medicamento.dataFim);
   if (fimIso.compareTo(hoje) < 0) return true;
   if (fimIso.compareTo(hoje) > 0) return false;
-  if (!temDoseNoDia(medicamento, diaIso: hoje)) return true; // último dia sem dose: ciclo já cumprido
+  if (!temDoseNoDia(medicamento, diaIso: hoje)) return true;
 
   final historicoHoje = (historico ?? []).where((h) => dataAtualISO(h.data) == hoje && h.medicamentoId == medicamento.id);
   return medicamento.horarios.every((horario) => historicoHoje.any((h) => h.hora == horario));
 }
 
-/// false enquanto a data de início do tratamento ainda não chegou.
 bool medicamentoIniciado(Medicamento medicamento, {String? hojeIso}) =>
     dataAtualISO(medicamento.dataInicio).compareTo(hojeIso ?? dataAtualISO()) <= 0;
 
@@ -122,11 +98,6 @@ int _diasEntre(String deIso, String ateIso) => DateTime.parse(ateIso).difference
 
 String _somarDias(String dataIso, int dias) => dataAtualISO(DateTime.parse(dataIso).add(Duration(days: dias)));
 
-/// Doses que já passaram do horário e não têm registro no histórico (ninguém
-/// marcou "tomada" nem "perdida") — porta de dosesSemRegistro do web. O Início
-/// já as mostra como atrasadas ou perdidas; o Histórico usa isto para mostrar o
-/// mesmo. Dias anteriores: PERDIDO. Hoje: ATRASADO ou PERDIDO pela regra do
-/// Início (dose ainda no horário não entra). Nada é gravado no banco.
 List<Historico> dosesSemRegistro(
   int pacienteId,
   List<Medicamento> medicamentos,
@@ -138,7 +109,6 @@ List<Historico> dosesSemRegistro(
   final momento = agora ?? DateTime.now();
   final hojeIso = dataAtualISO(momento);
   final ateIso = dataAtualISO(ate).compareTo(hojeIso) > 0 ? hojeIso : dataAtualISO(ate);
-  // Não precisa varrer dias antes do primeiro tratamento.
   var dia = dataAtualISO(de);
   final inicios = medicamentos.map((m) => dataAtualISO(m.dataInicio)).toList()..sort();
   if (inicios.isNotEmpty && inicios.first.compareTo(dia) > 0) dia = inicios.first;
@@ -155,7 +125,7 @@ List<Historico> dosesSemRegistro(
             : calcularStatusAtual(horario, null, agoraEmMinutos: agoraEmMinutos);
         if (status == 'pendente') continue;
         doses.add(Historico(
-          id: 0, // não existe no banco
+          id: 0,
           pacienteId: pacienteId,
           medicamentoId: medicamento.id,
           data: DateTime.parse(dia),
@@ -170,14 +140,10 @@ List<Historico> dosesSemRegistro(
   return doses;
 }
 
-/// Frequências que não são diárias: "Dias alternados" = dose a cada 2 dias e
-/// "Semanal" = a cada 7, contando a partir da data de início. As demais
-/// (1x/2x/3x ao dia, a cada 8 horas) têm dose todos os dias. Igual ao web.
 const Map<String, int> _intervaloDiasPorFrequencia = {'DIAS_ALTERNADOS': 2, 'SEMANAL': 7};
 
 int intervaloEntreDiasDeDose(Medicamento medicamento) => _intervaloDiasPorFrequencia[medicamento.frequencia] ?? 1;
 
-/// O remédio tem dose nesse dia? Considera início, fim e a frequência.
 bool temDoseNoDia(Medicamento medicamento, {String? diaIso}) {
   final dia = diaIso ?? dataAtualISO();
   final inicio = dataAtualISO(medicamento.dataInicio);
@@ -188,7 +154,6 @@ bool temDoseNoDia(Medicamento medicamento, {String? diaIso}) {
   return _diasEntre(inicio, dia) % intervalo == 0;
 }
 
-/// Próximo dia (a partir de [aPartirIso], inclusive) com dose; null se o ciclo acaba antes.
 String? proximoDiaDeDose(Medicamento medicamento, {String? aPartirIso}) {
   final base = aPartirIso ?? dataAtualISO();
   final inicio = dataAtualISO(medicamento.dataInicio);
@@ -202,7 +167,6 @@ String? proximoDiaDeDose(Medicamento medicamento, {String? aPartirIso}) {
   return null;
 }
 
-/// Quantos dias com dose existem entre [deIso] e [ateIso] (inclusive).
 int _contarDiasDeDose(Medicamento medicamento, String deIso, String ateIso) {
   if (ateIso.compareTo(deIso) < 0) return 0;
   final intervalo = intervaloEntreDiasDeDose(medicamento);
@@ -212,7 +176,6 @@ int _contarDiasDeDose(Medicamento medicamento, String deIso, String ateIso) {
   return _diasEntre(primeiro, ateIso) ~/ intervalo + 1;
 }
 
-/// Espelha calcularDiasRestantesCiclo do web: null quando não há data final.
 int? calcularDiasRestantesCiclo(DateTime? dataFim, {String? hojeIso}) {
   if (dataFim == null) return null;
   final hoje = DateTime.parse(hojeIso ?? dataAtualISO());
@@ -227,7 +190,6 @@ class InfoEstoque {
   final bool esgotado;
   final bool baixo;
 
-  /// O estoque atual cobre todas as doses que faltam até a data final.
   final bool duraAteOFim;
   InfoEstoque({
     required this.quantidade,
@@ -241,8 +203,6 @@ class InfoEstoque {
 
 const int limiarDiasEstoqueBaixo = 5;
 
-/// null pra Pomada (não tem unidade discreta) ou quando não há quantidade
-/// cadastrada — espelha calcularEstoque do web.
 InfoEstoque? calcularEstoque(Medicamento medicamento, {List<Historico> historico = const [], String? hojeIso}) {
   if (medicamento.forma == 'POMADA') return null;
   if (medicamento.quantidadeEstoque == null) return null;
@@ -250,10 +210,8 @@ InfoEstoque? calcularEstoque(Medicamento medicamento, {List<Historico> historico
   final dosesPorDia = medicamento.horarios.isEmpty ? 1 : medicamento.horarios.length;
   final consumoPorDose = medicamento.quantidadePorDose ?? 1;
   final quantidade = medicamento.quantidadeEstoque!;
-  // Dias de calendário: em "Dias alternados"/"Semanal" cada dia de dose rende 2/7 dias.
   final diasRestantes = (quantidade / (dosesPorDia * consumoPorDose)).floor() * intervaloEntreDiasDeDose(medicamento);
   final necessarias = _unidadesAteOFim(medicamento, historico, hoje, dosesPorDia, consumoPorDose);
-  // Se o que tem cobre tudo o que falta tomar até a data final, não precisa comprar.
   final duraAteOFim = necessarias != null && quantidade > 0 && quantidade >= necessarias;
   return InfoEstoque(
     quantidade: quantidade,
@@ -265,9 +223,6 @@ InfoEstoque? calcularEstoque(Medicamento medicamento, {List<Historico> historico
   );
 }
 
-/// Unidades que ainda serão consumidas até o fim do tratamento: doses de hoje
-/// ainda não registradas + as dos dias seguintes (o back-end já desconta do
-/// estoque cada dose registrada como tomada). null em uso contínuo (sem fim).
 int? _unidadesAteOFim(Medicamento medicamento, List<Historico> historico, String hoje, int dosesPorDia, int consumoPorDose) {
   if (medicamento.dataFim == null) return null;
   final fim = dataAtualISO(medicamento.dataFim);
@@ -293,7 +248,6 @@ int calcularIdade(DateTime? nascimento, [DateTime? hoje]) {
   return idade;
 }
 
-/// Remédio com estoque baixo ou esgotado, para o Início e o painel do cuidador.
 class AvisoEstoque {
   final String nome;
   final String texto;

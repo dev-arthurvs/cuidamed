@@ -43,7 +43,6 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe e-mail ou telefone e a senha.");
         }
 
-        // E-mail ("@") ou telefone (só os dígitos contam: com ou sem máscara).
         List<Paciente> pacientes;
         List<Cuidador> cuidadores;
         if (Contato.ehEmail(identificador)) {

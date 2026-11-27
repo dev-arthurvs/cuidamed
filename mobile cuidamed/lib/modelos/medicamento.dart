@@ -1,17 +1,16 @@
-/// Espelha MedicamentoRespostaDTO (back-end cuidamed/.../medicamento/MedicamentoRespostaDTO.java).
 class Medicamento {
   final int id;
   final int pacienteId;
   final String nome;
   final String dosagem;
-  final String forma; // COMPRIMIDO | CAPSULA | GOTA | XAROPE | INJECAO | POMADA
+  final String forma;
   final String frequencia;
   final DateTime dataInicio;
   final DateTime? dataFim;
   final String? observacoes;
   final int? quantidadeEstoque;
   final int? quantidadePorDose;
-  final List<String> horarios; // "HH:mm"
+  final List<String> horarios;
 
   Medicamento({
     required this.id,
@@ -33,7 +32,7 @@ class Medicamento {
       id: json['id'] as int,
       pacienteId: json['pacienteId'] as int,
       nome: json['nome'] as String,
-      dosagem: json['dosagem'] as String? ?? '', // opcional: saiu do formulário
+      dosagem: json['dosagem'] as String? ?? '',
       forma: json['forma'] as String,
       frequencia: json['frequencia'] as String,
       dataInicio: DateTime.parse(json['dataInicio']),

@@ -22,7 +22,7 @@ class PacienteServico {
   Future<Paciente> criar({
     required String nome,
     required String email,
-    String? senha, // null quando o cuidador cadastra: o paciente cria a senha em "Ativar meu acesso"
+    String? senha,
     DateTime? dataNascimento,
     String? sexo,
     String? enfermidade,

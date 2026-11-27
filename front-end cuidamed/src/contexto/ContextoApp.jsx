@@ -50,7 +50,6 @@ function mapearPacienteDaApi(paciente) {
     observacoesClinicas: paciente.observacoesClinicas || '',
     cuidadorId: paciente.cuidadorId,
     cuidadorSolicitadoId: paciente.cuidadorSolicitadoId,
-    // Id do vínculo ativo com o cuidador ("nº do cartão"); null sem cuidador.
     codigoVinculo: paciente.codigoVinculo ?? null,
     alertaManualPendente: paciente.alertaManualPendente,
     alertaManualMensagem: paciente.alertaManualMensagem,
@@ -109,8 +108,6 @@ async function hidratarPaciente(pacienteBase) {
 export function ProvedorApp({ children }) {
   const [pacientes, setPacientes] = useState([])
   const [usuario, setUsuario] = useState(null)
-  // Com uma sessão salva no navegador, os dados são recarregados ao abrir a
-  // página; até lá as rotas esperam, em vez de mandar para o login.
   const [carregandoSessao, setCarregandoSessao] = useState(() => lerSessao() !== null)
   const [pacienteFocoId, setPacienteFocoId] = useState(null)
   const [toast, setToast] = useState('')
@@ -129,14 +126,9 @@ export function ProvedorApp({ children }) {
     timeoutToast.current = setTimeout(() => setToast(''), 2600)
   }, [])
 
-  // Tamanho da fonte e tema escolhidos valem só dentro do sistema: login,
-  // cadastro e ativação ficam sempre no tamanho e no visual padrão.
   useEffect(() => {
     const fator = autenticado ? ZOOM_POR_TAMANHO[tamanhoFonte] : 1
     document.documentElement.style.zoom = fator
-    // O zoom escala a renderização, mas não o valor de "100vh" — sem essa
-    // variável, layouts de tela cheia (login, modais) estouram a viewport
-    // visível e ficam com um vão vazio embaixo. Ver autenticacao.css.
     document.documentElement.style.setProperty('--fator-zoom', fator)
   }, [tamanhoFonte, autenticado])
 
@@ -160,8 +152,6 @@ export function ProvedorApp({ children }) {
 
   useEffect(() => () => clearTimeout(timeoutToast.current), [])
 
-  // Alerta de horário: verifica periodicamente se alguma dose do idoso logado
-  // chegou ao horário agendado e ainda não foi confirmada.
   useEffect(() => {
     const intervalo = setInterval(() => setTick((valor) => valor + 1), INTERVALO_VERIFICACAO_MS)
     return () => clearInterval(intervalo)
@@ -178,9 +168,7 @@ export function ProvedorApp({ children }) {
         ...paciente,
         idade: calcularIdade(paciente.dataNascimento),
         medicamentosAtivos,
-        // Todos os remédios com dose hoje, inclusive o que termina hoje: na Agenda
-        // ele já vai para "Encerrados" quando a última dose é registrada, mas no
-        // Início a dose tomada continua aparecendo (e pode ser desfeita).
+        // Inclui o remédio que termina hoje, para a dose tomada continuar no Início.
         dosesHoje: construirDosesHoje(paciente.medicamentos, historicoHoje),
       }
     })
@@ -211,8 +199,6 @@ export function ProvedorApp({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tick, usuario, pacienteFoco])
 
-  // Cuidador: avisa uma vez quando a dose de um paciente fica atrasada (depois de
-  // 15 minutos sem registro). Só com o app aberto; o status também fica no painel.
   useEffect(() => {
     if (!usuario || usuario.tipo !== 'cuidador') return
     const hoje = dataAtualISO()
@@ -236,8 +222,6 @@ export function ProvedorApp({ children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tick, usuario, pacientesComStatusAtual])
 
-  // Alerta manual: verifica periodicamente se o cuidador pediu pra lembrar o
-  // paciente agora, mesmo fora do horário programado de alguma dose.
   useEffect(() => {
     if (!usuario || usuario.tipo !== 'paciente') return
     let cancelado = false
@@ -252,7 +236,7 @@ export function ProvedorApp({ children }) {
         notificarDose('Lembrete do seu cuidador 💊', mensagem)
         await api.post(`/api/pacientes/${usuario.id}/alerta-manual/confirmar`)
       } catch {
-        // falha de rede num polling não deve interromper a experiência do usuário
+        // falha de rede: tenta de novo na próxima verificação
       }
     }
 
@@ -264,10 +248,6 @@ export function ProvedorApp({ children }) {
     }
   }, [usuario, mostrarToast])
 
-  // Sincronização entre web e mobile: a cada 30 s busca de novo no servidor os
-  // dados de quem está logado (o paciente, ou todos os pacientes do cuidador),
-  // pra refletir o que foi alterado no outro app sem precisar recarregar a
-  // página. Pausa com a aba em segundo plano e sincroniza na hora ao voltar.
   useEffect(() => {
     if (!usuario) return undefined
     let cancelado = false
@@ -286,7 +266,7 @@ export function ProvedorApp({ children }) {
           if (!cancelado) setPacientes(hidratados)
         }
       } catch {
-        // falha de rede numa sincronização não interrompe o uso — tenta de novo na próxima
+        // falha de rede: tenta de novo na próxima verificação
       } finally {
         emAndamento = false
       }
@@ -305,7 +285,6 @@ export function ProvedorApp({ children }) {
     }
   }, [usuario])
 
-  // Busca os dados de quem entrou (o paciente, ou o cuidador e os pacientes dele).
   const carregarUsuario = useCallback(async (tipo, id) => {
     if (tipo === 'PACIENTE') {
       const pacienteBase = await api.get(`/api/pacientes/${id}`)
@@ -330,8 +309,6 @@ export function ProvedorApp({ children }) {
     }
   }, [])
 
-  // lembrar ("Lembrar de mim"): continua logado mesmo sem uso (até o login
-  // vencer) e o e-mail ou telefone já vem preenchido na próxima vez.
   const entrar = useCallback(
     async (identificador, senha, lembrar = false) => {
       const login = await api.post('/api/auth/login', { login: identificador, senha })
@@ -354,7 +331,6 @@ export function ProvedorApp({ children }) {
     setPacientes([])
   }, [])
 
-  // Sessão salva de uma visita anterior: recarrega os dados sem pedir login.
   useEffect(() => {
     const sessao = lerSessao()
     if (!sessao) return
@@ -372,7 +348,6 @@ export function ProvedorApp({ children }) {
     restaurarSessao()
   }, [carregarUsuario])
 
-  // Token recusado pelo servidor (expirou ou ficou inválido): sai da conta e avisa.
   useEffect(() => {
     definirAoExpirarSessao(() => {
       sair()
@@ -381,16 +356,13 @@ export function ProvedorApp({ children }) {
     return () => definirAoExpirarSessao(null)
   }, [sair, mostrarToast])
 
-  // Inatividade: depois de 30 minutos sem clique, toque, tecla ou rolagem, sai
-  // da conta e volta para o login (vale para paciente e cuidador). Atualizações
-  // automáticas (sincronização, alertas) não contam como uso.
   const autenticadoAgora = usuario !== null
   useEffect(() => {
     if (!autenticadoAgora) return undefined
     let ultimaGravacao = 0
     function aoUsar() {
       const agora = Date.now()
-      if (agora - ultimaGravacao < 15000) return // grava no máximo a cada 15 s
+      if (agora - ultimaGravacao < 15000) return
       ultimaGravacao = agora
       registrarAtividade(agora)
     }
@@ -410,7 +382,6 @@ export function ProvedorApp({ children }) {
     }
   }, [autenticadoAgora, sair])
 
-  // Depois de criar a conta, entra com o mesmo e-mail (ou telefone) e senha (é o login que gera o token).
   const cadastrar = useCallback(async ({ nome, email, senha, tipo, dataNascimento, sexo, telefone, endereco, profissao }) => {
     if (tipo === 'paciente') {
       await api.post('/api/pacientes', {
@@ -533,7 +504,6 @@ export function ProvedorApp({ children }) {
     [pacientesComStatusAtual, recarregarPaciente, mostrarToast],
   )
 
-  // "Desfazer": apaga o registro de hoje; o servidor devolve o estoque descontado.
   const desfazerDose = useCallback(
     async (pacienteId, dose) => {
       const paciente = pacientes.find((item) => item.id === pacienteId)
@@ -570,7 +540,6 @@ export function ProvedorApp({ children }) {
           sexo: dados.sexo ? SEXO_PARA_API[dados.sexo] : null,
           enfermidade: pacienteFoco?.enfermidade || null,
           telefone: dados.telefone || null,
-          // Endereço saiu dos formulários: mantém o que já estava salvo.
           endereco: pacienteFoco?.endereco || null,
           observacoesClinicas: pacienteFoco?.observacoesClinicas || null,
           cuidadorId: pacienteFoco?.cuidadorId || null,
@@ -646,9 +615,6 @@ export function ProvedorApp({ children }) {
     [usuario],
   )
 
-  // Salva só as observações clínicas: busca o paciente atual no servidor e
-  // reenvia todos os campos como estão (o PUT substitui tudo), trocando apenas
-  // as observações — assim nada que foi alterado em outro lugar é apagado.
   const atualizarObservacoesClinicas = useCallback(
     async (pacienteId, texto) => {
       const atual = await api.get(`/api/pacientes/${pacienteId}`)

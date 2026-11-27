@@ -17,7 +17,6 @@ public class ChatController {
     private final Autorizacao autorizacao;
     private final LimitadorDeTentativas limitador;
 
-    // Cada pergunta é uma chamada paga à Anthropic: até 30 por hora e 100 por dia por paciente.
     static final int PERGUNTAS_POR_HORA = 30;
     static final int PERGUNTAS_POR_DIA = 100;
     private static final String LIMITE_HORA = "Você fez muitas perguntas em pouco tempo. Tente de novo daqui a pouco.";
@@ -31,7 +30,6 @@ public class ChatController {
 
     @PostMapping("/api/chat/{pacienteId}")
     public ChatRespostaDTO perguntar(@PathVariable Long pacienteId, @RequestBody ChatMensagemDTO dto) {
-        // O assistente responde só ao próprio paciente (e usa a chave paga da Anthropic).
         autorizacao.exigirOProprioPaciente(pacienteId);
         limitador.exigirDisponivel("chat-dia:" + pacienteId, PERGUNTAS_POR_DIA, Duration.ofDays(1), LIMITE_DIA);
         limitador.consumir("chat-hora:" + pacienteId, PERGUNTAS_POR_HORA, Duration.ofHours(1), LIMITE_HORA);

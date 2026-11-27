@@ -37,12 +37,6 @@ import com.nimbusds.jose.jwk.source.ImmutableSecret;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-/**
- * Segurança da API: toda rota exige o token do login (Authorization: Bearer
- * ...), exceto as que existem justamente para quem ainda não tem conta ou não
- * entrou (login, cadastro e ativação de acesso). O que cada usuário pode ver
- * ou alterar é conferido nos controllers, pela {@link Autorizacao}.
- */
 @Configuration
 public class ConfiguracaoSeguranca {
 
@@ -57,7 +51,6 @@ public class ConfiguracaoSeguranca {
                 resposta, HttpStatus.FORBIDDEN, "Você não tem permissão para essa ação.");
 
         http
-                // Sem cookies de sessão: o token vai no cabeçalho, então não há CSRF a proteger.
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .sessionManagement(sessao -> sessao.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -65,9 +58,9 @@ public class ConfiguracaoSeguranca {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST,
                                 "/api/auth/login",
-                                "/api/cuidadores",              // cadastro de cuidador
-                                "/api/pacientes",               // cadastro de paciente (ou cuidador cadastrando, com token)
-                                "/api/pacientes/definir-senha") // "Ativar meu acesso"
+                                "/api/cuidadores",
+                                "/api/pacientes",
+                                "/api/pacientes/definir-senha")
                         .permitAll()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
@@ -82,10 +75,6 @@ public class ConfiguracaoSeguranca {
         return http.build();
     }
 
-    /**
-     * Chave que assina os tokens. Sem JWT_SECRET, gera uma temporária: funciona,
-     * mas a cada reinício do servidor todos precisam entrar de novo.
-     */
     @Bean
     public SecretKey chaveDosTokens(@Value("${cuidamed.jwt.segredo}") String segredo) {
         byte[] bytes;
@@ -110,16 +99,10 @@ public class ConfiguracaoSeguranca {
     @Bean
     public JwtDecoder decodificadorJwt(SecretKey chave) {
         NimbusJwtDecoder decodificador = NimbusJwtDecoder.withSecretKey(chave).macAlgorithm(MacAlgorithm.HS256).build();
-        // Além da assinatura e da validade, só aceita tokens emitidos por este servidor.
         decodificador.setJwtValidator(JwtValidators.createDefaultWithIssuer(ServicoToken.EMISSOR));
         return decodificador;
     }
 
-    /**
-     * Quais sites podem chamar a API pelo navegador (CORS_ORIGENS, separados por
-     * vírgula). O nome do método importa: o Spring Security procura o bean
-     * "corsConfigurationSource" — com outro nome, nenhuma regra era aplicada.
-     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource(@Value("${cuidamed.cors.origens}") String origens) {
         CorsConfiguration configuracao = new CorsConfiguration();
@@ -136,7 +119,6 @@ public class ConfiguracaoSeguranca {
         return fonte;
     }
 
-    /** Mesmo formato de erro do TratadorDeErros, para o app mostrar a mensagem. */
     private static void escreverErro(HttpServletResponse resposta, HttpStatus status, String mensagem) throws IOException {
         resposta.setStatus(status.value());
         resposta.setContentType("application/json");

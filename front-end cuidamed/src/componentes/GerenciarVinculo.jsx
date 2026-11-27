@@ -6,8 +6,6 @@ import Cartao from './Cartao'
 import ModalConfirmacao from './ModalConfirmacao'
 import './GerenciarVinculo.css'
 
-// Parte final dos detalhes do paciente (só o cuidador vê): permissão para o
-// paciente alterar a própria agenda e o desvínculo. Antes era uma tela à parte.
 export default function GerenciarVinculo({ paciente }) {
   const { atualizarPermissaoAlteracoes, desvincularPaciente, mostrarToast } = useApp()
   const navegar = useNavigate()

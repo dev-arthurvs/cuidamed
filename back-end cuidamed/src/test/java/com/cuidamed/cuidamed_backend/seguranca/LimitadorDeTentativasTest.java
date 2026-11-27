@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 class LimitadorDeTentativasTest {
 
-    /** Relógio que o teste avança à vontade (sem esperar de verdade). */
     private static final class RelogioManual extends Clock {
         private Instant agora = Instant.parse("2026-09-30T12:00:00Z");
 

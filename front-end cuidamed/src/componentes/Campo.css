@@ -20,7 +20,6 @@
   width: 100%;
 }
 
-/* Campo com ícone à esquerda e/ou "olho" de senha à direita. */
 .campo__controle {
   position: relative;
   display: flex;

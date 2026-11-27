@@ -15,10 +15,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-/**
- * Regras de acesso da API. Usa ids que não existem no banco (Long.MAX_VALUE),
- * então nenhum teste lê ou altera dados reais.
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 class SegurancaTest {
@@ -96,8 +92,6 @@ class SegurancaTest {
 
     @Test
     void chatLimitaPerguntasPorHora() throws Exception {
-        // Paciente inexistente: cada pergunta para no "não encontrado" (sem chamar a IA),
-        // mas conta no limite, que é conferido antes.
         String token = bearer(UsuarioAutenticado.PACIENTE, ID_INEXISTENTE - 1);
         for (int i = 0; i < 30; i++) {
             mvc.perform(post("/api/chat/" + (ID_INEXISTENTE - 1)).header(HttpHeaders.AUTHORIZATION, token)

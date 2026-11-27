@@ -41,7 +41,6 @@ export default function PainelIdoso() {
             />
           </div>
 
-          {/* À esquerda o card da dose; à direita o Cartão do paciente. */}
           <CartaoPaciente paciente={pacienteFoco} contagem={contagem} />
 
           <AvisosEstoque paciente={pacienteFoco} className="painel-idoso__agenda-completa" />

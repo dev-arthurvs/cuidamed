@@ -14,10 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-/**
- * Login por e-mail ou telefone e cadastro sem e-mail. Cada teste roda numa
- * transação desfeita no fim: as contas criadas aqui não ficam no banco.
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -26,7 +22,6 @@ class ContatoTest {
     @Autowired
     private MockMvc mvc;
 
-    /** Celular que não existe no banco: (11) 9xxxx-xxxx a partir do relógio. */
     private static String telefoneNovo() {
         String n = String.valueOf(System.nanoTime());
         String oito = n.substring(n.length() - 8);
@@ -44,7 +39,6 @@ class ContatoTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.email").doesNotExist());
 
-        // Com máscara, só os dígitos ou com o 55 do Brasil: mesmo telefone.
         String digitos = Contato.digitos(telefone);
         for (String login : new String[] {telefone, digitos, "+55 " + digitos}) {
             postar("/api/auth/login", "{\"login\":\"" + login + "\",\"senha\":\"senha1234\"}")
@@ -86,7 +80,6 @@ class ContatoTest {
         String email = "com.email." + System.nanoTime() + "@teste.com";
         postar("/api/pacientes", "{\"nome\":\"Com Email\",\"email\":\"" + email + "\",\"senha\":\"senha1234\"}")
                 .andExpect(status().isCreated());
-        // Campo antigo "email" (versões anteriores do app) continua funcionando.
         postar("/api/auth/login", "{\"email\":\"" + email + "\",\"senha\":\"senha1234\"}").andExpect(status().isOk());
     }
 

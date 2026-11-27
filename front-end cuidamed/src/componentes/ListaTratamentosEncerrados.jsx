@@ -5,8 +5,6 @@ import LogoMarca from './LogoMarca'
 import '../paginas/AgendaMedicamentos.css'
 import './ListaTratamentosEncerrados.css'
 
-// Aba "Encerrados" da Agenda: remédios cujo tratamento já terminou, só para
-// consulta (sem editar/excluir), com o período em que foram usados.
 export default function ListaTratamentosEncerrados({ medicamentos }) {
   return (
     <div className="agenda__grade tratamentos-encerrados__grade">

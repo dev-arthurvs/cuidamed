@@ -6,16 +6,12 @@ import '../servicos/notificacao_servico.dart';
 import '../utilitarios/tema.dart';
 import 'botao.dart';
 
-/// ScaffoldMessenger do app inteiro: o alerta aparece em qualquer tela em que
-/// o paciente esteja (equivalente ao toast global do web).
 final chaveMensageiroGlobal = GlobalKey<ScaffoldMessengerState>();
 
-/// Aviso na tela + som + notificação do sistema — o mesmo trio do web.
 void dispararAlerta(AlertaPaciente alerta, {NotificacaoServico? servico}) {
   final notificacoes = servico ?? NotificacaoServico.instancia;
   mostrarAlertaNaTela(alerta);
   notificacoes.tocarAlerta();
-  // No navegador não há agendamento: lá a notificação sai sempre daqui.
   if (kIsWeb || !alerta.notificacaoAgendada) notificacoes.notificar(alerta.titulo, alerta.mensagem);
 }
 
@@ -52,8 +48,6 @@ void mostrarAlertaNaTela(AlertaPaciente alerta) {
     );
 }
 
-/// Faixa "Ative os lembretes sonoros e notificações" do painel do paciente
-/// (igual à do web). Some depois que o usuário responde ao pedido.
 class FaixaAtivarNotificacoes extends StatefulWidget {
   final NotificacaoServico? servico;
   const FaixaAtivarNotificacoes({super.key, this.servico});

@@ -10,9 +10,6 @@ import 'botao.dart';
 import 'cartao.dart';
 import 'confirmacao.dart';
 
-/// Parte final dos detalhes do paciente (só o cuidador vê), como em
-/// GerenciarVinculo.jsx do web: permissão para o paciente alterar a própria
-/// agenda e o desvínculo. Antes era uma tela à parte.
 class GerenciarVinculo extends StatefulWidget {
   final Paciente paciente;
   const GerenciarVinculo({super.key, required this.paciente});

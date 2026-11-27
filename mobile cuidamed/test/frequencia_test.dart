@@ -33,7 +33,6 @@ Medicamento _med({
     );
 
 void main() {
-  // Mesmos cenários validados no web.
   final alt = _med(frequencia: 'DIAS_ALTERNADOS', inicio: '2026-09-20');
   final sem = _med(id: 2, frequencia: 'SEMANAL', horarios: const ['09:00'], inicio: '2026-09-17', fim: '2026-10-15');
 
@@ -89,7 +88,7 @@ void main() {
     final dados = estado.pacientes.first;
     estado.pacientes = [
       PacienteComDados(paciente: dados.paciente, historico: const [], medicamentos: [
-        _med(frequencia: 'DIAS_ALTERNADOS', inicio: dataAtualISO(ontem)), // ontem sim, hoje não, amanhã sim
+        _med(frequencia: 'DIAS_ALTERNADOS', inicio: dataAtualISO(ontem)),
       ]),
     ];
     await montarPagina(tester, estado, '/agenda', (_) => const AgendaMedicamentos());
@@ -105,21 +104,18 @@ void main() {
       final dados = estado.pacientes.first;
       estado.pacientes = [
         PacienteComDados(paciente: dados.paciente, historico: const [], medicamentos: [
-          // 23:59: se houver dose hoje, ela é sempre a "próxima", a qualquer hora do teste.
           _med(frequencia: 'DIAS_ALTERNADOS', horarios: const ['23:59'], inicio: dataAtualISO(inicio)),
         ]),
       ];
       return estado;
     }
 
-    // Começou ontem: hoje NÃO é dia de dose -> card vazio, nada nos contadores.
     await montarPagina(tester, estadoComInicio(hoje.subtract(const Duration(days: 1))), '/painel',
         (_) => const PainelIdoso());
     expect(find.text('Nada pendente'), findsOneWidget);
     expect(find.text('Remédio'), findsNothing);
     expect(find.text('Registrar dose'), findsNothing);
 
-    // Controle: começou anteontem -> hoje É dia de dose -> aparece no card.
     await montarPagina(tester, estadoComInicio(hoje.subtract(const Duration(days: 2))), '/painel',
         (_) => const PainelIdoso());
     expect(find.text('Registrar dose'), findsOneWidget);

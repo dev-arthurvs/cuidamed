@@ -25,10 +25,7 @@ import 'servicos/notificacao_servico.dart';
 import 'servicos/paciente_servico.dart';
 import 'utilitarios/tema.dart';
 
-/// Multiplica a escala de texto do sistema pela preferência do usuário.
 Widget aplicarEscalaFonte(BuildContext context, Widget? child) {
-  // O tamanho escolhido vale só dentro do sistema: deslogado (login, cadastro
-  // e ativação), as telas ficam sempre no tamanho padrão.
   final escala = context.select<AppEstado, double>((e) => e.autenticado ? e.escalaFonte : 1.0);
   final midia = MediaQuery.of(context);
   return MediaQuery(
@@ -62,10 +59,9 @@ GoRouter _construirRouter(AppEstado estado) {
         },
       ),
       GoRoute(
-        path: rotaDetalhesPaciente, // '/cuidador/paciente/:pacienteId'
+        path: rotaDetalhesPaciente,
         builder: (context, state) => DetalhePaciente(pacienteId: int.parse(state.pathParameters['pacienteId']!)),
         routes: [
-          // O antigo "Painel do paciente" agora faz parte dos detalhes do paciente.
           GoRoute(
             path: 'painel',
             redirect: (context, state) => '/cuidador/paciente/${state.pathParameters['pacienteId']}',
@@ -76,7 +72,6 @@ GoRouter _construirRouter(AppEstado estado) {
         path: '/agenda',
         builder: (context, state) => const AgendaMedicamentos(),
       ),
-      // Tratamentos encerrados viraram a aba "Encerrados" da Agenda.
       GoRoute(
         path: '/ciclos-encerrados',
         redirect: (context, state) => '/agenda?aba=encerrados',
@@ -97,7 +92,6 @@ GoRouter _construirRouter(AppEstado estado) {
       GoRoute(path: '/acessibilidade', builder: (context, state) => const Acessibilidade()),
       GoRoute(
         path: '/chat',
-        // O assistente responde sobre os remédios do próprio paciente logado.
         redirect: (context, state) => estado.usuario?.tipo == 'cuidador' ? '/painel' : null,
         builder: (context, state) => const Chat(),
       ),
@@ -123,8 +117,6 @@ class _CuidaMedAppState extends State<CuidaMedApp> {
     super.initState();
     _estado = AppEstado();
     _router = _construirRouter(_estado);
-    // "Lembrar agora" do cuidador e "Hora do remédio" — liga sozinho quando
-    // um paciente entra e desliga ao sair (ver MonitorAlertas).
     final pacientes = PacienteServico();
     _monitorAlertas = MonitorAlertas(
       estado: _estado,
@@ -133,7 +125,6 @@ class _CuidaMedAppState extends State<CuidaMedApp> {
       aoAlertar: dispararAlerta,
     );
     NotificacaoServico.instancia.inicializar();
-    // Lembretes de "Hora do remédio" agendados no celular: tocam com o app fechado.
     _lembretes = LembretesAgendados(
       estado: _estado,
       agendar: NotificacaoServico.instancia.agendarLembretes,
@@ -141,8 +132,6 @@ class _CuidaMedAppState extends State<CuidaMedApp> {
     );
     _estado.addListener(_aplicarTema);
     _estado.restaurarSessao();
-    // Voltou pro app (ou pra aba do navegador): vê se passou dos 7 dias sem uso
-    // e, se continua logado, sincroniza na hora.
     _ciclo = AppLifecycleListener(
       onHide: () => _estado.emSegundoPlano = true,
       onShow: () => _estado.emSegundoPlano = false,
@@ -151,23 +140,18 @@ class _CuidaMedAppState extends State<CuidaMedApp> {
         if (_estado.autenticado) await _estado.sincronizarDados();
       },
     );
-    // Com o app aberto o tempo todo, confere também de tempos em tempos.
     _relogioInatividade = Timer.periodic(const Duration(minutes: 10), (_) => _estado.verificarInatividade());
   }
 
   late final AppLifecycleListener _ciclo;
   late final Timer _relogioInatividade;
 
-  /// Modo claro/escuro: troca a paleta do CorApp quando o tema efetivo muda
-  /// (chave do menu, Configurações, login ou saída) e redesenha todas as telas
-  /// já abertas — as cores são lidas no build, então basta reconstruir, sem
-  /// perder o que está aberto (pilha de telas, formulários, rolagem).
   void _aplicarTema() {
     final escuro = _estado.usarModoEscuro;
     if (escuro == CorApp.escuro) return;
     CorApp.usarModoEscuro(escuro);
     if (!mounted) return;
-    setState(() {}); // tema do MaterialApp (construirTema) com a paleta nova
+    setState(() {});
     void marcar(Element elemento) {
       elemento.markNeedsBuild();
       elemento.visitChildren(marcar);
@@ -196,14 +180,9 @@ class _CuidaMedAppState extends State<CuidaMedApp> {
         scaffoldMessengerKey: chaveMensageiroGlobal,
         theme: construirTema(),
         routerConfig: _router,
-        // Português do Brasil: calendários em dia/mês/ano e botões do sistema
-        // ("Cancelar", "OK"...) em português.
         locale: const Locale('pt', 'BR'),
         supportedLocales: const [Locale('pt', 'BR')],
         localizationsDelegates: GlobalMaterialLocalizations.delegates,
-        // Tamanho da fonte escolhido no Perfil/Acessibilidade escala o texto
-        // do app inteiro, por cima da preferência de acessibilidade do sistema.
-        // Qualquer toque na tela conta como uso (saída após 7 dias sem uso).
         builder: (context, child) => Listener(
           behavior: HitTestBehavior.translucent,
           onPointerDown: (_) => _estado.registrarAtividade(),

@@ -1,14 +1,8 @@
-// Funções usadas pelos quatro testes: endereço da API, contas de teste e
-// chamadas que o app faz. Os testes só falam com a API, como o app; não leem
-// nem alteram dados de pacientes reais.
 import http from 'k6/http'
 import { check, fail } from 'k6'
 
-// API de testes no PC (banco cuidamed_k6) por padrão. Para o Railway:
-//   k6 run -e API=https://<endereço-da-api> carga.js
 export const API = (__ENV.API || 'http://localhost:8081').replace(/\/$/, '')
 
-// Marca de cada execução: deixa as contas de teste fáceis de achar e de apagar.
 export const EXECUCAO = `${Date.now()}`
 export const SENHA = 'senhaK6teste'
 
@@ -18,8 +12,6 @@ export function cabecalhos(token, extras = {}) {
   return { headers: { ...JSON_HEADERS, ...(token ? { Authorization: `Bearer ${token}` } : {}), ...extras } }
 }
 
-// `esperado`: status de uma recusa esperada (ex.: 403). Sem ele, o k6 conta
-// qualquer resposta 4xx/5xx como erro; com ele, só conta se vier outro status.
 function opcoes(token, tags, esperado) {
   const extra = esperado === undefined ? {} : { responseCallback: http.expectedStatuses(...[].concat(esperado)) }
   return { ...cabecalhos(token), tags, ...extra }
@@ -45,12 +37,10 @@ export function dados(resposta) {
   }
 }
 
-// O app usa a data de Brasília (UTC-3, sem horário de verão).
 export function diaDeBrasilia(somarDias = 0) {
   return new Date(Date.now() - 3 * 3600 * 1000 + somarDias * 86400 * 1000).toISOString().slice(0, 10)
 }
 
-// Telefone único por conta, pois a API não aceita o mesmo número em duas contas.
 export function telefoneDeTeste(numero) {
   const oito = String((Number(EXECUCAO) % 1000000) * 100 + numero).padStart(8, '0').slice(-8)
   return `(79) 9${oito.slice(0, 4)}-${oito.slice(4)}`
@@ -62,9 +52,9 @@ export function entrar(login, senha = SENHA) {
   return ok ? dados(resposta) : null
 }
 
-/** Paciente de teste que cria a própria conta, com um remédio diário às 08:00. */
 export function criarPacienteComRemedio(numero, { estoque = 1000, inicio = diaDeBrasilia() } = {}) {
   const email = `k6.paciente.${EXECUCAO}.${numero}@teste.cuidamed`
+  // Guardado na conta: o setup do k6 roda em outro contexto, com outro EXECUCAO.
   const telefone = telefoneDeTeste(numero)
   const cadastro = postar('/api/pacientes', {
     nome: `K6 Paciente ${numero}`,
@@ -89,8 +79,6 @@ export function criarPacienteComRemedio(numero, { estoque = 1000, inicio = diaDe
     quantidadePorDose: 1,
   }, sessao.token, { nome: 'cadastro' })
   if (remedio.status !== 201) fail(`remédio do paciente ${numero} falhou: ${remedio.status} ${remedio.body}`)
-  // O telefone vai junto: o k6 roda a preparação em outro contexto, onde a
-  // marca da execução (EXECUCAO) é outra.
   return { email, telefone, id: sessao.id, token: sessao.token, medicamentoId: dados(remedio).id }
 }
 
@@ -100,7 +88,6 @@ export function apagarPacientes(contas) {
   }
 }
 
-/** Cria as contas aos poucos, em lotes, para não medir o cadastro no lugar do uso. */
 export function criarContas(quantidade) {
   const contas = []
   for (let i = 1; i <= quantidade; i++) contas.push(criarPacienteComRemedio(i))

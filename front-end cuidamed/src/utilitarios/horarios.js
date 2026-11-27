@@ -1,5 +1,3 @@
-// Regra de negócio do alerta de horário: compara o horário agendado da dose
-// com o horário atual para decidir se ela está pendente, atrasada ou perdida.
 import { UNIDADE_ESTOQUE_POR_FORMA } from '../dados/dadosMock'
 
 const TOLERANCIA_ATRASO_MIN = 15
@@ -45,20 +43,16 @@ export function obterIniciais(nomeCompleto) {
   return (primeira + ultima).toUpperCase()
 }
 
-// No próprio dia do "fim" do ciclo, só considera encerrado depois que todas
-// as doses de hoje já foram registradas no histórico — senão o medicamento
-// desapareceria da agenda antes do cuidador conseguir confirmar a última dose.
 export function medicamentoEncerrado(medicamento, hojeIso = dataAtualISO(), historico = []) {
   if (!medicamento.fim) return false
   if (medicamento.fim < hojeIso) return true
   if (medicamento.fim > hojeIso) return false
-  if (!temDoseNoDia(medicamento, hojeIso)) return true // último dia sem dose: ciclo já cumprido
+  if (!temDoseNoDia(medicamento, hojeIso)) return true
   return medicamento.horarios.every((horario) =>
     historico.some((item) => item.medicamentoId === medicamento.id && item.data === hojeIso && item.horario === horario),
   )
 }
 
-// false enquanto a data de início do tratamento ainda não chegou.
 export function medicamentoIniciado(medicamento, hojeIso = dataAtualISO()) {
   return !medicamento.inicio || medicamento.inicio <= hojeIso
 }
@@ -73,16 +67,12 @@ export function somarDias(dataIso, dias) {
   return data.toISOString().slice(0, 10)
 }
 
-// Frequências que não são diárias: "Dias alternados" = dose a cada 2 dias e
-// "Semanal" = a cada 7, contando a partir da data de início. As demais
-// (1x/2x/3x ao dia, a cada 8 horas) têm dose todos os dias.
 const INTERVALO_DIAS_POR_FREQUENCIA = { 'Dias alternados': 2, Semanal: 7, DIAS_ALTERNADOS: 2, SEMANAL: 7 }
 
 export function intervaloEntreDiasDeDose(medicamento) {
   return INTERVALO_DIAS_POR_FREQUENCIA[medicamento.frequencia] || 1
 }
 
-// O remédio tem dose nesse dia? Considera início, fim e a frequência.
 export function temDoseNoDia(medicamento, diaIso = dataAtualISO()) {
   if (medicamento.inicio && diaIso < medicamento.inicio) return false
   if (medicamento.fim && diaIso > medicamento.fim) return false
@@ -91,7 +81,6 @@ export function temDoseNoDia(medicamento, diaIso = dataAtualISO()) {
   return diasEntre(medicamento.inicio, diaIso) % intervalo === 0
 }
 
-// Próximo dia (a partir de [aPartirIso], inclusive) com dose; null se o ciclo acaba antes.
 export function proximoDiaDeDose(medicamento, aPartirIso = dataAtualISO()) {
   let dia = medicamento.inicio && medicamento.inicio > aPartirIso ? medicamento.inicio : aPartirIso
   for (let i = 0; i < 8; i += 1) {
@@ -102,7 +91,6 @@ export function proximoDiaDeDose(medicamento, aPartirIso = dataAtualISO()) {
   return null
 }
 
-// Quantos dias com dose existem entre [deIso] e [ateIso] (inclusive).
 function contarDiasDeDose(medicamento, deIso, ateIso) {
   if (ateIso < deIso) return 0
   const intervalo = intervaloEntreDiasDeDose(medicamento)
@@ -113,8 +101,6 @@ function contarDiasDeDose(medicamento, deIso, ateIso) {
   return Math.floor(diasEntre(primeiro, ateIso) / intervalo) + 1
 }
 
-// null quando o medicamento não tem data final (uso contínuo/indefinido) —
-// nesse caso não dá pra calcular quantos dias faltam pro ciclo acabar.
 export function calcularDiasRestantesCiclo(dataFimIso, hojeIso = dataAtualISO()) {
   if (!dataFimIso) return null
   const fim = new Date(`${dataFimIso}T00:00:00Z`)
@@ -140,16 +126,9 @@ export function calcularIdade(dataNascimentoIso, hoje = new Date()) {
   return idade
 }
 
-// Substitui o array `dosesHoje` que antes vinha pronto do mock: monta a
-// agenda do dia combinando os horários de cada medicamento ativo com o
-// histórico de hoje (se já tiver um registro pra aquele horário, usa o
-// status gravado; senão calcula ao vivo, igual sempre foi feito).
 export function construirDosesHoje(medicamentosAtivos, historicoHoje, hojeIso = dataAtualISO()) {
   const doses = []
   for (const medicamento of medicamentosAtivos) {
-    // Só entra se hoje é dia de dose: tratamento que ainda não começou não tem
-    // dose (antes aparecia como "perdido"), e "Dias alternados"/"Semanal" só
-    // têm dose a cada 2/7 dias (antes geravam dose todo dia).
     if (!temDoseNoDia(medicamento, hojeIso)) continue
     for (const horario of medicamento.horarios) {
       const registrado = historicoHoje.find(
@@ -172,15 +151,9 @@ export function construirDosesHoje(medicamentosAtivos, historicoHoje, hojeIso = 
   return doses.sort((a, b) => a.horario.localeCompare(b.horario))
 }
 
-// Doses que já passaram do horário e não têm registro no histórico (ninguém
-// marcou "tomada" nem "perdida"). O Início já as mostra como atrasadas ou
-// perdidas, calculando na hora; o Histórico usa isto para mostrar o mesmo.
-// Dias anteriores: perdida. Hoje: atrasada ou perdida, pela mesma regra do
-// Início (dose ainda no horário não entra). Nada é gravado no banco.
 export function dosesSemRegistro(medicamentos, historico, deIso, ateIso, agora = new Date()) {
   const hojeIso = dataAtualISO(agora)
   const fim = ateIso > hojeIso ? hojeIso : ateIso
-  // Não precisa varrer dias antes do primeiro tratamento.
   const inicios = medicamentos.map((medicamento) => medicamento.inicio).filter(Boolean).sort()
   let dia = inicios.length && inicios[0] > deIso ? inicios[0] : deIso
   const registrados = new Set(historico.map((item) => `${item.medicamentoId}|${item.data}|${item.horario}`))
@@ -210,19 +183,12 @@ export function dosesSemRegistro(medicamentos, historico, deIso, ateIso, agora =
 
 export const DIAS_JANELA_ADESAO = 30
 
-// Web e mobile mantêm só os últimos dias do histórico, o suficiente para o Início,
-// o estoque e a adesão (um dia a mais, por segurança). Períodos mais antigos são
-// buscados pela tela de Histórico.
 export const DIAS_JANELA_HISTORICO = DIAS_JANELA_ADESAO + 1
 
 export function inicioJanelaHistorico(hojeIso = dataAtualISO()) {
   return somarDias(hojeIso, -DIAS_JANELA_HISTORICO)
 }
 
-// Adesão dos últimos 30 dias (hoje incluso) — é o período que as telas anunciam
-// ("Adesão média (30 dias)"). Dose que passou do limite sem registro conta como
-// perdida, a mesma regra do Início e do Histórico; a atrasada ainda não conta,
-// porque a pessoa ainda pode tomar.
 export function calcularAdesao(historico, medicamentos = [], hojeIso = dataAtualISO()) {
   const inicioJanela = new Date(`${hojeIso}T00:00:00Z`)
   inicioJanela.setUTCDate(inicioJanela.getUTCDate() - (DIAS_JANELA_ADESAO - 1))
@@ -238,9 +204,6 @@ export function calcularAdesao(historico, medicamentos = [], hojeIso = dataAtual
 
 const LIMIAR_DIAS_ESTOQUE_BAIXO = 5
 
-// Unidades que ainda serão consumidas até o fim do tratamento: doses de hoje
-// ainda não registradas + as dos dias seguintes (o back-end já desconta do
-// estoque cada dose registrada como tomada). null em uso contínuo (sem fim).
 function unidadesAteOFim(medicamento, historico, hojeIso, dosesPorDia, consumoPorDose) {
   if (!medicamento.fim || medicamento.fim < hojeIso) return null
   if (!medicamentoIniciado(medicamento, hojeIso)) {
@@ -261,10 +224,8 @@ export function calcularEstoque(medicamento, historico = [], hojeIso = dataAtual
   const dosesPorDia = medicamento.horarios.length || 1
   const consumoPorDose = temQuantidadePorDose ? Number(medicamento.quantidadePorDose) : 1
   const quantidade = Number(medicamento.quantidadeEstoque)
-  // Dias de calendário: em "Dias alternados"/"Semanal" cada dia de dose rende 2/7 dias.
   const diasRestantes = Math.floor(quantidade / (dosesPorDia * consumoPorDose)) * intervaloEntreDiasDeDose(medicamento)
   const necessarias = unidadesAteOFim(medicamento, historico, hojeIso, dosesPorDia, consumoPorDose)
-  // Se o que tem cobre tudo o que falta tomar até a data final, não precisa comprar.
   const duraAteOFim = necessarias != null && quantidade > 0 && quantidade >= necessarias
   return {
     quantidade,
@@ -276,7 +237,6 @@ export function calcularEstoque(medicamento, historico = [], hojeIso = dataAtual
   }
 }
 
-// Remédios com estoque baixo ou esgotado, para o Início e o painel do cuidador.
 export function avisosEstoque(medicamentosAtivos, historico = [], hojeIso = dataAtualISO()) {
   const avisos = []
   for (const medicamento of medicamentosAtivos) {

@@ -16,16 +16,6 @@ import com.cuidamed.cuidamed_backend.paciente.PacienteRepository;
 import com.cuidamed.cuidamed_backend.vinculo.SituacaoVinculo;
 import com.cuidamed.cuidamed_backend.vinculo.VinculoRepository;
 
-/**
- * Regras de "quem pode acessar o quê", usadas nos controllers antes de cada
- * operação. Em resumo:
- * <ul>
- * <li>o paciente acessa só os próprios dados;</li>
- * <li>o cuidador acessa só os pacientes vinculados a ele;</li>
- * <li>remédios: o cuidador altera sempre; o paciente, só se o cuidador liberou.</li>
- * </ul>
- * Qualquer tentativa fora disso recebe 403, sem revelar se o registro existe.
- */
 @Component
 public class Autorizacao {
 
@@ -47,7 +37,6 @@ public class Autorizacao {
         this.vinculoRepository = vinculoRepository;
     }
 
-    /** Usuário do token da requisição, ou null se ela veio sem login (rotas públicas). */
     public UsuarioAutenticado usuarioAtual() {
         Authentication autenticacao = SecurityContextHolder.getContext().getAuthentication();
         if (autenticacao == null || !(autenticacao.getPrincipal() instanceof Jwt token)) {
@@ -61,7 +50,6 @@ public class Autorizacao {
         return new UsuarioAutenticado(tipo, numero.longValue());
     }
 
-    /** O paciente em pessoa ou o cuidador vinculado a ele. */
     public void exigirAcessoAoPaciente(Long pacienteId) {
         UsuarioAutenticado usuario = exigirLogin();
         exigirId(pacienteId, "Informe o paciente.");
@@ -74,7 +62,6 @@ public class Autorizacao {
         throw semAcesso();
     }
 
-    /** Só o próprio paciente (ex.: trocar a senha dele, usar o chat). */
     public void exigirOProprioPaciente(Long pacienteId) {
         UsuarioAutenticado usuario = exigirLogin();
         if (!usuario.ehPaciente() || !usuario.id().equals(pacienteId)) {
@@ -82,11 +69,6 @@ public class Autorizacao {
         }
     }
 
-    /**
-     * Exige um cuidador logado e devolve o id dele. Os controllers usam esse id
-     * no lugar do "cuidadorId" que o app manda no corpo — assim ninguém age em
-     * nome de outro cuidador.
-     */
     public Long exigirCuidador() {
         UsuarioAutenticado usuario = exigirLogin();
         if (!usuario.ehCuidador()) {
@@ -95,7 +77,6 @@ public class Autorizacao {
         return usuario.id();
     }
 
-    /** Só o próprio cuidador (dados e senha da conta dele). */
     public void exigirOProprioCuidador(Long cuidadorId) {
         UsuarioAutenticado usuario = exigirLogin();
         if (!usuario.ehCuidador() || !usuario.id().equals(cuidadorId)) {
@@ -103,10 +84,6 @@ public class Autorizacao {
         }
     }
 
-    /**
-     * Ver os dados de um cuidador: ele mesmo, ou um paciente vinculado a ele (ou
-     * com pedido de vínculo pendente) — o perfil do paciente mostra o cuidador.
-     */
     public void exigirAcessoAoCuidador(Long cuidadorId) {
         UsuarioAutenticado usuario = exigirLogin();
         if (usuario.ehCuidador() && usuario.id().equals(cuidadorId)) {
@@ -119,7 +96,6 @@ public class Autorizacao {
         throw semAcesso();
     }
 
-    /** Criar, editar ou excluir remédios: cuidador vinculado, ou o paciente se o cuidador liberou. */
     public void exigirPodeAlterarMedicamentos(Long pacienteId) {
         UsuarioAutenticado usuario = exigirLogin();
         exigirId(pacienteId, "Informe o paciente.");

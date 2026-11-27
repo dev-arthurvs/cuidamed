@@ -11,7 +11,6 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
 
     Optional<Paciente> findByEmail(String email);
 
-    /** Pelo telefone, comparando só os dígitos (o número fica salvo com máscara). */
     @Query(value = "SELECT * FROM paciente WHERE regexp_replace(COALESCE(telefone_pac, ''), '[^0-9]', '', 'g') = :digitos",
             nativeQuery = true)
     List<Paciente> findByTelefoneDigitos(@Param("digitos") String digitos);

@@ -14,7 +14,6 @@ import com.cuidamed.cuidamed_backend.seguranca.LimitadorDeTentativas;
 @RestController
 public class AuthController {
 
-    // Até 5 senhas erradas por e-mail/telefone a cada 15 minutos; depois, espera.
     static final int MAXIMO_ERROS_LOGIN = 5;
     static final Duration JANELA_ERROS_LOGIN = Duration.ofMinutes(15);
     static final String MUITAS_TENTATIVAS = "Muitas tentativas de login. Aguarde 15 minutos e tente de novo.";

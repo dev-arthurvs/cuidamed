@@ -1,5 +1,3 @@
-// Ícones de traço usados dentro dos campos de formulário (mesmo estilo dos
-// ícones do menu). 20 px, herdam a cor do texto.
 const propsSvg = {
   width: 20,
   height: 20,

@@ -2,25 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-/// Animações do app — mesmas do web (utilitarios/animacoes.js, LayoutApp.jsx e
-/// os @keyframes cm-modal-* do global.css), pra manter a mesma sensação de
-/// movimento nas duas plataformas. Todas respeitam o "reduzir movimento" do
-/// sistema (o web faz o mesmo com prefers-reduced-motion).
-
-/// Itens de lista: 0,22 s easeOut (TRANSICAO_ITEM_LISTA do web).
 const duracaoItemLista = Duration(milliseconds: 220);
 
-/// Troca de tela: 0,22 s easeInOut (variantesPagina do LayoutApp.jsx).
 const duracaoPagina = Duration(milliseconds: 220);
 
-/// Caixas de diálogo: cubic-bezier(0.16, 1, 0.3, 1) — sobe e "assenta".
 const curvaModal = Cubic(0.16, 1, 0.3, 1);
 
 bool _semAnimacao(BuildContext context) => MediaQuery.maybeDisableAnimationsOf(context) ?? false;
 
-/// Entrada de item de lista (VARIANTES_ITEM_LISTA do web): aparece subindo
-/// [deslocamento] px e crescendo de 98% → 100%. [indice] escalona a entrada
-/// dos itens (cascata curta, no máximo 240 ms de atraso).
 class EntradaSuave extends StatefulWidget {
   final Widget child;
   final int indice;
@@ -92,8 +81,6 @@ class _EntradaSuaveState extends State<EntradaSuave> with SingleTickerProviderSt
   }
 }
 
-/// Troca de tela (LayoutApp.jsx do web): a nova página aparece com fade
-/// subindo 10 px. Registrada no tema, vale pro GoRouter e pro Navigator.
 class TransicaoPaginaCuidaMed extends PageTransitionsBuilder {
   const TransicaoPaginaCuidaMed();
 
@@ -124,8 +111,6 @@ class TransicaoPaginaCuidaMed extends PageTransitionsBuilder {
   }
 }
 
-/// Caixa de diálogo com a animação dos modais do web: fundo escurece (fade) e
-/// a caixa sobe 16 px crescendo de 97% → 100% com curva "elástica".
 Future<T?> mostrarDialogoAnimado<T>({
   required BuildContext context,
   required WidgetBuilder builder,
@@ -156,8 +141,6 @@ Future<T?> mostrarDialogoAnimado<T>({
   );
 }
 
-/// Para AnimatedSwitcher: o conteúdo novo entra com fade subindo [deslocamento]
-/// px (como os `initial: {opacity: 0, y: 8}` do framer-motion no web).
 AnimatedSwitcherTransitionBuilder transicaoTrocaSuave({double deslocamento = 8}) {
   return (filho, animacao) {
     final curva = CurvedAnimation(parent: animacao, curve: Curves.easeOut);

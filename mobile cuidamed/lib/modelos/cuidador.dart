@@ -1,4 +1,3 @@
-/// Espelha CuidadorRespostaDTO (back-end cuidamed/.../cuidador/CuidadorRespostaDTO.java).
 class Cuidador {
   final int id;
   final String nome;
@@ -18,7 +17,7 @@ class Cuidador {
     return Cuidador(
       id: json['id'] as int,
       nome: json['nome'] as String,
-      email: json['email'] as String? ?? '', // opcional: pode entrar pelo telefone
+      email: json['email'] as String? ?? '',
       profissao: json['profissao'] as String?,
       telefone: json['telefone'] as String?,
     );

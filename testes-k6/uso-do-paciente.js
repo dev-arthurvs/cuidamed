@@ -1,7 +1,3 @@
-// O que um paciente faz no app, usado pelos testes de carga e de estresse:
-// abre o Início (dados, remédios e últimos 31 dias do histórico), registra a
-// dose e desfaz. Registrar e desfazer devolve o estoque, então o teste pode
-// repetir sem acumular dados.
 import { check, group, sleep } from 'k6'
 import { apagar, buscar, dados, diaDeBrasilia, postar } from './comum.js'
 

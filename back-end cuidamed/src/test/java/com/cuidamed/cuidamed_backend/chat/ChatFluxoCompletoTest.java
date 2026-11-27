@@ -32,10 +32,6 @@ import com.cuidamed.cuidamed_backend.seguranca.ServicoToken;
 import com.cuidamed.cuidamed_backend.seguranca.UsuarioAutenticado;
 import com.jayway.jsonpath.JsonPath;
 
-/**
- * O chat de ponta a ponta, com a Anthropic simulada (não gasta a chave). Sem
- * transação no teste, como em produção; o que é criado aqui é apagado no fim.
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 class ChatFluxoCompletoTest {

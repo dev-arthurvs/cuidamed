@@ -13,10 +13,6 @@ export default function BarraSuperior() {
   const { usuario, pacientes, pacienteFoco, selecionarPaciente } = useApp()
   const navegar = useNavigate()
   const location = useLocation()
-  // Dois estados separados: "passando o mouse" mostra a lista (prévia) e o
-  // clique "trava" a lista aberta até escolher um paciente, clicar fora ou
-  // apertar Esc. Antes era um estado só, e o clique fechava a lista que o
-  // mouse tinha acabado de abrir.
   const [itemSobMouse, setItemSobMouse] = useState(null)
   const [itemTravado, setItemTravado] = useState(null)
   const [ajudaAberta, setAjudaAberta] = useState(false)
@@ -52,8 +48,6 @@ export default function BarraSuperior() {
     setItemSobMouse(rota)
   }
 
-  // Pequena folga antes de fechar a prévia: se o mouse escapa por um instante
-  // no caminho até a lista, ela não some.
   function aoSairDoMenu(rota) {
     clearTimeout(temporizadorSaida.current)
     temporizadorSaida.current = setTimeout(() => {
@@ -61,7 +55,6 @@ export default function BarraSuperior() {
     }, 150)
   }
 
-  // Clique no menu: trava a lista aberta; clicar de novo no mesmo menu destrava e fecha.
   function alternarTrava(rota) {
     if (itemTravado === rota) {
       setItemTravado(null)
@@ -97,7 +90,6 @@ export default function BarraSuperior() {
             )
           }
 
-          // Com uma lista travada, só ela fica aberta; sem trava, abre a que está sob o mouse.
           const aberto = itemTravado ? itemTravado === item.rota : itemSobMouse === item.rota
           const travado = itemTravado === item.rota
 
@@ -156,7 +148,6 @@ export default function BarraSuperior() {
         })}
       </div>
 
-      {/* Engrenagem (Configurações) e "?" (ajuda da tela) no canto direito. */}
       <div className="barra-superior__acoes">
         <NavLink
           to="/configuracoes"

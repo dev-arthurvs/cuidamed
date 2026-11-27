@@ -3,14 +3,6 @@ import { DATA_MAXIMA, DATA_MINIMA, formatarEmailOuTelefone, formatarTelefone } f
 import { ICONE_OLHO, ICONE_OLHO_FECHADO } from './iconesCampo'
 import './Campo.css'
 
-// `icone`: ícone dentro do campo, à esquerda (ver iconesCampo.jsx).
-// `alternarSenha`: em campos de senha, botão de "olho" para mostrar/esconder
-// o que foi digitado (ajuda quem erra a digitação, comum entre idosos).
-// Sem esses dois, o campo é exatamente como antes.
-// Máscaras automáticas: telefone (tipo="tel") vira "(79) 99999-9999" e data
-// (tipo="date") fica com ano de 4 dígitos, entre 1900 e 2100 (min/max podem
-// ser passados para restringir mais, ex.: nascimento até hoje). Em
-// tipo="email-ou-telefone", só números ganham a máscara de telefone.
 export default function Campo({ rotulo, tipo = 'texto', className = '', icone, alternarSenha = false, children, ...resto }) {
   const [senhaVisivel, setSenhaVisivel] = useState(false)
   const classes = ['campo', className].filter(Boolean).join(' ')

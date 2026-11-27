@@ -44,7 +44,6 @@ public class HistoricoController {
         return historicoService.listarPorPaciente(pacienteId, data, medicamentoId, de, ate);
     }
 
-    /** "Desfazer" uma dose registrada por engano (só as de hoje). */
     @DeleteMapping("/api/historicos/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void desfazer(@PathVariable Long id) {

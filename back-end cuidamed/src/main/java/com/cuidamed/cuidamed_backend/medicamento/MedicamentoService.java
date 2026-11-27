@@ -100,10 +100,6 @@ public class MedicamentoService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medicamento não encontrado."));
     }
 
-    // Não faz clear()+recriar tudo: horários que continuam iguais entre a edição
-    // anterior e a nova ficam intocados. Um clear()+add() com o mesmo horário fazia
-    // o Hibernate tentar inserir a linha nova antes de apagar a antiga na mesma
-    // flush, violando a constraint de unicidade (medicamento_id_hor, hora_hor).
     private void substituirHorarios(Medicamento medicamento, List<String> horariosTexto) {
         Set<LocalTime> novosHorarios = horariosTexto.stream()
                 .map(this::interpretarHora)
@@ -139,13 +135,10 @@ public class MedicamentoService {
         }
     }
 
-    // Dosagem é opcional (saiu do formulário); vazia vira nulo no banco.
     private static String textoOuNulo(String texto) {
         return texto == null || texto.isBlank() ? null : texto.trim();
     }
 
-    // Pomada não tem controle de estoque: não dá pra contar "unidades" de pomada
-    // do mesmo jeito que comprimido ou xarope.
     private void validarCamposObrigatorios(
             String nome, FormaMedicamento forma, FrequenciaMedicamento frequencia,
             LocalDate dataInicio, List<String> horarios, Integer quantidadeEstoque, Integer quantidadePorDose) {

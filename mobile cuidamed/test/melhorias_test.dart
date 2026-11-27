@@ -82,9 +82,9 @@ void main() {
         dias: 2,
       );
       expect(lembretes.map((l) => l.quando), [
-        DateTime(2026, 11, 2, 15, 0), // B hoje
-        DateTime(2026, 11, 2, 20, 0), // A hoje; 08:00 já passou e 18:00 foi registrada
-        DateTime(2026, 11, 3, 8, 0), // A amanhã (B terminou hoje)
+        DateTime(2026, 11, 2, 15, 0),
+        DateTime(2026, 11, 2, 20, 0),
+        DateTime(2026, 11, 3, 8, 0),
         DateTime(2026, 11, 3, 20, 0),
       ]);
       expect(lembretes.first.corpo, 'Está na hora de tomar B.');
@@ -125,7 +125,7 @@ void main() {
       expect(agendamentos, hasLength(1));
       expect(agendamentos.single, greaterThan(0));
 
-      estado.notifyListeners(); // nada mudou: não agenda de novo
+      estado.notifyListeners();
       expect(agendamentos, hasLength(1));
 
       _comRemedios(estado, []);
@@ -184,11 +184,8 @@ void main() {
       final hojeIso = dataAtualISO();
       final ontem = diaHoje.subtract(const Duration(days: 1));
       final medicamento = _med(horarios: const ['08:00'], inicio: ontem, fim: ontem);
-      // Ontem: 1 dose sem registro (perdida). Nenhuma tomada.
       expect(calcularAdesao(const [], medicamentos: [medicamento], hojeIso: hojeIso), 0);
-      // Com o registro de tomada, a mesma dose vira 100%.
       expect(calcularAdesao([_registro(1, ontem, '08:00', 'TOMADO')], medicamentos: [medicamento], hojeIso: hojeIso), 100);
-      // Sem remédios nem registros não há o que cobrar.
       expect(calcularAdesao(const [], hojeIso: hojeIso), 100);
     });
   });

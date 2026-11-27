@@ -1,5 +1,3 @@
-/* Cartão do paciente: visual de cartão de plano de saúde (azul-marinho, com
-   brilho e círculos decorativos, chip dourado e dados em caixa alta). */
 .cartao-paciente {
   position: relative;
   overflow: hidden;
@@ -40,7 +38,6 @@
   gap: 14px;
 }
 
-/* Chip dourado, como nos cartões de verdade. */
 .cartao-paciente__chip {
   width: 46px;
   height: 34px;
@@ -114,7 +111,6 @@
   line-height: 1.1;
 }
 
-/* Bolinha colorida identifica cada contador (verde, azul, amarelo). */
 .cartao-paciente__dose span {
   display: flex;
   align-items: center;

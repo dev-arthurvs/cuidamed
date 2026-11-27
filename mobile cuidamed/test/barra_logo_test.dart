@@ -51,7 +51,7 @@ void main() {
     final logo = tester.getRect(find.byType(LogoCuidaMed).first);
     expect(logo.top, greaterThanOrEqualTo(40));
     final cabecalho = tester.getRect(find.byType(Cabecalho));
-    expect(cabecalho.top, lessThan(40 + BarraComLogo.alturaFaixa + 2)); // sem espaço duplicado da barra de status
+    expect(cabecalho.top, lessThan(40 + BarraComLogo.alturaFaixa + 2));
     expect(tester.takeException(), isNull);
   });
 
@@ -62,18 +62,16 @@ void main() {
     final ajuda = tester.getRect(find.byTooltip('Ajuda desta tela'));
     final cabecalho = tester.getRect(find.byType(Cabecalho));
 
-    expect(logo.left, closeTo(20, 8)); // a logo abre a faixa
-    expect(ajuda.center.dy, closeTo(logo.center.dy, 2)); // "?" na faixa de cima
+    expect(logo.left, closeTo(20, 8));
+    expect(ajuda.center.dy, closeTo(logo.center.dy, 2));
     expect(ajuda.bottom, lessThanOrEqualTo(cabecalho.top + 1));
-    expect(360 - ajuda.right, greaterThanOrEqualTo(12)); // afastado da borda direita
-    expect(360 - ajuda.right, lessThanOrEqualTo(24)); // mas encostado no canto, não no meio
+    expect(360 - ajuda.right, greaterThanOrEqualTo(12));
+    expect(360 - ajuda.right, lessThanOrEqualTo(24));
 
-    // Engrenagem (Configurações) logo à esquerda do "?", na mesma linha.
     final engrenagem = tester.getRect(find.byTooltip('Configurações'));
     expect(engrenagem.right, lessThanOrEqualTo(ajuda.left + 1));
     expect(engrenagem.center.dy, closeTo(ajuda.center.dy, 2));
 
-    // O cabeçalho da tela não repete os botões.
     expect(find.descendant(of: find.byType(Cabecalho), matching: find.byIcon(Icons.help_outline)), findsNothing);
   });
 
@@ -92,7 +90,7 @@ void main() {
     final engrenagem = tester.getRect(find.byTooltip('Configurações'));
     expect(1000 - ajuda.right, lessThanOrEqualTo(24));
     expect(engrenagem.right, lessThanOrEqualTo(ajuda.left + 1));
-    expect(ajuda.left - engrenagem.right, lessThan(20)); // lado a lado, sem buraco entre eles
+    expect(ajuda.left - engrenagem.right, lessThan(20));
   });
 
   testWidgets('Tocar na engrenagem abre as Configurações', (tester) async {

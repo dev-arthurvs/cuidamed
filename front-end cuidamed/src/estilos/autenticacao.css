@@ -1,13 +1,9 @@
-/* Telas de Login, Cadastro e Ativar acesso.
-   O gradiente azul ocupa a tela inteira; a marca fica à esquerda e o card
-   branco do formulário "flutua" sobre o fundo à direita (sombra profunda). */
 .autenticacao {
   min-height: calc(100vh / var(--fator-zoom, 1));
   display: flex;
   flex-wrap: wrap;
   align-items: stretch;
   color: #fff;
-  /* Duas luzes suaves sobre o gradiente dão profundidade ao fundo. */
   background:
     radial-gradient(circle at 12% 18%, rgba(74, 168, 240, 0.32), transparent 42%),
     radial-gradient(circle at 88% 92%, rgba(4, 22, 52, 0.55), transparent 48%),
@@ -17,7 +13,6 @@
 .autenticacao__hero {
   flex: 1 1 420px;
   min-width: 0;
-  /* Fica parado enquanto um formulário longo (cadastro) rola ao lado. */
   position: sticky;
   top: 0;
   align-self: flex-start;
@@ -71,7 +66,6 @@
   color: var(--texto);
   border-radius: 22px;
   padding: 40px 40px 32px;
-  /* Sombra longa e escura: o card parece sair do fundo azul. */
   box-shadow:
     0 32px 70px rgba(3, 16, 42, 0.45),
     0 4px 14px rgba(3, 16, 42, 0.18);
@@ -94,9 +88,6 @@
   margin: 6px 0 0;
 }
 
-/* "Esqueci minha senha": discreto, alinhado à direita logo abaixo da senha. */
-/* "Lembrar de mim" à esquerda e "Esqueci minha senha" à direita, na mesma
-   linha logo abaixo da senha. */
 .autenticacao__opcoes {
   display: flex;
   align-items: center;
@@ -142,7 +133,6 @@
   text-decoration: underline;
 }
 
-/* Campos do card: brancos, com borda fina e realce azul ao focar. */
 .autenticacao__caixa .campo__entrada {
   background: #fff;
   border-color: #cfdcec;
@@ -159,7 +149,6 @@
   color: var(--azul);
 }
 
-/* Botão principal sóbrio: azul sólido e escuro, em vez do degradê. */
 .autenticacao__caixa .botao--primario {
   background: var(--azul-solido);
   box-shadow: 0 10px 22px rgba(15, 63, 128, 0.28);
@@ -169,8 +158,6 @@
   background: var(--azul-escuro);
 }
 
-/* Rodapé do card: linha divisória e os outros caminhos como dois botões de
-   contorno lado a lado (mais fáceis de achar e tocar que links no texto). */
 .autenticacao__alternativas {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -248,7 +235,6 @@
   border-color: var(--azul);
 }
 
-/* Celular / tela estreita: marca centralizada em cima, card logo abaixo. */
 @media (max-width: 900px) {
   .autenticacao {
     flex-direction: column;
@@ -284,7 +270,6 @@
   }
 }
 
-/* Celular muito estreito: os dois botões do rodapé um abaixo do outro. */
 @media (max-width: 380px) {
   .autenticacao__alternativas {
     grid-template-columns: 1fr;

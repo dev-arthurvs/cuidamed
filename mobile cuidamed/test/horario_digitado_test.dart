@@ -6,8 +6,6 @@ import 'package:cuidamed_mobile/paginas/formulario_medicamento.dart';
 import 'apoio.dart';
 
 void main() {
-  // No navegador (e no desktop) os botões são compactos e, com a fonte "Pequena",
-  // o relógio do Flutter ficava menor que o mínimo dele ao trocar para digitar a hora.
   for (final tamanho in ['pequena', 'media', 'grande']) {
     testWidgets('Digitar o horário na mão (17:10) funciona com a fonte $tamanho', (tester) async {
       await montarPagina(tester, estadoPaciente()..tamanhoFonte = tamanho, '/agenda/novo', (_) => const FormularioMedicamento());
@@ -20,7 +18,6 @@ void main() {
 
       expect(tester.takeException(), isNull);
 
-      // Horário da tarde digitado no formato de 24 horas, como no Brasil.
       final campos = find.descendant(of: find.byType(Dialog), matching: find.byType(TextField));
       await tester.enterText(campos.at(0), '17');
       await tester.enterText(campos.at(1), '10');

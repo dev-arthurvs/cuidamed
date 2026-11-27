@@ -1,10 +1,6 @@
-/// Conteúdo do guia de ajuda — porta de front-end cuidamed/src/utilitarios/ajudaConteudo.js,
-/// com os passos ajustados ao que existe no app (toque, barra inferior, menu).
-/// Usado na tela de Acessibilidade (guia completo) e no botão "?" do cabeçalho
-/// (só a seção da tela atual).
 class SecaoAjuda {
   final String chave;
-  final String publico; // 'paciente' | 'cuidador' | 'ambos'
+  final String publico;
   final String titulo;
   final String paraQueServe;
   final List<String> passos;

@@ -64,7 +64,6 @@
   height: 18px;
 }
 
-/* Engrenagem na tela de Configurações: preenchida, como item ativo. */
 .barra-superior__ajuda--ativo,
 .barra-superior__ajuda--ativo:hover {
   background: var(--azul-texto);
@@ -141,9 +140,6 @@
   gap: 2px;
 }
 
-/* "Ponte" invisível cobrindo o vão de 8px entre o menu e a lista: sem ela, o
-   mouse "saía" do menu ao atravessar o vão e a lista fechava antes de ser
-   alcançada. */
 .barra-superior__dropdown::before {
   content: '';
   position: absolute;

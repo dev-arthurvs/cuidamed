@@ -26,11 +26,11 @@ void main() {
     const hoje = '2026-09-24';
     test('ignora registros mais antigos que 30 dias', () {
       final historico = [
-        _h('2026-08-01', 'PERDIDO'), _h('2026-08-02', 'PERDIDO'), // fora da janela
-        _h('2026-08-26', 'TOMADO'), // 29 dias atrás: dentro
+        _h('2026-08-01', 'PERDIDO'), _h('2026-08-02', 'PERDIDO'),
+        _h('2026-08-26', 'TOMADO'),
         _h('2026-09-24', 'PERDIDO'),
       ];
-      expect(calcularAdesao(historico, hojeIso: hoje), 50); // antes: 25%
+      expect(calcularAdesao(historico, hojeIso: hoje), 50);
     });
     test('30 dias atrás já fica fora', () {
       expect(calcularAdesao([_h('2026-08-25', 'PERDIDO')], hojeIso: hoje), 100);
@@ -85,9 +85,9 @@ void main() {
     var redesenhos = 0;
     estado.addListener(() => redesenhos++);
     await tester.pump(const Duration(seconds: 31));
-    expect(redesenhos, 0); // sem login: nenhum relógio
+    expect(redesenhos, 0);
 
-    estado.iniciarRelogio(); // o login liga o relógio
+    estado.iniciarRelogio();
     await tester.pump(const Duration(seconds: 30));
     expect(redesenhos, 1);
     await tester.pump(const Duration(seconds: 30));
@@ -96,7 +96,7 @@ void main() {
     await estado.sair();
     final depoisDeSair = redesenhos;
     await tester.pump(const Duration(seconds: 90));
-    expect(redesenhos, depoisDeSair); // saiu: relógio parado
+    expect(redesenhos, depoisDeSair);
     estado.dispose();
   });
 

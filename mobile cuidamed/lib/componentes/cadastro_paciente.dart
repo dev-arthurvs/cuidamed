@@ -12,13 +12,8 @@ import 'campo_texto.dart';
 
 const _opcoesSexo = ['Feminino', 'Masculino', 'Outro'];
 
-/// Largura a partir da qual o cadastro abre como janela centralizada (como o
-/// modal do web); abaixo disso, sobe como painel inferior de tela quase cheia.
 const _larguraJanela = 700.0;
 
-/// Abre o "Cadastrar novo paciente" do cuidador — equivalente ao
-/// paginas/CadastroPaciente.jsx do web: mesmos campos, textos e validações,
-/// sem senha (o paciente cria a própria em "Ativar meu acesso").
 Future<void> abrirCadastroPaciente(BuildContext context) async {
   final mensageiro = ScaffoldMessenger.of(context);
   final largo = MediaQuery.sizeOf(context).width >= _larguraJanela;
@@ -28,7 +23,6 @@ Future<void> abrirCadastroPaciente(BuildContext context) async {
       context: context,
       barrierColor: const Color(0x800C2342),
       builder: (_) => Dialog(
-        // Branco puro como o modal do web (o Material 3 tinge diálogos por padrão).
         backgroundColor: CorApp.fundoCard,
         surfaceTintColor: Colors.transparent,
         insetPadding: const EdgeInsets.all(24),
@@ -235,8 +229,6 @@ class _FormularioCadastroPacienteState extends State<_FormularioCadastroPaciente
       children: [
         CampoTexto(rotulo: 'Nome completo', rotuloExterno: true, placeholder: 'Ex.: Maria Aparecida Souza', controller: _nome),
         const SizedBox(height: 16),
-        // Lado a lado quando há espaço (como o grid do web); empilhados no celular,
-        // onde a data espremida quebrava em duas linhas.
         LayoutBuilder(
           builder: (context, r) => r.maxWidth >= 420
               ? Row(
@@ -282,7 +274,6 @@ class _FormularioCadastroPacienteState extends State<_FormularioCadastroPaciente
             tipoTeclado: TextInputType.phone,
             onSubmitted: (_) => _salvar(),
           ),
-          // Pelo topo: a caixa "Não tenho e-mail" deixa a coluna do e-mail mais alta.
           alinhar: CrossAxisAlignment.start,
         ),
       ],

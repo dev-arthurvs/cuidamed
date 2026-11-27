@@ -15,7 +15,6 @@ import 'apoio.dart';
 
 const _texto = 'Voltar para os detalhes do paciente';
 
-/// Router com o caminho real: painel → detalhes → agenda → histórico de doses.
 Future<GoRouter> _montarFluxo(WidgetTester tester, AppEstado estado) async {
   SharedPreferences.setMockInitialValues({});
   tester.view.physicalSize = const Size(360, 800);
@@ -74,7 +73,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('tela detalhes'), findsOneWidget);
 
-    // O painel continua embaixo: voltar dos detalhes leva ao painel.
     router.pop();
     await tester.pumpAndSettle();
     expect(find.text('tela painel'), findsOneWidget);

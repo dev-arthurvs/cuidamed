@@ -29,8 +29,6 @@ function IconeStatus({ status }) {
 
 const ROTULO_STATUS = { tomado: 'Tomada', perdido: 'Perdida', atrasado: 'Atrasada', pendente: 'Pendente' }
 
-// Linha pequena (dose anterior em cima, próxima embaixo): tomada em verde com
-// ✓; perdida em vermelho, riscada e com ✕; pendente/atrasada em branco.
 function LinhaDose({ dose, posicao }) {
   if (!dose) return <div className="carrossel-doses__vaga" />
   if (dose.fim) {
@@ -54,22 +52,14 @@ function LinhaDose({ dose, posicao }) {
   )
 }
 
-/**
- * Card "Doses de hoje" da tela inicial: carrossel vertical com a dose anterior
- * (pequena, em cima), a dose em foco (grande, com "Registrar dose" ao lado
- * quando é a dose da vez) e a próxima (pequena, embaixo). Só as duas setas
- * trocam de dose: rolar ou arrastar sobre o card move a página.
- */
 export default function CarrosselDoses({ doses, aoRegistrar, aoDesfazer }) {
   const indiceDaVez = doses.findIndex((dose) => dose.status === 'pendente' || dose.status === 'atrasado')
-  // Sem dose da vez, entra um item final "Nada pendente" depois da última dose.
   const itens = indiceDaVez === -1 ? [...doses, FIM] : doses
   const indiceInicial = indiceDaVez === -1 ? itens.length - 1 : indiceDaVez
   const chaveDaVez = indiceDaVez === -1 ? `fim-${doses.length}` : doses[indiceDaVez].id
 
   const [foco, setFoco] = useState(indiceInicial)
   const [direcao, setDirecao] = useState(1)
-  // Logo depois de registrar, oferece "Desfazer" por alguns segundos.
   const [registrada, setRegistrada] = useState(null)
   useEffect(() => {
     if (!registrada) return undefined
@@ -86,7 +76,6 @@ export default function CarrosselDoses({ doses, aoRegistrar, aoDesfazer }) {
     aoDesfazer(dose)
   }
 
-  // Quando a dose da vez muda (ex.: acabou de registrar), o foco volta pra ela.
   const [chaveAnterior, setChaveAnterior] = useState(chaveDaVez)
   if (chaveAnterior !== chaveDaVez) {
     setChaveAnterior(chaveDaVez)
@@ -171,7 +160,6 @@ export default function CarrosselDoses({ doses, aoRegistrar, aoDesfazer }) {
                     )}
                   </div>
                   <div className="carrossel-doses__nome">{atual.nome}</div>
-                  {/* Quantidade por dose (ex.: "1 comp"); pomada não tem. */}
                   {formatarQuantidadePorDose(atual) && (
                     <div className="carrossel-doses__quantidade">{formatarQuantidadePorDose(atual)}</div>
                   )}
@@ -189,7 +177,6 @@ export default function CarrosselDoses({ doses, aoRegistrar, aoDesfazer }) {
               </div>
             )}
 
-            {/* Abre espaço para a seta do canto inferior, que fica fora da animação. */}
             <div className="carrossel-doses__linha-proxima">
               <LinhaDose dose={proxima} posicao="proxima" />
             </div>
@@ -211,7 +198,6 @@ export default function CarrosselDoses({ doses, aoRegistrar, aoDesfazer }) {
         </button>
       )}
 
-      {/* No body: as animações da página mudariam a referência do position: fixed. */}
       {createPortal(
         <AnimatePresence>
           {registrada && (

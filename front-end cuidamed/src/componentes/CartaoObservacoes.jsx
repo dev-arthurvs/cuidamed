@@ -2,9 +2,6 @@ import { useState } from 'react'
 import { useApp } from '../contexto/useApp'
 import Botao from './Botao'
 
-// Card "Observações clínicas" dos detalhes do paciente, editável no próprio
-// card pelo cuidador. O texto é salvo no paciente (observacoesClinicas) e
-// também entra no contexto do assistente de IA.
 export default function CartaoObservacoes({ paciente }) {
   const { atualizarObservacoesClinicas, mostrarToast } = useApp()
   const salvo = paciente.observacoesClinicas || ''
@@ -12,10 +9,6 @@ export default function CartaoObservacoes({ paciente }) {
   const [base, setBase] = useState(salvo)
   const [salvando, setSalvando] = useState(false)
 
-  // A sincronização automática (a cada 30 s) pode trazer um valor novo do
-  // servidor: só atualiza o campo se a pessoa não estiver no meio de uma edição.
-  // (Ajuste de estado durante a renderização — o padrão recomendado pelo React
-  // para reagir a mudança de prop, em vez de setState dentro de useEffect.)
   if (salvo !== base) {
     setBase(salvo)
     if (rascunho === base) setRascunho(salvo)

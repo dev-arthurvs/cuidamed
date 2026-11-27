@@ -5,12 +5,9 @@ import '../utilitarios/horarios.dart';
 import '../utilitarios/tema.dart';
 import 'cartao.dart';
 
-/// Remédios com estoque baixo ou esgotado, como em AvisosEstoque.jsx do web.
-/// Sem nenhum, o card não aparece.
 class AvisosEstoque extends StatelessWidget {
   final PacienteComDados dados;
 
-  /// Espaço acima do card, só quando ele aparece.
   final double espacoAcima;
 
   const AvisosEstoque({super.key, required this.dados, this.espacoAcima = 20});

@@ -5,10 +5,6 @@ import '../modelos/paciente.dart';
 import '../utilitarios/tema.dart';
 import 'cabecalho.dart';
 
-/// "Cartão do paciente" da tela inicial, no formato de cartão de plano de
-/// saúde — equivalente ao CartaoPaciente.jsx do web: identifica o paciente
-/// (nome, nascimento, sexo, nº) e resume o dia (doses tomadas, a tomar e
-/// atrasadas), com o atalho para a agenda.
 class CartaoPaciente extends StatelessWidget {
   final Paciente paciente;
   final int tomados;
@@ -25,7 +21,6 @@ class CartaoPaciente extends StatelessWidget {
 
   static const _sexoParaTexto = {'FEMININO': 'Feminino', 'MASCULINO': 'Masculino', 'OUTRO': 'Outro'};
 
-  /// Código do vínculo como número de cartão: 12 → "0000 0012".
   static String numeroDoCartao(int id) {
     final digitos = id.toString().padLeft(8, '0');
     return '${digitos.substring(0, 4)} ${digitos.substring(4)}';
@@ -49,7 +44,6 @@ class CartaoPaciente extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
-            // Círculos de brilho, como nos cartões de verdade.
             const Positioned(right: -60, top: -80, child: _Circulo(tamanho: 220, cor: Color(0x29FFFFFF))),
             const Positioned(right: -40, bottom: -110, child: _Circulo(tamanho: 240, cor: Color(0x474AA8F0))),
             Padding(
@@ -61,7 +55,6 @@ class CartaoPaciente extends StatelessWidget {
                     children: [
                       const LogoCuidaMed(tamanho: 34, tamanhoTexto: 20, claro: true),
                       const SizedBox(width: 12),
-                      // Flexível: em tela estreita (ou fonte grande) quebra em vez de estourar.
                       Expanded(
                         child: Text(
                           'CARTÃO DO PACIENTE',
@@ -96,7 +89,6 @@ class CartaoPaciente extends StatelessWidget {
                     children: [
                       _Dado(rotulo: 'NASCIMENTO', valor: _data(paciente.dataNascimento)),
                       _Dado(rotulo: 'SEXO', valor: _sexoParaTexto[paciente.sexo] ?? '—'),
-                      // Nº do cartão = código do vínculo com o cuidador: só com cuidador vinculado.
                       if (paciente.codigoVinculo != null)
                         _Dado(rotulo: 'Nº DO CARTÃO', valor: numeroDoCartao(paciente.codigoVinculo!), espacado: true),
                     ],
@@ -104,7 +96,6 @@ class CartaoPaciente extends StatelessWidget {
                   const SizedBox(height: 16),
                   Container(height: 1, color: Colors.white.withValues(alpha: 0.18)),
                   const SizedBox(height: 14),
-                  // Wrap: se não couberem lado a lado, descem para a linha de baixo.
                   Wrap(
                     spacing: 22,
                     runSpacing: 10,
@@ -152,7 +143,6 @@ class _Circulo extends StatelessWidget {
   );
 }
 
-/// Chip dourado do cartão.
 class _Chip extends StatelessWidget {
   const _Chip();
 

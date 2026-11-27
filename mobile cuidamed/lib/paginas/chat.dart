@@ -25,10 +25,7 @@ class _Mensagem {
   _Mensagem({required this.doUsuario, required this.texto, this.digitando = false});
 }
 
-/// Equivalente a paginas/Chat.jsx: conversa com o assistente (só paciente),
-/// perguntas sugeridas e indicador de "digitando" enquanto a API responde.
 class Chat extends StatefulWidget {
-  /// Injetável pra teste; por padrão usa a API real.
   final Future<String> Function(int pacienteId, String mensagem)? perguntar;
   const Chat({super.key, this.perguntar});
 
@@ -84,7 +81,6 @@ class _ChatState extends State<Chat> {
       final perguntar = widget.perguntar ?? ChatServico().perguntar;
       resposta.texto = await perguntar(pacienteId, texto);
     } catch (erro) {
-      // Erro do servidor (ex.: limite de perguntas atingido) já vem com a mensagem certa.
       resposta.texto = erro is ApiExcecao ? erro.mensagem : _mensagemErroConexao;
     } finally {
       resposta.digitando = false;
@@ -111,16 +107,13 @@ class _ChatState extends State<Chat> {
               itemBuilder: (context, indice) => _Bolha(mensagem: _mensagens[indice]),
             ),
           ),
-          // Perguntas prontas quebrando em linhas (flex-wrap do web), todas
-          // visíveis sem rolagem lateral. Limitadas a ~1/3 da tela (rolam se passar) pra não
-          // espremer a conversa, e escondidas enquanto o teclado está aberto.
           if (MediaQuery.viewInsetsOf(context).bottom == 0)
             ConstrainedBox(
               constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.32),
               child: SingleChildScrollView(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
                 child: SizedBox(
-                  width: double.infinity, // alinhadas à esquerda, como no web
+                  width: double.infinity,
                   child: Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -171,13 +164,10 @@ class _ChatState extends State<Chat> {
   }
 }
 
-/// "Pílula" de pergunta pronta — igual ao .chat__sugestao do web. Se o texto
-/// não couber numa linha, quebra dentro da pílula em vez de ser cortado.
 class _PerguntaSugerida extends StatelessWidget {
   final String texto;
   final VoidCallback? onPressed;
 
-  /// Telas bem estreitas: um pouco menor, pra as 4 perguntas caberem sem rolar.
   final bool compacta;
   const _PerguntaSugerida({required this.texto, required this.onPressed, this.compacta = false});
 
@@ -252,7 +242,6 @@ class _Bolha extends StatelessWidget {
   }
 }
 
-/// Três pontinhos pulsando enquanto o assistente responde.
 class _Digitando extends StatefulWidget {
   const _Digitando();
 

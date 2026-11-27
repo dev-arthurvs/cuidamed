@@ -31,7 +31,7 @@ void main() {
     ]) {
       expect(find.text(rotulo), findsWidgets, reason: rotulo);
     }
-    expect(find.text('Endereço'), findsNothing); // endereço não é pedido
+    expect(find.text('Endereço'), findsNothing);
     expect(find.textContaining('Senha'), findsNothing);
     expect(find.text('Cancelar'), findsOneWidget);
     expect(find.text('Cadastrar paciente'), findsOneWidget);
@@ -44,7 +44,6 @@ void main() {
 
     await _abrir(tester, tamanho: _desktop);
     expect(find.byType(Dialog), findsOneWidget);
-    // Tela larga: e-mail e telefone lado a lado, como no web.
     final email = tester.getRect(find.text('E-mail'));
     final telefone = tester.getRect(find.text('Telefone'));
     expect(telefone.top, closeTo(email.top, 1));
@@ -79,10 +78,10 @@ void main() {
 
   testWidgets('Fonte grande no celular: rola até o fim sem overflow', (tester) async {
     await _abrir(tester, fonte: 'grande');
-    await tester.drag(find.text('Cadastrar novo paciente'), const Offset(0, 0)); // garante foco no sheet
+    await tester.drag(find.text('Cadastrar novo paciente'), const Offset(0, 0));
     await tester.drag(find.byType(SingleChildScrollView).last, const Offset(0, -1500));
     await tester.pumpAndSettle();
-    expect(find.text('Telefone'), findsOneWidget); // último campo
+    expect(find.text('Telefone'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

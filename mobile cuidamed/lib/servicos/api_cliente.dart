@@ -1,11 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 
-/// URL base da API. Sobrescrita em tempo de build/execução com
-/// `--dart-define=API_BASE_URL=http://SEU_IP:8080`. O default varia por
-/// plataforma porque "localhost" não aponta pra máquina host a partir de um
-/// emulador Android (lá, o host é 10.0.2.2); iOS simulator e desktop/web
-/// usam localhost normalmente.
 String _urlBasePadrao() {
   if (kIsWeb) return 'http://localhost:8080';
   if (defaultTargetPlatform == TargetPlatform.android) return 'http://10.0.2.2:8080';
@@ -14,9 +9,6 @@ String _urlBasePadrao() {
 
 const String _urlBaseDefinida = String.fromEnvironment('API_BASE_URL');
 
-/// Wrapper fino sobre o dio — equivalente ao utilitarios/api.js do front-end
-/// web: centraliza base URL, cabeçalhos e tradução de erro HTTP pra uma
-/// mensagem amigável (o back-end sempre responde erro como {"message": "..."}).
 class ApiCliente {
   ApiCliente._interno()
       : dio = Dio(BaseOptions(
@@ -30,12 +22,8 @@ class ApiCliente {
 
   final Dio dio;
 
-  /// Token do login (JWT), enviado como "Authorization: Bearer ..." em toda
-  /// chamada, menos no próprio login. Definido pelo AppEstado.
   String? token;
 
-  /// Chamado quando o servidor recusa o token (expirado ou inválido): o
-  /// AppEstado sai da conta e a tela volta para o login.
   VoidCallback? aoSessaoExpirar;
 
   static bool _ehRotaDeLogin(String caminho) => caminho.startsWith('/api/auth/');

@@ -3,8 +3,6 @@ import { useApp } from '../contexto/useApp'
 import Botao from './Botao'
 import Cartao from './Cartao'
 
-// Detalhes do paciente: código para ativar o acesso ou, se ele esqueceu a
-// senha, botão para o cuidador gerar um código de nova senha (vale 24 horas).
 export default function AcessoPaciente({ paciente }) {
   const { gerarCodigoNovaSenha, mostrarToast } = useApp()
   const [gerando, setGerando] = useState(false)

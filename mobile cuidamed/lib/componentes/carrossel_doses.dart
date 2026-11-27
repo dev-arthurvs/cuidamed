@@ -8,31 +8,20 @@ import '../utilitarios/whatsapp.dart';
 const _corTomada = Color(0xFF7EF0B4);
 const _corPerdida = Color(0xFFFFB0B0);
 const _corAtrasada = Color(0xFFFFD98A);
-const _fundoLinha = Color(0x17FFFFFF); // branco 9%
+const _fundoLinha = Color(0x17FFFFFF);
 
 const _rotuloStatus = {'tomado': 'Tomada', 'perdido': 'Perdida', 'atrasado': 'Atrasada', 'pendente': 'Pendente'};
 
 String _quantidade(Dose dose) =>
     formatarQuantidadePorDose(forma: dose.forma, quantidadePorDose: dose.quantidadePorDose, dosagem: dose.dosagem);
 
-/// Card "Doses de hoje" do Início do paciente — equivalente a
-/// CarrosselDoses.jsx do web: carrossel vertical com a dose anterior (pequena,
-/// em cima), a dose em foco (grande, com "Registrar dose" quando é a dose da
-/// vez) e a próxima (pequena, embaixo). Só as duas setas trocam de dose:
-/// arrastar ou rolar sobre o card move a tela.
 class CarrosselDoses extends StatefulWidget {
-  /// Doses de hoje, já em ordem de horário.
   final List<Dose> doses;
 
-  /// Registra a dose; devolve true se deu certo.
   final Future<bool> Function(Dose dose) aoRegistrar;
 
-  /// "Desfazer" uma dose registrada hoje por engano.
   final void Function(Dose dose) aoDesfazer;
 
-  /// "Registrar dose" ao lado da dose (card largo) ou embaixo, ocupando a
-  /// largura (celular). Vem de fora porque o card fica numa LinhaDupla, que mede
-  /// a altura intrínseca — e LayoutBuilder não suporta isso.
   final bool botaoAoLado;
 
   const CarrosselDoses({super.key, required this.doses, required this.aoRegistrar, required this.aoDesfazer, this.botaoAoLado = false});
@@ -46,7 +35,6 @@ class _CarrosselDosesState extends State<CarrosselDoses> {
   int _direcao = 1;
   late String _chaveDaVez;
 
-  // Logo depois de registrar, oferece "Desfazer" por alguns segundos.
   static const _tempoDesfazer = Duration(seconds: 12);
   Dose? _registrada;
   Timer? _temporizadorDesfazer;
@@ -93,14 +81,12 @@ class _CarrosselDosesState extends State<CarrosselDoses> {
 
   int get _indiceDaVez => widget.doses.indexWhere((d) => d.status == 'pendente' || d.status == 'atrasado');
 
-  /// Sem dose da vez, entra um item final "Nada pendente" depois da última dose.
   int get _total => _indiceDaVez == -1 ? widget.doses.length + 1 : widget.doses.length;
 
   int get _indiceInicial => _indiceDaVez == -1 ? _total - 1 : _indiceDaVez;
 
   String _calcularChave() => _indiceDaVez == -1 ? 'fim-${widget.doses.length}' : widget.doses[_indiceDaVez].id;
 
-  /// null = item final "Nada pendente".
   Dose? _item(int indice) => indice < widget.doses.length ? widget.doses[indice] : null;
 
   @override
@@ -113,7 +99,6 @@ class _CarrosselDosesState extends State<CarrosselDoses> {
   @override
   void didUpdateWidget(CarrosselDoses antigo) {
     super.didUpdateWidget(antigo);
-    // Quando a dose da vez muda (ex.: acabou de registrar), o foco volta pra ela.
     final chave = _calcularChave();
     if (chave != _chaveDaVez) {
       _chaveDaVez = chave;
@@ -177,7 +162,6 @@ class _CarrosselDosesState extends State<CarrosselDoses> {
                   const SizedBox(height: 14),
                   atual == null ? _nadaPendente() : _doseEmFoco(atual),
                   const SizedBox(height: 14),
-                  // Abre espaço para a seta do canto inferior, que fica fora da animação.
                   Padding(
                     padding: const EdgeInsets.only(right: 54),
                     child: proxima ?? const SizedBox(height: 44),
@@ -202,8 +186,6 @@ class _CarrosselDosesState extends State<CarrosselDoses> {
     return OverlayPortal(controller: _popupDesfazer, overlayChildBuilder: _construirPopup, child: conteudo);
   }
 
-  /// Pop-up logo depois de registrar, acima da barra inferior, com o "Desfazer"
-  /// e a barrinha do tempo que resta.
   Widget _construirPopup(BuildContext context) {
     final dose = _registrada;
     if (dose == null) return const SizedBox.shrink();
@@ -306,7 +288,6 @@ class _CarrosselDosesState extends State<CarrosselDoses> {
             decorationThickness: 2,
           ),
         ),
-        // Quantidade por dose (ex.: "1 comp"); pomada não tem.
         if (_quantidade(dose).isNotEmpty) Text(_quantidade(dose), style: const TextStyle(color: Colors.white, fontSize: 16)),
       ],
     );
@@ -336,10 +317,8 @@ class _CarrosselDosesState extends State<CarrosselDoses> {
   }
 }
 
-/// Linha pequena (dose anterior em cima, próxima embaixo): tomada em verde com
-/// ✓; perdida em vermelho, riscada e com ✕; pendente/atrasada em branco.
 class _LinhaDose extends StatelessWidget {
-  final Dose? dose; // null = fim das doses de hoje
+  final Dose? dose;
 
   const _LinhaDose({required this.dose});
 

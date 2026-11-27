@@ -9,7 +9,6 @@ import 'apoio.dart';
 
 int _diasAtras(int dias) => DateTime.now().subtract(Duration(days: dias)).millisecondsSinceEpoch;
 
-/// Sai da conta sozinho depois de 7 dias sem uso (qualquer tipo de usuário).
 void main() {
   test('Ao abrir: sessão salva parada há mais de 7 dias não volta (sem aviso)', () async {
     SharedPreferences.setMockInitialValues({

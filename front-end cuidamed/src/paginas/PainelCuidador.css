@@ -157,8 +157,6 @@
   color: var(--texto-label);
 }
 
-/* Detalhe do paciente */
-
 .painel-cuidador-detalhe {
   display: flex;
   flex-direction: column;
@@ -237,7 +235,6 @@
   font-weight: 600;
 }
 
-/* Código de ativação: grande e espaçado, fácil de ler em voz alta ou copiar. */
 .painel-cuidador-detalhe__codigo {
   font-size: 30px;
   font-weight: 700;
@@ -294,7 +291,6 @@
 }
 
 
-/* Nº do cartão do paciente (código do vínculo), nos detalhes do paciente. */
 .painel-cuidador-detalhe__cartao {
   margin-top: 4px;
   font-size: 14px;

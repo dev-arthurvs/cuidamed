@@ -7,9 +7,6 @@ import '../servicos/api_cliente.dart';
 import '../utilitarios/tema.dart';
 import 'botao.dart';
 
-/// Card "Observações clínicas" dos detalhes do paciente, editável no próprio
-/// card pelo cuidador — equivalente ao CartaoObservacoes.jsx do web. O texto é
-/// salvo no paciente e também entra no contexto do assistente de IA.
 class CartaoObservacoes extends StatefulWidget {
   final Paciente paciente;
   const CartaoObservacoes({super.key, required this.paciente});
@@ -20,9 +17,6 @@ class CartaoObservacoes extends StatefulWidget {
 
 class _CartaoObservacoesState extends State<CartaoObservacoes> {
   late final TextEditingController _controller;
-  // Valor do servidor que o campo mostrava por último. Inicializado no
-  // initState (não como `late` com valor inicial: esse só seria calculado no
-  // primeiro acesso — já com o valor novo — e a sincronização nunca atualizaria).
   late String _base;
   bool _salvando = false;
 
@@ -40,8 +34,6 @@ class _CartaoObservacoesState extends State<CartaoObservacoes> {
   @override
   void didUpdateWidget(covariant CartaoObservacoes antigo) {
     super.didUpdateWidget(antigo);
-    // A sincronização automática (a cada 30 s) pode trazer um valor novo do
-    // servidor: só atualiza o campo se a pessoa não estiver no meio de uma edição.
     if (_salvo != _base) {
       if (_controller.text == _base) _controller.text = _salvo;
       _base = _salvo;

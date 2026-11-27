@@ -33,9 +33,6 @@ class PainelIdoso extends StatelessWidget {
     final doses = construirDosesHoje(pacienteFoco.medicamentos, pacienteFoco.historicoHoje())
       ..sort((a, b) => a.horario.compareTo(b.horario));
     final primeiroNome = estado.usuario!.nome.split(' ').first;
-    // Largura útil do card de doses (lista com padding 20; lado a lado com o
-    // cartão a partir de 680, com 20 entre eles; card com padding 24): com
-    // 420 ou mais, "Registrar dose" cabe ao lado da dose.
     final larguraLista = MediaQuery.sizeOf(context).width - 40;
     final larguraCard = larguraLista >= 680 ? (larguraLista - 20) / 2 : larguraLista;
     final botaoAoLado = larguraCard - 48 >= 420;
@@ -50,8 +47,6 @@ class PainelIdoso extends StatelessWidget {
           padding: const EdgeInsets.all(20),
           children: [
             const FaixaAtivarNotificacoes(),
-            // "Doses de hoje" (carrossel) à esquerda e Cartão do paciente à direita em
-            // tela larga (como no web); no celular, um embaixo do outro, nessa ordem.
             LinhaDupla(
               espaco: 20,
               direita: CartaoPaciente(
@@ -63,7 +58,6 @@ class PainelIdoso extends StatelessWidget {
               esquerda: Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  // Cor oposta ao fundo da tela, para chamar a atenção.
                   gradient: CorApp.fundoCardDose,
                   borderRadius: BorderRadius.circular(RaioApp.grande),
                 ),

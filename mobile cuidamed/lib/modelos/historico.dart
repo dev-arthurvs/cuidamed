@@ -1,13 +1,12 @@
-/// Espelha HistoricoRespostaDTO (back-end cuidamed/.../historico/HistoricoRespostaDTO.java).
 class Historico {
   final int id;
   final int pacienteId;
   final int medicamentoId;
   final DateTime data;
-  final String hora; // "HH:mm"
+  final String hora;
   final String nomeMedicamento;
   final String dosagem;
-  final String status; // TOMADO | ATRASADO | PERDIDO
+  final String status;
 
   Historico({
     required this.id,
@@ -28,7 +27,7 @@ class Historico {
       data: DateTime.parse(json['data']),
       hora: json['hora'] as String,
       nomeMedicamento: json['nomeMedicamento'] as String,
-      dosagem: json['dosagem'] as String? ?? '', // opcional: saiu do formulário
+      dosagem: json['dosagem'] as String? ?? '',
       status: json['status'] as String,
     );
   }

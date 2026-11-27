@@ -29,7 +29,6 @@ public class PacienteService {
     private final VinculoRepository vinculoRepository;
     private final VerificadorDeContato verificadorDeContato;
 
-    // Sem letras e números que se confundem (0/O, 1/I/L) — o código é lido e digitado por idosos.
     private static final String ALFABETO_CODIGO = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
     private static final int TAMANHO_CODIGO = 6;
     private static final int HORAS_VALIDADE_NOVA_SENHA = 24;
@@ -57,7 +56,6 @@ public class PacienteService {
         }
 
         boolean temSenha = dto.senha() != null && !dto.senha().isBlank();
-        // Quem se cadastra sozinho (com senha) entra pelo e-mail ou pelo telefone.
         if (temSenha) {
             verificadorDeContato.exigirEmailOuTelefone(dto.email(), dto.telefone());
         }
@@ -67,7 +65,6 @@ public class PacienteService {
         paciente.setNome(dto.nome());
         paciente.setEmail(Contato.emailOuNulo(dto.email()));
         paciente.setSenha(temSenha ? passwordEncoder.encode(dto.senha()) : null);
-        // Cadastrado pelo cuidador, sem senha: precisa do código para ativar o acesso.
         paciente.setCodigoAtivacao(temSenha ? null : gerarCodigoAtivacao());
         paciente.setDataNascimento(dto.dataNascimento());
         paciente.setSexo(dto.sexo());
@@ -77,7 +74,6 @@ public class PacienteService {
         paciente.setObservacoesClinicas(dto.observacoesClinicas());
         Cuidador cuidador = buscarCuidadorOuNulo(dto.cuidadorId());
         Paciente salvo = salvar(paciente);
-        // Cadastrado por um cuidador: já nasce vinculado a ele.
         if (cuidador != null) {
             vinculoRepository.save(Vinculo.ativo(salvo, cuidador));
         }
@@ -92,7 +88,6 @@ public class PacienteService {
     @Transactional(readOnly = true)
     public List<PacienteRespostaDTO> listarPorCuidador(Long cuidadorId) {
         List<Vinculo> ativos = vinculoRepository.findByCuidadorIdAndSituacaoOrderByIdAsc(cuidadorId, SituacaoVinculo.ATIVO);
-        // Os pedidos pendentes vêm de uma vez só, em vez de uma consulta por paciente.
         java.util.Map<Long, Vinculo> pendentes = vinculoRepository
                 .findByPacienteIdInAndSituacao(ativos.stream().map(vinculo -> vinculo.getPaciente().getId()).toList(), SituacaoVinculo.PENDENTE)
                 .stream()
@@ -110,12 +105,9 @@ public class PacienteService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe o nome do paciente.");
         }
 
-        // Conta já ativa (com senha) precisa continuar com um jeito de entrar.
         if (paciente.getSenha() != null) {
             verificadorDeContato.exigirEmailOuTelefone(dto.email(), dto.telefone());
         }
-        // Só quando mudou: contas antigas podem ter telefone repetido ou incompleto
-        // e não devem ficar sem conseguir salvar os outros dados.
         if (!Contato.digitos(dto.telefone()).equals(Contato.digitos(paciente.getTelefone()))) {
             verificadorDeContato.exigirTelefoneLivre(dto.telefone(), id, null);
         }
@@ -128,9 +120,6 @@ public class PacienteService {
         paciente.setTelefone(dto.telefone());
         paciente.setEndereco(dto.endereco());
         paciente.setObservacoesClinicas(dto.observacoesClinicas());
-        // O vínculo com o cuidador não muda aqui (dto.cuidadorId é ignorado): só
-        // pelos fluxos de solicitar/aceitar/desvincular. Antes, editar o perfil
-        // permitia ao paciente se ligar a qualquer cuidador sem aprovação.
 
         return paraDTO(salvar(paciente));
     }
@@ -158,8 +147,6 @@ public class PacienteService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A senha deve ter no mínimo 8 caracteres.");
         }
 
-        // Mesma mensagem para e-mail/telefone inexistente, código errado ou vencido:
-        // não revela quais contas estão cadastradas.
         String codigo = dto.codigo() != null ? dto.codigo().trim() : "";
         List<Paciente> candidatos = Contato.ehEmail(identificador)
                 ? pacienteRepository.findByEmail(identificador.trim()).stream().toList()
@@ -176,11 +163,6 @@ public class PacienteService {
         pacienteRepository.save(paciente);
     }
 
-    /**
-     * "Esqueci minha senha": o cuidador vinculado gera um código e passa ao
-     * paciente, que cria a senha nova em "Ativar meu acesso". A senha antiga vale
-     * até o código ser usado. Quem ainda não ativou continua com o código que tem.
-     */
     @Transactional
     public PacienteRespostaDTO gerarCodigoNovaSenha(Long pacienteId, Long cuidadorId) {
         Paciente paciente = buscarEntidadePorId(pacienteId);
@@ -211,7 +193,6 @@ public class PacienteService {
         Cuidador cuidador = encontrado.orElseThrow(() -> new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Nenhum cuidador cadastrado com esse e-mail ou telefone."));
 
-        // Um pedido novo substitui o anterior que ainda não teve resposta.
         vinculoRepository.findFirstByPacienteIdAndSituacao(pacienteId, SituacaoVinculo.PENDENTE).ifPresent(anterior -> {
             anterior.encerrar(SituacaoVinculo.CANCELADO);
             vinculoRepository.saveAndFlush(anterior);
@@ -250,7 +231,6 @@ public class PacienteService {
                         HttpStatus.BAD_REQUEST, "Não há solicitação pendente desse cuidador para esse paciente."));
     }
 
-    /** O vínculo ativo do paciente com esse cuidador; senão, 400. */
     private Vinculo vinculoAtivoDoCuidador(Long pacienteId, Long cuidadorId) {
         return vinculoRepository.findFirstByPacienteIdAndSituacao(pacienteId, SituacaoVinculo.ATIVO)
                 .filter(vinculo -> cuidadorId != null && vinculo.getCuidador().getId().equals(cuidadorId))
@@ -278,7 +258,6 @@ public class PacienteService {
         pacienteRepository.save(paciente);
     }
 
-    /** Encerra o vínculo (fica no histórico) e tira a permissão de alterar remédios. */
     @Transactional
     public void desvincularCuidador(Long pacienteId, AcaoVinculoDTO dto) {
         Paciente paciente = buscarEntidadePorId(pacienteId);
@@ -306,7 +285,6 @@ public class PacienteService {
         pacienteRepository.deleteById(id);
     }
 
-    /** Monta a resposta com o cuidador atual, o pedido pendente e o nº do cartão (id do vínculo). */
     private PacienteRespostaDTO paraDTO(Paciente paciente) {
         Optional<Vinculo> ativo = vinculoRepository.findFirstByPacienteIdAndSituacao(paciente.getId(), SituacaoVinculo.ATIVO);
         Optional<Vinculo> pendente =

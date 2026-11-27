@@ -57,11 +57,7 @@ class _FormularioMedicamentoState extends State<FormularioMedicamento> {
     final selecionado = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
-      // Dois defeitos do relógio do Flutter no modo de digitar a hora:
-      // - com a fonte "Pequena" ele ficava menor que o mínimo dele e quebrava
-      //   (aqui o texto nunca fica abaixo do tamanho normal);
-      // - mostrava 24 horas (português), mas no navegador validava em 12 horas
-      //   e recusava "17" (aqui ele usa sempre 24 horas, como no Brasil).
+      // Contorna dois bugs do seletor de hora do Flutter no modo de digitar: fonte pequena e formato 12 h.
       builder: (context, filho) => MediaQuery(
         data: MediaQuery.of(context).copyWith(
           textScaler: MediaQuery.textScalerOf(context).clamp(minScaleFactor: 1),
@@ -129,7 +125,6 @@ class _FormularioMedicamentoState extends State<FormularioMedicamento> {
       id: widget.medicamentoExistente?.id ?? 0,
       pacienteId: pacienteId,
       nome: _nomeController.text.trim(),
-      // Dosagem saiu do formulário: remédio antigo mantém a que tinha.
       dosagem: widget.medicamentoExistente?.dosagem ?? '',
       forma: _forma,
       frequencia: _frequencia,

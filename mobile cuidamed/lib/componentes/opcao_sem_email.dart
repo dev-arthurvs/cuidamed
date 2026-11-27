@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../utilitarios/tema.dart';
 
-/// Caixa "Não tenho e-mail" dos cadastros — equivalente a OpcaoSemEmail.jsx do
-/// web: muitos idosos não têm e-mail. Marcada, o campo de e-mail some e o
-/// telefone passa a ser o que permite entrar no app.
 class OpcaoSemEmail extends StatelessWidget {
   final bool marcado;
   final ValueChanged<bool> aoMudar;

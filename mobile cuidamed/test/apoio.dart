@@ -15,7 +15,6 @@ import 'package:cuidamed_mobile/modelos/medicamento.dart';
 import 'package:cuidamed_mobile/modelos/paciente.dart';
 import 'package:cuidamed_mobile/utilitarios/tema.dart';
 
-/// Estado já "logado", sem tocar na API — os testes montam as telas direto.
 AppEstado estadoPaciente({int? cuidadorId, int? cuidadorSolicitadoId, bool permiteAlteracoes = true}) {
   final hoje = DateTime.now();
   final paciente = Paciente(
@@ -91,8 +90,6 @@ AppEstado estadoCuidador() {
     ..carregandoSessao = false;
 }
 
-/// Monta [pagina] numa rota [rota] com router real (AndaimeApp lê o
-/// GoRouterState) e a mesma escala de fonte do app. Tela de celular 360x800.
 Future<void> montarPagina(
   WidgetTester tester,
   AppEstado estado,
@@ -116,7 +113,6 @@ Future<void> montarPagina(
   await tester.pumpWidget(
     ChangeNotifierProvider.value(
       value: estado,
-      // Em português, como o app (calendários em dia/mês/ano).
       child: MaterialApp.router(
         theme: construirTema(),
         routerConfig: router,
@@ -130,17 +126,12 @@ Future<void> montarPagina(
   await tester.pumpAndSettle();
 }
 
-/// scrollUntilVisible no ListView principal (TextFields também são Scrollable).
-/// O ListView constrói itens um pouco fora da tela (cache), então depois de
-/// achar o alvo ainda garante que ele esteja de fato visível pra ser tocado.
 Future<void> rolarAte(WidgetTester tester, Finder alvo) async {
   await tester.scrollUntilVisible(alvo, 300, scrollable: find.byType(Scrollable).first);
   await tester.ensureVisible(alvo);
   await tester.pumpAndSettle();
 }
 
-/// Carrega a fonte do app de verdade (por padrão os testes desenham texto com
-/// uma fonte de blocos, mais larga) — pra medir larguras de texto realistas.
 Future<void> carregarFonteDoApp(WidgetTester tester) => tester.runAsync(() async {
       final loader = FontLoader('Source Sans 3');
       for (final peso in ['Regular', 'Medium', 'SemiBold', 'Bold', 'ExtraBold']) {

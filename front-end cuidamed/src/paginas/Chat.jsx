@@ -68,8 +68,6 @@ export default function Chat() {
         atual.map((item) => (item.id === idResposta ? { ...item, texto: json.resposta, digitando: false } : item)),
       )
     } catch (erro) {
-      // Sem rede, o fetch falha com TypeError; um erro do servidor (ex.: limite
-      // de perguntas atingido) já vem com a mensagem certa para mostrar.
       const texto = erro instanceof TypeError ? MENSAGEM_ERRO_CONEXAO : erro.message || MENSAGEM_ERRO_CONEXAO
       setMensagens((atual) =>
         atual.map((item) => (item.id === idResposta ? { ...item, texto, digitando: false } : item)),

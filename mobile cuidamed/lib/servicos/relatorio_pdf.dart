@@ -11,15 +11,12 @@ const _rotuloStatus = {'TOMADO': 'Tomada', 'ATRASADO': 'Atrasada', 'PERDIDO': 'P
 
 String _data(DateTime d) => '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
 
-/// Fontes do app, para os acentos saírem certos no PDF.
 Future<pw.ThemeData> carregarTemaRelatorio() async {
   final normal = await rootBundle.load('assets/fonts/SourceSans3-Regular.ttf');
   final negrito = await rootBundle.load('assets/fonts/SourceSans3-Bold.ttf');
   return pw.ThemeData.withFont(base: pw.Font.ttf(normal), bold: pw.Font.ttf(negrito));
 }
 
-/// Relatório para levar ao médico — mesmo conteúdo de RelatorioDoses.jsx do web.
-/// [entradas]: as doses já filtradas pela tela de Histórico de doses.
 Future<Uint8List> gerarRelatorioPdf({
   required Paciente paciente,
   required List<Medicamento> medicamentosAtivos,

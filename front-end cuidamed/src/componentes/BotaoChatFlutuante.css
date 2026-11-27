@@ -1,8 +1,6 @@
 .botao-chat-flutuante {
   position: fixed;
   right: 22px;
-  /* Fica acima da área onde o Toast (avisos do sistema) aparece — os dois são
-     ancorados no canto inferior direito, então não podem disputar o mesmo espaço. */
   bottom: 96px;
   width: 58px;
   height: 58px;

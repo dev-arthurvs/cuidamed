@@ -10,8 +10,6 @@ import '../utilitarios/ajuda_conteudo.dart';
 import '../utilitarios/tema.dart';
 import 'edicao_perfil.dart';
 
-/// Equivalente a paginas/Acessibilidade.jsx: guia sanfonado de todas as
-/// telas (filtrado pelo tipo de usuário) + controle de tamanho da fonte.
 class Acessibilidade extends StatefulWidget {
   const Acessibilidade({super.key});
 

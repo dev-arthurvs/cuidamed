@@ -16,7 +16,6 @@ void main() {
 
     final passo = guiaSecoes.firstWhere((s) => s.chave == 'historico').passos.first;
     expect(find.text(passo), findsNothing);
-    // "Histórico" também é rótulo da barra inferior — procura só no ListView.
     final titulo = find.descendant(of: find.byType(ListView), matching: find.text('Histórico de doses'));
     await rolarAte(tester, titulo);
     await tester.tap(titulo);
@@ -39,7 +38,6 @@ void main() {
     final estado = estadoPaciente()..tamanhoFonte = 'grande';
     await montarPagina(tester, estado, '/acessibilidade', (_) => const Acessibilidade());
     for (final secao in guiaSecoes.where((s) => s.visivelPara('paciente'))) {
-      // Alguns títulos (ex.: "Histórico") também são rótulos da barra inferior — procura só no ListView.
       final titulo = find.descendant(of: find.byType(ListView), matching: find.text(secao.titulo));
       await rolarAte(tester, titulo);
       await tester.tap(titulo);

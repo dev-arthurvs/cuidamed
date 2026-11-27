@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 
 import 'animacoes.dart';
 
-/// Tons que mudam entre o modo claro e o escuro — os mesmos valores das
-/// variáveis do web (front-end cuidamed/src/estilos/global.css, `:root` e
-/// `:root[data-tema='escuro']`).
 class PaletaCores {
   final Color azulClaro, azul, azulSolido, azulEscuro, azulTexto, azulFundo;
   final Color fundo, fundoDestaque, fundoCard, fundoSuave;
@@ -99,23 +96,16 @@ const paletaEscura = PaletaCores(
   vermelho: Color(0xFFE5574A),
 );
 
-/// Cores do app. Os tons vêm da paleta ativa ([usarModoEscuro]): por isso são
-/// getters, não `const` — ao trocar o tema, o app reconstrói as telas e cada
-/// widget lê o tom novo. Os gradientes das telas de login/cadastro e dos
-/// cartões azuis não mudam com o tema.
 class CorApp {
   static PaletaCores _paleta = paletaClara;
 
   static bool get escuro => identical(_paleta, paletaEscura);
 
-  /// Chamado pelo app quando o tema efetivo muda. O modo escuro só vale dentro
-  /// do sistema: login, cadastro e ativação ficam sempre no claro (como no web).
   static void usarModoEscuro(bool escuro) => _paleta = escuro ? paletaEscura : paletaClara;
 
   static Color get azulClaro => _paleta.azulClaro;
   static Color get azul => _paleta.azul;
 
-  /// Mesmo --azul-solido do web: botão principal das telas de login/cadastro.
   static Color get azulSolido => _paleta.azulSolido;
   static Color get azulEscuro => _paleta.azulEscuro;
   static Color get azulTexto => _paleta.azulTexto;
@@ -127,7 +117,6 @@ class CorApp {
         colors: [azulClaro, azul],
       );
 
-  /// Mesmo --gradiente-hero do web (150deg, três tons de azul).
   static const gradienteHero = LinearGradient(
     begin: Alignment(-0.6, -1),
     end: Alignment(0.6, 1),
@@ -135,9 +124,6 @@ class CorApp {
     stops: [0, 0.6, 1],
   );
 
-  /// Tela inicial do paciente (como no web): o card da dose fica com a cor
-  /// oposta ao fundo da tela, para chamar a atenção; o Cartão do paciente, com
-  /// a outra. Modo claro: dose escura e cartão claro; modo escuro: o inverso.
   static const gradienteCartaoEscuro = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -153,8 +139,6 @@ class CorApp {
   static LinearGradient get fundoCardDose => escuro ? gradienteCartaoClaro : gradienteCartaoEscuro;
   static LinearGradient get fundoCartaoPaciente => escuro ? gradienteCartaoEscuro : gradienteCartaoClaro;
 
-  /// Mesmo --gradiente-autenticacao do web: fundo das telas de login, cadastro
-  /// e ativação (mais escuro que o hero).
   static const gradienteAutenticacao = LinearGradient(
     begin: Alignment(-0.6, -1),
     end: Alignment(0.6, 1),
@@ -183,7 +167,6 @@ class CorApp {
   static Color get amareloTexto => _paleta.amareloTexto;
   static Color get amarelo => _paleta.amarelo;
 
-  /// Mesmo --amarelo-borda do web (card "Precisam de atenção").
   static Color get amareloBorda => escuro ? const Color(0xFF5A4622) : const Color(0xFFF2E0C2);
 
   static Color get vermelhoFundo => _paleta.vermelhoFundo;
@@ -230,8 +213,6 @@ ThemeData construirTema() {
   final base = ThemeData(
     useMaterial3: true,
     brightness: CorApp.escuro ? Brightness.dark : Brightness.light,
-    // Mesma fonte do web: Source Sans 3 (sem serifa, formal, feita para leitura
-    // longa). Arquivos em assets/fonts, declarados no pubspec.yaml.
     fontFamily: 'Source Sans 3',
     scaffoldBackgroundColor: CorApp.fundo,
     colorScheme: ColorScheme.fromSeed(
@@ -245,10 +226,6 @@ ThemeData construirTema() {
   );
 
   return base.copyWith(
-    // TextTheme.apply(fontSizeFactor:) quebra se algum estilo do tema base
-    // tiver fontSize nulo — troco por um copyWith manual, multiplicando só
-    // quando o fontSize existe, pra aumentar o texto (público idoso) sem
-    // depender dessa API frágil.
     textTheme: _escalarTextTheme(base.textTheme, 1.05, CorApp.texto),
     appBarTheme: AppBarTheme(
       backgroundColor: CorApp.fundoCard,
@@ -283,7 +260,6 @@ ThemeData construirTema() {
       ),
       labelStyle: TextStyle(color: CorApp.textoLabel, fontWeight: FontWeight.w700),
     ),
-    // Troca de tela igual ao web: fade subindo 10 px em 0,22 s.
     pageTransitionsTheme: const PageTransitionsTheme(builders: {
       TargetPlatform.android: TransicaoPaginaCuidaMed(),
       TargetPlatform.iOS: TransicaoPaginaCuidaMed(),

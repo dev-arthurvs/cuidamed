@@ -5,10 +5,6 @@ import '../utilitarios/whatsapp.dart';
 
 const Set<String> _statusVisiveis = {'pendente', 'atrasado', 'perdido'};
 
-/// Ícone circular de lembrete via WhatsApp — mesma regra do web
-/// (componentes/BotaoWhatsApp.jsx): só aparece pra doses ainda não tomadas,
-/// desabilitado se o paciente não tiver telefone. Ícone genérico (telefone
-/// em linha), não o logotipo oficial da WhatsApp.
 class BotaoWhatsApp extends StatelessWidget {
   final String nomePaciente;
   final String? telefone;

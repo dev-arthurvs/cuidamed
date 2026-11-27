@@ -54,8 +54,6 @@ class _DetalhePacienteState extends State<DetalhePaciente> {
   Widget build(BuildContext context) {
     final estado = context.watch<AppEstado>();
     if (estado.pacienteFocoId != widget.pacienteId) {
-      // Garante que o restante do app (Agenda, Histórico, WhatsApp...) veja
-      // este paciente como o "em foco" ao navegar direto pra essa rota.
       WidgetsBinding.instance.addPostFrameCallback((_) => estado.selecionarPaciente(widget.pacienteId));
     }
     final dados = estado.pacienteFoco;

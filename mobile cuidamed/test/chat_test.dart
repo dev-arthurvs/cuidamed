@@ -27,14 +27,14 @@ void main() {
 
     expect(find.textContaining('Eu sou o assistente'), findsOneWidget);
     final botaoEnviar = find.widgetWithText(Botao, 'Enviar');
-    expect(tester.widget<Botao>(botaoEnviar).onPressed, isNull); // vazio → desabilitado
+    expect(tester.widget<Botao>(botaoEnviar).onPressed, isNull);
 
     await tester.enterText(find.byType(TextField), '  Que remédio tomo agora?  ');
     await tester.pump();
     await tester.tap(botaoEnviar);
     await tester.pump();
     for (var i = 0; i < 8; i++) {
-      await tester.pump(const Duration(milliseconds: 50)); // rolagem automática até a nova mensagem
+      await tester.pump(const Duration(milliseconds: 50));
     }
 
     expect(pacienteRecebido, 1);
@@ -57,7 +57,7 @@ void main() {
     );
     await tester.tap(find.text('Quais remédios eu preciso tomar?'));
     await tester.pumpAndSettle();
-    expect(find.text('Quais remédios eu preciso tomar?'), findsNWidgets(2)); // chip + bolha
+    expect(find.text('Quais remédios eu preciso tomar?'), findsNWidgets(2));
     expect(find.textContaining('Não consegui me conectar'), findsOneWidget);
   });
 

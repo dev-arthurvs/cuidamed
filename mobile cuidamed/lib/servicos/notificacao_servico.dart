@@ -5,15 +5,8 @@ import 'package:timezone/timezone.dart' as tz;
 
 import '../estado/lembretes_agendados.dart';
 
-/// Situação da permissão de notificação — espelha o Notification.permission
-/// do web ('default' | 'granted' | 'denied' | 'unsupported').
 enum PermissaoNotificacao { naoPerguntada, concedida, negada, indisponivel }
 
-/// Notificações do sistema + som de alerta — equivalente a
-/// utilitarios/notificacoes.js e utilitarios/alertaSonoro.js do web.
-/// No navegador usa a Notification API (via service worker do plugin); no
-/// Android/iOS, a notificação local nativa. Qualquer falha é engolida: um
-/// alerta que não sai nunca pode derrubar o app.
 class NotificacaoServico {
   NotificacaoServico._();
   static final NotificacaoServico instancia = NotificacaoServico._();
@@ -37,7 +30,6 @@ class NotificacaoServico {
       await _plugin.initialize(
         settings: const InitializationSettings(
           android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-          // No iOS a permissão é pedida só quando o usuário toca em "Ativar".
           iOS: DarwinInitializationSettings(
             requestAlertPermission: false,
             requestBadgePermission: false,
@@ -78,7 +70,6 @@ class NotificacaoServico {
     return PermissaoNotificacao.indisponivel;
   }
 
-  /// Deve ser chamado a partir de um toque do usuário (o navegador ignora pedidos automáticos).
   Future<PermissaoNotificacao> pedirPermissao() async {
     await inicializar();
     try {
@@ -92,8 +83,6 @@ class NotificacaoServico {
             ?.requestPermissions(alert: true, sound: true);
       }
     } catch (_) {}
-    // Mesmo sem permissão de notificação, o som passa a poder tocar no
-    // navegador: este toque do usuário "destrava" o áudio da página.
     await _prepararSom();
     return permissao();
   }
@@ -117,9 +106,6 @@ class NotificacaoServico {
     }
   }
 
-  /// Troca os lembretes agendados no celular por [lembretes]: tocam mesmo com o
-  /// app fechado. No navegador não existe agendamento (lá o aviso sai com a
-  /// página aberta). Se o Android não liberar o horário exato, usa o aproximado.
   Future<void> agendarLembretes(List<LembreteAgendado> lembretes) async {
     if (kIsWeb) return;
     await inicializar();
@@ -132,7 +118,6 @@ class NotificacaoServico {
           id: lembrete.id,
           title: lembrete.titulo,
           body: lembrete.corpo,
-          // Em UTC basta: é o mesmo instante, e o horário local já foi resolvido.
           scheduledDate: tz.TZDateTime.from(lembrete.quando, tz.UTC),
           notificationDetails: const NotificationDetails(
             android: _canalAndroid,
@@ -161,7 +146,6 @@ class NotificacaoServico {
     } catch (_) {}
   }
 
-  /// "Ding-dong" ×3 (assets/sons/alerta.wav, gerado com as mesmas notas do web).
   Future<void> tocarAlerta() async {
     try {
       _player ??= AudioPlayer();

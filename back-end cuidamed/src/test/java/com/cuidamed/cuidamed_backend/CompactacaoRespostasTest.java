@@ -22,7 +22,6 @@ import com.cuidamed.cuidamed_backend.seguranca.ServicoToken;
 import com.cuidamed.cuidamed_backend.seguranca.UsuarioAutenticado;
 import com.jayway.jsonpath.JsonPath;
 
-/** Compactação pelo servidor HTTP de verdade. O que é criado aqui é apagado no fim. */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class CompactacaoRespostasTest {
 

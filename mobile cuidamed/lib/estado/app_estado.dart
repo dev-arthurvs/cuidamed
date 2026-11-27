@@ -19,14 +19,12 @@ class UsuarioLogado {
   final int id;
   final String nome;
   final String email;
-  final String tipo; // 'paciente' | 'cuidador'
-  final String? profissao; // só cuidador
-  final String? telefone; // só cuidador (o do paciente fica em Paciente)
+  final String tipo;
+  final String? profissao;
+  final String? telefone;
   UsuarioLogado({required this.id, required this.nome, required this.email, required this.tipo, this.profissao, this.telefone});
 }
 
-/// Preferência de tamanho de fonte (acessibilidade) — mesmos valores e
-/// fatores do web (utilitarios/preferenciaFonte.js).
 const Map<String, double> escalaPorTamanhoFonte = {'pequena': 0.9, 'media': 1.0, 'grande': 1.15};
 const List<({String valor, String rotulo})> opcoesTamanhoFonte = [
   (valor: 'pequena', rotulo: 'Pequena'),
@@ -35,15 +33,10 @@ const List<({String valor, String rotulo})> opcoesTamanhoFonte = [
 ];
 const _chaveTamanhoFonte = 'tamanhoFonte';
 const _chaveTema = 'tema';
-// Sai sozinho depois de 7 dias sem uso (qualquer tipo de usuário). O horário do
-// último toque fica salvo no aparelho, então vale também com o app fechado.
 const limiteInatividade = Duration(days: 7);
 const _chaveUltimaAtividade = 'ultimaAtividade';
-// "Lembrar de mim": a sessão não sai por inatividade (vale até o login vencer)
-// e o e-mail ou telefone já vem preenchido no próximo login.
 const _chaveLembrar = 'lembrarMim';
 const _chaveLoginLembrado = 'loginLembrado';
-// Sessão salva no aparelho (o app continua logado ao reabrir; o token expira em alguns dias).
 const _chaveId = 'usuarioId';
 const _chaveTipo = 'usuarioTipo';
 const _chaveToken = 'tokenSessao';
@@ -65,17 +58,9 @@ class PacienteComDados {
   }
 }
 
-/// Estado central da aplicação — equivalente ao ContextoApp.jsx do web:
-/// usuário logado, paciente em foco, lista de pacientes (do cuidador) e as
-/// operações que os disparam. Widgets consomem via Provider/Consumer.
 class AppEstado extends ChangeNotifier {
-  /// Igual ao INTERVALO_VERIFICACAO_MS do web: a cada 30 s as telas se
-  /// redesenham e recalculam os status das doses (pendente → atrasado →
-  /// perdido) e a virada do dia — sem isso, uma dose das 08:00 ficava
-  /// "A tomar" o dia todo até algo redesenhar a tela.
   static const intervaloAtualizacao = Duration(seconds: 30);
 
-  /// App fora da tela: não busca dados (poupa bateria e internet) e atualiza ao voltar.
   bool emSegundoPlano = false;
 
   Timer? _relogio;
@@ -92,11 +77,6 @@ class AppEstado extends ChangeNotifier {
 
   bool _sincronizando = false;
 
-  /// Sincronização entre web e mobile (igual ao web): busca de novo no servidor
-  /// os dados de quem está logado — o paciente, ou todos os pacientes do
-  /// cuidador — pra refletir o que foi alterado no outro app sem precisar
-  /// puxar a tela. Roda a cada 30 s e ao voltar pro app. Falha de rede é
-  /// ignorada (tenta de novo na próxima).
   Future<void> sincronizarDados() async {
     final atual = usuario;
     if (atual == null || _sincronizando) return;
@@ -104,7 +84,7 @@ class AppEstado extends ChangeNotifier {
     try {
       if (atual.tipo == 'paciente') {
         final dados = await _hidratarPaciente(await _pacienteServico.buscarPorId(atual.id));
-        if (usuario?.id != atual.id) return; // saiu/trocou de conta no meio
+        if (usuario?.id != atual.id) return;
         pacientes = [dados];
       } else {
         final lista = await _pacienteServico.listarPorCuidador(atual.id);
@@ -112,12 +92,11 @@ class AppEstado extends ChangeNotifier {
         if (usuario?.id != atual.id) return;
         pacientes = hidratados;
         if (pacienteFocoId != null && !pacientes.any((p) => p.paciente.id == pacienteFocoId)) {
-          pacienteFocoId = null; // paciente foi desvinculado em outro lugar
+          pacienteFocoId = null;
         }
       }
       notifyListeners();
     } catch (_) {
-      // sem rede agora: mantém o que já está na tela
     } finally {
       _sincronizando = false;
     }
@@ -141,15 +120,12 @@ class AppEstado extends ChangeNotifier {
   bool carregandoSessao = true;
   String tamanhoFonte = 'media';
 
-  /// 'claro' | 'escuro' — preferência salva no aparelho, como no web
-  /// (cuidamed_tema). Só vale dentro do sistema: deslogado fica sempre claro.
   String tema = 'claro';
 
   double get escalaFonte => escalaPorTamanhoFonte[tamanhoFonte] ?? 1.0;
 
   bool get modoEscuro => tema == 'escuro';
 
-  /// Tema que as telas devem usar agora (login/cadastro/ativação: sempre claro).
   bool get usarModoEscuro => autenticado && modoEscuro;
 
   bool get autenticado => usuario != null;
@@ -167,10 +143,8 @@ class AppEstado extends ChangeNotifier {
     ApiCliente.instancia.aoSessaoExpirar = _aoSessaoExpirar;
   }
 
-  /// Aviso para a tela de login quando a sessão acabou sozinha (token vencido).
   String? avisoSessao;
 
-  /// Lê e apaga o aviso (a tela de login mostra uma vez só).
   String? consumirAvisoSessao() {
     final aviso = avisoSessao;
     avisoSessao = null;
@@ -196,13 +170,11 @@ class AppEstado extends ChangeNotifier {
         ultimaAtividade != null &&
         DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(ultimaAtividade)) > limiteInatividade;
     if (token != null && inativa) {
-      // Ficou 7 dias sem abrir/usar o app: a sessão salva não volta.
       await _apagarSessaoSalva(prefs);
     } else if (id != null && tipo != null && token != null) {
-      // Sessões antigas (de antes do login com token) não têm token: pedem login de novo.
       ApiCliente.instancia.token = token;
       _ultimaGravacaoAtividade = null;
-      await registrarAtividade(); // abrir o app conta como uso
+      await registrarAtividade();
       try {
         await _carregarAposLogin(tipo, id);
       } catch (_) {
@@ -215,8 +187,6 @@ class AppEstado extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// [lembrar] ("Lembrar de mim"): continua logado mesmo sem uso (até o login
-  /// vencer) e o e-mail ou telefone já vem preenchido na próxima vez.
   Future<void> entrar(String identificador, String senha, {bool lembrar = false}) async {
     final login = await _authServico.login(identificador, senha);
     ApiCliente.instancia.token = login.token;
@@ -242,10 +212,8 @@ class AppEstado extends ChangeNotifier {
 
   DateTime? _ultimaGravacaoAtividade;
 
-  /// Toque na tela (ou app aberto): guarda o horário da última atividade —
-  /// no máximo uma gravação por minuto.
   Future<void> registrarAtividade() async {
-    if (ApiCliente.instancia.token == null) return; // deslogado: nada a registrar
+    if (ApiCliente.instancia.token == null) return;
     final agora = DateTime.now();
     final ultima = _ultimaGravacaoAtividade;
     if (ultima != null && agora.difference(ultima) < const Duration(minutes: 1)) return;
@@ -254,11 +222,10 @@ class AppEstado extends ChangeNotifier {
     await prefs.setInt(_chaveUltimaAtividade, agora.millisecondsSinceEpoch);
   }
 
-  /// Com o app aberto ou ao voltar para ele: passou do limite sem uso? Sai da conta.
   Future<void> verificarInatividade() async {
     if (!autenticado) return;
     final prefs = await SharedPreferences.getInstance();
-    if (prefs.getBool(_chaveLembrar) == true) return; // "Lembrar de mim"
+    if (prefs.getBool(_chaveLembrar) == true) return;
     final ultima = prefs.getInt(_chaveUltimaAtividade);
     if (ultima == null) return;
     if (DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(ultima)) <= limiteInatividade) return;
@@ -271,14 +238,13 @@ class AppEstado extends ChangeNotifier {
     await prefs.remove(_chaveTipo);
     await prefs.remove(_chaveToken);
     await prefs.remove(_chaveUltimaAtividade);
-    await prefs.remove(_chaveLembrar); // o login lembrado fica, para a próxima vez
+    await prefs.remove(_chaveLembrar);
   }
 
-  /// E-mail ou telefone salvo pelo "Lembrar de mim" (null se a pessoa não pediu).
   Future<String?> loginLembrado() async => (await SharedPreferences.getInstance()).getString(_chaveLoginLembrado);
 
   Future<void> cadastrar({
-    required String tipo, // 'paciente' | 'cuidador'
+    required String tipo,
     required String nome,
     required String email,
     required String senha,
@@ -301,7 +267,6 @@ class AppEstado extends ChangeNotifier {
     } else {
       await _cuidadorServico.criar(nome: nome, email: email, senha: senha, profissao: profissao, telefone: telefone);
     }
-    // Depois de criar a conta, entra com o mesmo e-mail (ou telefone) e senha (é o login que gera o token).
     await entrar(email.isNotEmpty ? email : (telefone ?? ''), senha);
   }
 
@@ -338,7 +303,6 @@ class AppEstado extends ChangeNotifier {
     return PacienteComDados(paciente: paciente, medicamentos: medicamentos, historico: historico);
   }
 
-  /// Período mais antigo que os últimos dias guardados no app (tela de Histórico).
   Future<List<Historico>> carregarHistoricoAntigo(int pacienteId, DateTime de, DateTime ate) =>
       _historicoServico.listarPorPaciente(pacienteId, de: de, ate: ate);
 
@@ -386,7 +350,6 @@ class AppEstado extends ChangeNotifier {
     await recarregarPaciente(pacienteId);
   }
 
-  /// "Desfazer" uma dose registrada hoje por engano.
   Future<void> desfazerDose(int pacienteId, int medicamentoId, String horario) async {
     final encontrados = pacientes.where((p) => p.paciente.id == pacienteId);
     if (encontrados.isEmpty) return;
@@ -396,15 +359,11 @@ class AppEstado extends ChangeNotifier {
     await recarregarPaciente(pacienteId);
   }
 
-  /// O paciente esqueceu a senha: o cuidador gera um código para ele criar uma nova.
   Future<void> gerarCodigoNovaSenha(int pacienteId) async {
     await _pacienteServico.gerarCodigoNovaSenha(pacienteId);
     await recarregarPaciente(pacienteId);
   }
 
-  /// Paciente: [sexo] vem no rótulo da tela ('Feminino'...) e é convertido
-  /// pro enum da API. Campos que a tela não edita (enfermidade, observações,
-  /// cuidador) são reenviados como estão, porque o PUT substitui tudo.
   Future<void> atualizarPerfil({
     required String nome,
     required String email,
@@ -425,7 +384,6 @@ class AppEstado extends ChangeNotifier {
         'sexo': sexo != null ? sexoParaApi[sexo] : null,
         'enfermidade': paciente?.enfermidade,
         'telefone': vazioParaNulo(telefone),
-        // Endereço saiu da tela: sem valor novo, mantém o que já estava salvo.
         'endereco': vazioParaNulo(endereco) ?? paciente?.endereco,
         'observacoesClinicas': paciente?.observacoesClinicas,
         'cuidadorId': paciente?.cuidadorId,
@@ -456,14 +414,11 @@ class AppEstado extends ChangeNotifier {
     await recarregarPaciente(usuario!.id);
   }
 
-  /// Cuidador cadastra um paciente já vinculado a ele, sem senha — igual ao
-  /// cadastrarPaciente do web. O paciente depois cria a própria senha em
-  /// "Ativar meu acesso" (tela Definir senha).
   Future<void> cadastrarPacienteDoCuidador({
     required String nome,
     required String email,
     DateTime? dataNascimento,
-    String? sexo, // rótulo da tela: 'Feminino' | 'Masculino' | 'Outro'
+    String? sexo,
     String? enfermidade,
     String? telefone,
     String? endereco,
@@ -482,9 +437,6 @@ class AppEstado extends ChangeNotifier {
     await recarregarPaciente(novo.id);
   }
 
-  /// Salva só as observações clínicas: busca o paciente atual no servidor e
-  /// reenvia todos os campos como estão (o PUT substitui tudo), trocando apenas
-  /// as observações — assim nada que foi alterado em outro lugar é apagado.
   Future<void> atualizarObservacoesClinicas(int pacienteId, String texto) async {
     final atual = await _pacienteServico.buscarPorId(pacienteId);
     final limpo = texto.trim();
@@ -524,7 +476,6 @@ class AppEstado extends ChangeNotifier {
     await prefs.setString(_chaveTamanhoFonte, tamanho);
   }
 
-  /// 'claro' ou 'escuro' — Configurações › Aparência e a chave do menu.
   Future<void> definirTema(String novoTema) async {
     if (novoTema != 'claro' && novoTema != 'escuro') return;
     tema = novoTema;

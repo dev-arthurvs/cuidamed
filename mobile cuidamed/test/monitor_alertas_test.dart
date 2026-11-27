@@ -27,7 +27,7 @@ class _ApiFalsa {
 
   Future<void> confirmar(int id) async {
     confirmados.add(id);
-    resposta = _paciente(); // o servidor limpa o pendente ao confirmar
+    resposta = _paciente();
   }
 }
 
@@ -45,13 +45,13 @@ void main() {
         buscarPaciente: api.buscar,
         confirmarAlertaManual: api.confirmar,
         aoAlertar: alertas.add,
-        agora: agora ?? () => DateTime(2000, 1, 1, 3, 0), // madrugada: nenhuma dose no horário
+        agora: agora ?? () => DateTime(2000, 1, 1, 3, 0),
       );
 
   testWidgets('Liga ao entrar e desliga ao sair; o cuidador não busca alerta manual', (tester) async {
     final cuidador = estadoCuidador();
     final monitorCuidador = criar(cuidador);
-    expect(monitorCuidador.ativo, isTrue); // vigia as doses atrasadas dos pacientes
+    expect(monitorCuidador.ativo, isTrue);
     await tester.pump();
     expect(api.buscas, 0);
     monitorCuidador.dispose();
@@ -60,7 +60,7 @@ void main() {
     final monitor = criar(paciente);
     expect(monitor.ativo, isTrue);
     await tester.pump();
-    expect(api.buscas, 1); // verifica logo ao entrar, sem esperar 30 s
+    expect(api.buscas, 1);
 
     await tester.pump(const Duration(seconds: 30));
     expect(api.buscas, 2);
@@ -84,7 +84,7 @@ void main() {
     expect(alertas.single.mensagem, 'Tome o remédio da pressão, mãe!');
     expect(api.confirmados, [1]);
 
-    await tester.pump(const Duration(seconds: 30)); // já confirmado: não repete
+    await tester.pump(const Duration(seconds: 30));
     expect(alertas, hasLength(1));
     monitor.dispose();
   });
@@ -99,17 +99,16 @@ void main() {
 
   testWidgets('"Hora do remédio" avisa no horário da dose, uma única vez', (tester) async {
     final hoje = DateTime.now();
-    var agora = DateTime(hoje.year, hoje.month, hoje.day, 20, 0, 5); // Losartana 20:00 (não tomada)
+    var agora = DateTime(hoje.year, hoje.month, hoje.day, 20, 0, 5);
     final monitor = criar(estadoPaciente(), agora: () => agora);
     await tester.pump();
     expect(alertas.where((a) => a.titulo == 'Hora do remédio 💊').single.mensagem,
         'Está na hora de tomar Losartana (50mg).');
 
-    agora = agora.add(const Duration(seconds: 30)); // ainda 20:00 — não repete
+    agora = agora.add(const Duration(seconds: 30));
     await tester.pump(const Duration(seconds: 30));
     expect(alertas, hasLength(1));
 
-    // A dose das 08:00 já está marcada como tomada no histórico: nunca avisa.
     agora = DateTime(hoje.year, hoje.month, hoje.day, 8, 0, 10);
     await tester.pump(const Duration(seconds: 30));
     expect(alertas, hasLength(1));
@@ -127,7 +126,7 @@ void main() {
     api.falhar = false;
     api.resposta = _paciente(pendente: true);
     await tester.pump(const Duration(seconds: 30));
-    expect(alertas, hasLength(1)); // volta a funcionar quando a rede volta
+    expect(alertas, hasLength(1));
     monitor.dispose();
   });
 }

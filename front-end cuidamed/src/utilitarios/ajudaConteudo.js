@@ -1,6 +1,3 @@
-// Conteúdo central do guia de ajuda: usado tanto na página /ajuda (guia completo)
-// quanto no botão "?" contextual do Cabecalho (mostra só a seção da tela atual).
-
 export const GUIA_SECOES = [
   {
     chave: 'inicio-paciente',

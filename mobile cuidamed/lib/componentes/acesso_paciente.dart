@@ -8,9 +8,6 @@ import '../utilitarios/tema.dart';
 import 'botao.dart';
 import 'cartao.dart';
 
-/// Detalhes do paciente, como em AcessoPaciente.jsx do web: código para ativar
-/// o acesso ou, se ele esqueceu a senha, botão para o cuidador gerar um código
-/// de nova senha (vale 24 horas).
 class AcessoPaciente extends StatefulWidget {
   final Paciente paciente;
   const AcessoPaciente({super.key, required this.paciente});

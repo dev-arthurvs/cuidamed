@@ -10,7 +10,6 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <ProvedorApp>
-        {/* Só os recursos de animação que o app usa, com os componentes "m". */}
         <LazyMotion features={domAnimation}>
           <App />
         </LazyMotion>

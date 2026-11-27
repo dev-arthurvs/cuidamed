@@ -11,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-// O CORS (quais sites podem chamar a API) fica em seguranca/ConfiguracaoSeguranca.
 public class ConfiguracaoWeb {
 
     @Bean

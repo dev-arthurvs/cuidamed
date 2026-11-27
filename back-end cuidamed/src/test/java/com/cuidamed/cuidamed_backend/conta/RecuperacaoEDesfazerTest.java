@@ -27,10 +27,6 @@ import com.cuidamed.cuidamed_backend.seguranca.ServicoToken;
 import com.cuidamed.cuidamed_backend.seguranca.UsuarioAutenticado;
 import com.jayway.jsonpath.JsonPath;
 
-/**
- * Código de nova senha gerado pelo cuidador e "desfazer" dose. Cada teste roda
- * numa transação desfeita no fim: nada do que é criado aqui fica no banco.
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional
@@ -65,7 +61,6 @@ class RecuperacaoEDesfazerTest {
         return JsonPath.read(resposta.andReturn().getResponse().getContentAsString(), "$.id");
     }
 
-    /** Paciente com senha, ligado a um cuidador pelo fluxo de pedido + aceite. */
     private long[] pacienteComCuidador(String emailPaciente) throws Exception {
         long paciente = idDe(postar("/api/pacientes",
                 "{\"nome\":\"Paciente\",\"email\":\"" + emailPaciente + "\",\"senha\":\"senhaantiga\"}", null)
@@ -94,7 +89,6 @@ class RecuperacaoEDesfazerTest {
         String codigo = JsonPath.read(resposta, "$.codigoAtivacao");
         assertThat(codigo).hasSize(6);
 
-        // A senha antiga vale até o código ser usado.
         postar("/api/auth/login", "{\"login\":\"" + emailPaciente + "\",\"senha\":\"senhaantiga\"}", null)
                 .andExpect(status().isOk());
 
@@ -107,7 +101,6 @@ class RecuperacaoEDesfazerTest {
         postar("/api/auth/login", "{\"login\":\"" + emailPaciente + "\",\"senha\":\"senhaantiga\"}", null)
                 .andExpect(status().isUnauthorized());
 
-        // O código só vale uma vez.
         postar("/api/pacientes/definir-senha",
                 "{\"login\":\"" + emailPaciente + "\",\"codigo\":\"" + codigo + "\",\"novaSenha\":\"outrasenha1\"}", null)
                 .andExpect(status().isBadRequest());
@@ -160,7 +153,6 @@ class RecuperacaoEDesfazerTest {
         mvc.perform(get("/api/medicamentos/" + medicamento).header(HttpHeaders.AUTHORIZATION, token))
                 .andExpect(jsonPath("$.quantidadeEstoque").value(8));
 
-        // Outro paciente não desfaz.
         long estranho = idDe(postar("/api/pacientes",
                 "{\"nome\":\"Estranho\",\"email\":\"" + email("estranho") + "\",\"senha\":\"senha1234\"}", null)).longValue();
         mvc.perform(delete("/api/historicos/" + registro)
@@ -172,7 +164,6 @@ class RecuperacaoEDesfazerTest {
         mvc.perform(get("/api/medicamentos/" + medicamento).header(HttpHeaders.AUTHORIZATION, token))
                 .andExpect(jsonPath("$.quantidadeEstoque").value(10));
 
-        // A dose pode ser registrada de novo depois de desfazer.
         postar("/api/historicos", corpo, token).andExpect(status().isCreated());
     }
 
@@ -190,7 +181,6 @@ class RecuperacaoEDesfazerTest {
                 + ",\"data\":\"" + hoje + "\",\"hora\":\"08:00\",\"status\":\"TOMADO\"}", token)
                 .andExpect(status().isCreated())).longValue();
 
-        // A qualquer hora, um destes dois fusos já está em outro dia em relação a Brasília.
         TimeZone original = TimeZone.getDefault();
         boolean adiantadoMudaODia = !java.time.LocalDate.now(java.time.ZoneId.of("Pacific/Kiritimati")).toString().equals(hoje);
         TimeZone.setDefault(TimeZone.getTimeZone(adiantadoMudaODia ? "Pacific/Kiritimati" : "Etc/GMT+12"));

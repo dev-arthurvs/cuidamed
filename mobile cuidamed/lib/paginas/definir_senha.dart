@@ -7,9 +7,6 @@ import '../componentes/layout_autenticacao.dart';
 import '../servicos/api_cliente.dart';
 import '../utilitarios/tema.dart';
 
-/// "Ativar meu acesso" — pro paciente que já foi cadastrado pelo cuidador e
-/// precisa criar a própria senha pela primeira vez (não é reset de senha
-/// tradicional). Espelha front-end cuidamed/src/paginas/DefinirSenha.jsx.
 class DefinirSenha extends StatefulWidget {
   const DefinirSenha({super.key});
 
@@ -34,7 +31,6 @@ class _DefinirSenhaState extends State<DefinirSenha> {
     super.dispose();
   }
 
-  // Veio de "Esqueci minha senha": mesmo formulário, com o código de nova senha.
   bool _ehRecuperacao(BuildContext context) => GoRouterState.of(context).uri.queryParameters['novaSenha'] == '1';
 
   Future<void> _ativarAcesso() async {

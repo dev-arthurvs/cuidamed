@@ -19,20 +19,19 @@ void main() {
 
   testWidgets('Indicadores com as contas do web', (tester) async {
     await montarPagina(tester, estadoCuidador(), '/painel', (_) => const PainelCuidador(), tamanho: _desktop);
-    // estadoCuidador: 1 paciente, 2 medicamentos (1 ativo + 1 encerrado), 1 dose tomada.
     final estado = estadoCuidador();
     final dados = estado.pacientes.first;
     final adesao = calcularAdesao(dados.historico, medicamentos: dados.medicamentos);
-    expect(adesao, lessThan(100)); // doses passadas sem registro contam como perdidas
+    expect(adesao, lessThan(100));
     String valorDo(String rotulo) {
       final coluna = find.ancestor(of: find.text(rotulo).first, matching: find.byType(Column)).first;
       return tester.widgetList<Text>(find.descendant(of: coluna, matching: find.byType(Text))).first.data!;
     }
 
     expect(valorDo('Pacientes vinculados'), '1');
-    expect(valorDo('Precisam de atenção'), isIn(['0', '1'])); // depende do horário em que o teste roda
+    expect(valorDo('Precisam de atenção'), isIn(['0', '1']));
     expect(valorDo('Adesão média (30 dias)'), '$adesao%');
-    expect(valorDo('Medicamentos monitorados'), '1'); // o encerrado não conta
+    expect(valorDo('Medicamentos monitorados'), '1');
     expect(find.textContaining('· 1 medicamentos'), findsOneWidget);
     expect(find.text('Acompanhe seus pacientes'), findsOneWidget);
   });
@@ -41,15 +40,13 @@ void main() {
     await montarPagina(tester, estadoCuidador(), '/painel', (_) => const PainelCuidador(), tamanho: _celular);
     expect(find.byType(FaixaDataHora), findsOneWidget);
     expect(find.byType(DataHoraCabecalho), findsNothing);
-    // Avatar do usuário logado no cabeçalho (os pacientes da lista também usam
-    // AvatarUsuario, com descrição "Paciente: ...").
     expect(find.byWidgetPredicate((w) => w is AvatarUsuario && w.descricao == null), findsOneWidget);
 
     final p1 = tester.getRect(find.text('Pacientes vinculados').first);
     final p2 = tester.getRect(find.text('Precisam de atenção'));
     final p3 = tester.getRect(find.text('Adesão média (30 dias)'));
-    expect(p2.top, closeTo(p1.top, 1)); // mesma linha
-    expect(p3.top, greaterThan(p1.bottom)); // linha de baixo
+    expect(p2.top, closeTo(p1.top, 1));
+    expect(p3.top, greaterThan(p1.bottom));
 
     await rolarAte(tester, find.text('+ Cadastrar paciente'));
     final titulo = tester.getRect(find.text('Pacientes vinculados').last);
@@ -75,7 +72,6 @@ void main() {
     for (final tamanho in [_celular, _desktop]) {
       await montarPagina(tester, estadoCuidador(), '/painel', (_) => const PainelCuidador(), tamanho: tamanho);
       await rolarAte(tester, find.text('+ Cadastrar paciente'));
-      // O Botao usa FittedBox(scaleDown): se o texto não coubesse, a altura renderizada ficaria menor que a natural.
       final caixa = find.ancestor(of: find.text('+ Cadastrar paciente'), matching: find.byType(FittedBox));
       final fitted = tester.renderObject<RenderBox>(caixa);
       final texto = tester.renderObject<RenderBox>(find.text('+ Cadastrar paciente'));

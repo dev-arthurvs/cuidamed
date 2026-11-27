@@ -20,12 +20,12 @@ void main() {
     expect(CorApp.escuro, isTrue);
     expect(CorApp.fundo, const Color(0xFF0D1624));
     expect(CorApp.texto, const Color(0xFFE6EDF6));
-    expect(CorApp.fundoCardDose, CorApp.gradienteCartaoClaro); // dose clara no escuro
+    expect(CorApp.fundoCardDose, CorApp.gradienteCartaoClaro);
     expect(CorApp.fundoCartaoPaciente, CorApp.gradienteCartaoEscuro);
 
     CorApp.usarModoEscuro(false);
     expect(CorApp.fundo, const Color(0xFFEEF4FB));
-    expect(CorApp.fundoCardDose, CorApp.gradienteCartaoEscuro); // dose escura no claro
+    expect(CorApp.fundoCardDose, CorApp.gradienteCartaoEscuro);
   });
 
   test('Tema salvo no aparelho e só vale dentro do sistema', () async {
@@ -37,7 +37,6 @@ void main() {
     expect(estado.usarModoEscuro, isTrue);
     expect((await SharedPreferences.getInstance()).getString('tema'), 'escuro');
 
-    // Deslogado (login, cadastro, ativação): sempre claro.
     await estado.sair();
     expect(estado.modoEscuro, isTrue);
     expect(estado.usarModoEscuro, isFalse);

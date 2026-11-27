@@ -15,7 +15,6 @@ AppEstado _deslogado() => AppEstado()..carregandoSessao = false;
 const _celular = Size(360, 800);
 const _desktop = Size(1400, 900);
 
-/// O card branco do formulário (o Container com sombra que envolve o conteúdo).
 Rect _cartao(WidgetTester tester, String textoDentro) => tester.getRect(find
     .ancestor(of: find.text(textoDentro), matching: find.byWidgetPredicate((w) => w is Container && w.decoration is BoxDecoration && (w.decoration as BoxDecoration).boxShadow != null))
     .first);
@@ -26,7 +25,7 @@ void main() {
       await montarPagina(tester, _deslogado(), '/login', (_) => const Login());
       expect(find.text('Entrar na minha conta'), findsOneWidget);
       expect(find.text('Esqueci minha senha'), findsOneWidget);
-      expect(find.byIcon(Icons.person_outline), findsOneWidget); // e-mail ou telefone
+      expect(find.byIcon(Icons.person_outline), findsOneWidget);
       expect(find.byIcon(Icons.lock_outline), findsOneWidget);
       expect(find.widgetWithText(OutlinedButton, 'Criar conta'), findsOneWidget);
       expect(find.widgetWithText(OutlinedButton, 'Ativar acesso'), findsOneWidget);
@@ -51,18 +50,18 @@ void main() {
       final esqueci = tester.getRect(find.text('Esqueci minha senha'));
       final entrar = tester.getRect(find.text('Entrar'));
       expect(esqueci.top, greaterThan(senha.bottom));
-      expect(esqueci.right, closeTo(form.right, 6)); // alinhado à direita
-      expect(entrar.top, greaterThan(esqueci.bottom)); // botão depois do "Esqueci"
+      expect(esqueci.right, closeTo(form.right, 6));
+      expect(entrar.top, greaterThan(esqueci.bottom));
 
       final criar = tester.getRect(find.widgetWithText(OutlinedButton, 'Criar conta'));
       final ativar = tester.getRect(find.widgetWithText(OutlinedButton, 'Ativar acesso'));
-      expect(criar.top, greaterThan(entrar.bottom)); // caminhos no rodapé
-      expect(criar.top, closeTo(ativar.top, 1)); // lado a lado
+      expect(criar.top, greaterThan(entrar.bottom));
+      expect(criar.top, closeTo(ativar.top, 1));
       expect(ativar.left, greaterThan(criar.right));
-      expect(criar.width, closeTo(ativar.width, 1)); // mesma largura
+      expect(criar.width, closeTo(ativar.width, 1));
       expect(criar.left, closeTo(form.left, 1));
       expect(ativar.right, closeTo(form.right, 1));
-      expect(criar.height, greaterThanOrEqualTo(52)); // fácil de tocar
+      expect(criar.height, greaterThanOrEqualTo(52));
       expect(tester.widget<Text>(find.text('Esqueci minha senha')).style!.fontSize, 16);
     });
 
@@ -96,7 +95,7 @@ void main() {
     testWidgets('Fonte "Grande" escolhida no sistema não aumenta o login', (tester) async {
       await montarPagina(tester, _deslogado()..tamanhoFonte = 'grande', '/login', (_) => const Login());
       final contexto = tester.element(find.text('Entrar na minha conta'));
-      expect(MediaQuery.textScalerOf(contexto).scale(10), 10); // escala 1,0
+      expect(MediaQuery.textScalerOf(contexto).scale(10), 10);
     });
 
     testWidgets('O gradiente azul escuro cobre a tela inteira', (tester) async {
@@ -153,9 +152,7 @@ void main() {
 
   group('Cadastro', () {
     testWidgets('Trocar para Cuidador troca campos e a frase do painel; sem "Protótipo"', (tester) async {
-      // A frase só aparece na tela larga (no celular fica só a logo).
       await montarPagina(tester, _deslogado(), '/cadastro', (_) => const Cadastro(), tamanho: _desktop);
-      // Endereço (paciente) e profissão (cuidador) não são pedidos no cadastro.
       expect(find.text('Endereço'), findsNothing);
       expect(find.text('Profissão'), findsNothing);
       expect(find.text('Data de nascimento'), findsOneWidget);
@@ -163,7 +160,7 @@ void main() {
       await tester.tap(find.text('Cuidador'));
       await tester.pumpAndSettle();
       expect(find.text('Profissão'), findsNothing);
-      expect(find.text('Data de nascimento'), findsNothing); // só do paciente
+      expect(find.text('Data de nascimento'), findsNothing);
       expect(find.text('Cuidado à distância, com tranquilidade total.'), findsOneWidget);
       expect(find.textContaining('Protótipo'), findsNothing);
     });

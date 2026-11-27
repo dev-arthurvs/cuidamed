@@ -22,7 +22,6 @@ import com.cuidamed.cuidamed_backend.seguranca.ServicoToken;
 import com.cuidamed.cuidamed_backend.seguranca.UsuarioAutenticado;
 import com.jayway.jsonpath.JsonPath;
 
-/** Histórico por período. Roda numa transação desfeita no fim: nada fica no banco. */
 @SpringBootTest
 @AutoConfigureMockMvc
 @Transactional

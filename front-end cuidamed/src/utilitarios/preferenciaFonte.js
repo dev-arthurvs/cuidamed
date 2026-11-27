@@ -1,7 +1,3 @@
-// Preferência de tamanho de fonte (acessibilidade). Como praticamente todo o
-// app usa font-size fixo em px (não rem), a forma confiável de escalar tudo de
-// uma vez — textos, ícones, espaçamentos — é o zoom do elemento raiz, não um
-// font-size no <html> (que só afetaria unidades relativas).
 export const CHAVE_TAMANHO_FONTE = 'cuidamed_tamanho_fonte'
 
 export const ZOOM_POR_TAMANHO = {
@@ -29,6 +25,6 @@ export function salvarTamanhoFonte(tamanho) {
   try {
     localStorage.setItem(CHAVE_TAMANHO_FONTE, tamanho)
   } catch {
-    // localStorage indisponível (aba privada, etc.) — preferência vale só pra sessão atual.
+    // armazenamento bloqueado: segue sem salvar
   }
 }

@@ -4,27 +4,15 @@ import '../modelos/paciente.dart';
 import '../utilitarios/horarios.dart';
 import 'app_estado.dart';
 
-/// Um aviso disparado pro paciente (vai pra tela, pro som e pra notificação).
 class AlertaPaciente {
   final String titulo;
   final String mensagem;
 
-  /// O celular já agendou esta notificação (lembretes agendados): com o app
-  /// aberto, só mostra na tela e toca o som, para não notificar duas vezes.
   final bool notificacaoAgendada;
 
   const AlertaPaciente(this.titulo, this.mensagem, {this.notificacaoAgendada = false});
 }
 
-/// Equivalente aos dois useEffect de alerta do ContextoApp.jsx do web. Enquanto
-/// há um PACIENTE logado, a cada [intervalo] (30 s, igual ao web):
-/// 1. "Lembrar agora": busca o paciente na API; se o cuidador deixou um alerta
-///    pendente, avisa e confirma o recebimento (o servidor limpa o pendente);
-/// 2. "Hora do remédio": se alguma dose não tomada chegou ao horário (janela de
-///    1 minuto), avisa — uma única vez por dose.
-/// Com um CUIDADOR logado, a cada [intervalo] avisa uma vez quando a dose de um
-/// paciente fica atrasada (só com o app aberto; o status também fica no painel).
-/// Ouve o [AppEstado] pra ligar ao entrar e desligar ao sair.
 class MonitorAlertas {
   final AppEstado estado;
   final Future<Paciente> Function(int pacienteId) buscarPaciente;
@@ -65,7 +53,7 @@ class MonitorAlertas {
     _pacienteMonitorado = pacienteId;
     _cuidadorMonitorado = cuidadorId;
     _timer = Timer.periodic(intervalo, (_) => verificarAgora());
-    verificarAgora(); // igual ao web: verifica já ao entrar, sem esperar 30 s
+    verificarAgora();
   }
 
   void _parar() {
@@ -76,7 +64,6 @@ class MonitorAlertas {
     _dosesAvisadas.clear();
   }
 
-  /// Uma rodada de verificação (público pra teste).
   Future<void> verificarAgora() async {
     if (_cuidadorMonitorado != null) {
       _verificarAtrasosDosPacientes();
@@ -89,7 +76,6 @@ class MonitorAlertas {
   }
 
   void _verificarAtrasosDosPacientes() {
-    // Em segundo plano os dados não atualizam: o aviso poderia ser de uma dose já tomada.
     if (estado.emSegundoPlano) return;
     final momento = agora();
     final hojeIso = dataAtualISO(momento);
@@ -135,7 +121,7 @@ class MonitorAlertas {
   }
 
   Future<void> _verificarAlertaManual(int pacienteId) async {
-    if (_verificandoManual) return; // evita avisar duas vezes se uma rodada atrasar
+    if (_verificandoManual) return;
     _verificandoManual = true;
     try {
       final paciente = await buscarPaciente(pacienteId);
@@ -146,7 +132,6 @@ class MonitorAlertas {
       aoAlertar(AlertaPaciente('Lembrete do seu cuidador 💊', mensagem));
       await confirmarAlertaManual(pacienteId);
     } catch (_) {
-      // Falha de rede numa verificação periódica não interrompe o uso do app.
     } finally {
       _verificandoManual = false;
     }

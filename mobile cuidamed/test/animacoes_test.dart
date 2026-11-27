@@ -40,9 +40,9 @@ void main() {
     ])));
     await tester.pump(const Duration(milliseconds: 100));
     expect(_opacidade(tester, find.text('a')), greaterThan(_opacidade(tester, find.text('b'))));
-    await tester.pump(const Duration(milliseconds: 150)); // passa do atraso máximo (240 ms)
+    await tester.pump(const Duration(milliseconds: 150));
     expect(_opacidade(tester, find.text('c')), lessThan(1.0));
-    await tester.pumpAndSettle(); // e termina, mesmo com índice 50 (atraso limitado)
+    await tester.pumpAndSettle();
     expect(_opacidade(tester, find.text('c')), 1.0);
   });
 
@@ -60,7 +60,7 @@ void main() {
     await tester.tap(find.bySemanticsLabel('Ir para o início'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
-    expect(_opacidade(tester, find.text('rota /painel')), inExclusiveRange(0.0, 1.0)); // no meio da transição
+    expect(_opacidade(tester, find.text('rota /painel')), inExclusiveRange(0.0, 1.0));
     await tester.pump(const Duration(milliseconds: 150));
     expect(find.text('rota /painel'), findsOneWidget);
   });

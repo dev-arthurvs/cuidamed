@@ -15,7 +15,6 @@ final Map<String, _EstiloStatus> _estilos = {
   'perdido': _EstiloStatus('Perdido', CorApp.vermelhoFundo, CorApp.vermelhoTexto),
 };
 
-/// Badge de status de dose — mesma paleta/rótulos de componentes/Rotulo.jsx.
 class RotuloStatus extends StatelessWidget {
   final String status;
   const RotuloStatus({super.key, required this.status});

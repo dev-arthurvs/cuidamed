@@ -51,12 +51,10 @@ void main() {
           }),
         ));
 
-    // Sem edição em andamento: o valor novo do servidor aparece.
     redesenhar(() => obs = 'Versão 2 (alterada no web)');
     await tester.pump();
     expect(find.widgetWithText(TextField, 'Versão 2 (alterada no web)'), findsOneWidget);
 
-    // Com rascunho: a sincronização não apaga o que está sendo digitado.
     await tester.enterText(find.byType(TextField), 'Meu rascunho');
     await tester.pump();
     redesenhar(() => obs = 'Versão 3');
@@ -68,7 +66,7 @@ void main() {
     await montarPagina(tester, estadoCuidador(), '/x',
         (_) => Scaffold(body: SingleChildScrollView(child: CartaoObservacoes(paciente: _paciente(null)))));
     expect(tester.widget<TextField>(find.byType(TextField)).controller!.text, isEmpty);
-    expect(find.textContaining('alergia a dipirona'), findsOneWidget); // exemplo (hint)
+    expect(find.textContaining('alergia a dipirona'), findsOneWidget);
   });
 
   test('AppEstado expõe o salvamento das observações', () {

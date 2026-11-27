@@ -10,14 +10,12 @@ const _meses = [
   'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro',
 ];
 
-/// "Quinta-feira, 24 de setembro" — mesmo formato do formatarDataPorExtenso do web.
 String formatarDataPorExtenso(DateTime data) =>
     '${_diasSemana[data.weekday - 1]}, ${data.day} de ${_meses[data.month - 1]}';
 
 String formatarHora(DateTime data) =>
     '${data.hour.toString().padLeft(2, '0')}:${data.minute.toString().padLeft(2, '0')}';
 
-/// Reconstrói [construtor] com a hora atual a cada 30 s (igual ao Cabecalho.jsx do web).
 class RelogioAtual extends StatefulWidget {
   final Widget Function(BuildContext context, DateTime agora) construtor;
   const RelogioAtual({super.key, required this.construtor});
@@ -46,7 +44,6 @@ class _RelogioAtualState extends State<RelogioAtual> {
   Widget build(BuildContext context) => widget.construtor(context, _agora);
 }
 
-/// Bloco do cabeçalho em tela larga: data em negrito e "08:24 · Agora" embaixo.
 class DataHoraCabecalho extends StatelessWidget {
   const DataHoraCabecalho({super.key});
 
@@ -68,7 +65,6 @@ class DataHoraCabecalho extends StatelessWidget {
   }
 }
 
-/// Faixa com data e hora pro celular, onde o cabeçalho não tem espaço pra ela.
 class FaixaDataHora extends StatelessWidget {
   const FaixaDataHora({super.key});
 
@@ -86,8 +82,6 @@ class FaixaDataHora extends StatelessWidget {
           children: [
             Icon(Icons.calendar_today_outlined, size: 22, color: CorApp.azulTexto),
             const SizedBox(width: 12),
-            // Data e hora empilhadas (como no cabeçalho do web) — lado a lado a
-            // data quebrava em duas linhas e espremia a hora.
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,13 +100,9 @@ class FaixaDataHora extends StatelessWidget {
   }
 }
 
-/// Círculo com as iniciais (fonte do app em extra-negrito sobre o gradiente azul do web).
-/// Usado para o usuário logado no cabeçalho e para os pacientes nas listas,
-/// para que todos os círculos de iniciais do app tenham a mesma fonte.
 class AvatarUsuario extends StatelessWidget {
   final String nome;
   final double tamanho;
-  /// Texto lido pelo leitor de tela; padrão "Usuário: nome".
   final String? descricao;
   const AvatarUsuario({super.key, required this.nome, this.tamanho = 40, this.descricao});
 
@@ -133,7 +123,7 @@ class AvatarUsuario extends StatelessWidget {
         decoration: BoxDecoration(gradient: CorApp.gradienteAzul, shape: BoxShape.circle),
         child: Text(
           _iniciais,
-          textScaler: TextScaler.noScaling, // cabe sempre no círculo, mesmo com fonte grande
+          textScaler: TextScaler.noScaling,
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: tamanho * 0.36),
         ),
       ),

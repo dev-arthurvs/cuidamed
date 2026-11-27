@@ -1,7 +1,3 @@
-// TESTE DE REGRESSÃO: as regras que já funcionavam continuam funcionando?
-// Confere, uma a uma, regras de segurança e de negócio do app. Rodar depois
-// de cada mudança mostra se algo que funcionava quebrou.
-//   k6 run regressao.js
 import { check, group, sleep } from 'k6'
 import http from 'k6/http'
 import {
@@ -11,7 +7,6 @@ import {
 export const options = {
   vus: 1,
   iterations: 1,
-  // Todas as regras precisam passar, e nenhuma resposta fora do esperado.
   thresholds: {
     checks: ['rate==1.0'],
     http_req_failed: ['rate==0'],
@@ -19,7 +14,6 @@ export const options = {
 }
 
 export function setup() {
-  // A, B e C: pacientes independentes. C tem o remédio desde 20 dias atrás.
   return {
     a: criarPacienteComRemedio(1, { estoque: 10 }),
     b: criarPacienteComRemedio(2),
@@ -27,8 +21,6 @@ export function setup() {
   }
 }
 
-// Pausa de 1 s entre os grupos: sem ela o teste termina em menos de 2 s e o k6
-// não gera o relatório HTML ("not enough data").
 export default function ({ a, b, c }) {
   const hoje = diaDeBrasilia()
 
@@ -42,6 +34,7 @@ export default function ({ a, b, c }) {
     check(http.get(`${API}/actuator/health`), { 'saúde do servidor é pública: 200': (r) => r.status === 200 })
   })
 
+  // Pausas curtas: sem elas o teste dura menos de 2 s e o k6 não gera o relatório HTML.
   sleep(1)
   group('Login e cadastro', () => {
     const errado = postar('/api/auth/login', { login: a.email, senha: 'senha-errada' }, null, {}, [400, 401])

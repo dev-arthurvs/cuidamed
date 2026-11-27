@@ -36,7 +36,6 @@ class _PainelCuidadorState extends State<PainelCuidador> {
   void initState() {
     super.initState();
     _carregarSolicitacoes();
-    // Pedidos de vínculo feitos no app do paciente aparecem sozinhos (a cada 30 s).
     _atualizarSolicitacoes = Timer.periodic(AppEstado.intervaloAtualizacao, (_) => _carregarSolicitacoes(silencioso: true));
   }
 
@@ -46,7 +45,6 @@ class _PainelCuidadorState extends State<PainelCuidador> {
     super.dispose();
   }
 
-  /// [silencioso]: atualização automática, sem o indicador de carregando piscar.
   Future<void> _carregarSolicitacoes({bool silencioso = false}) async {
     final estado = context.read<AppEstado>();
     if (!silencioso) setState(() => _carregandoSolicitacoes = true);
@@ -54,7 +52,6 @@ class _PainelCuidadorState extends State<PainelCuidador> {
       final lista = await _pacienteServico.listarSolicitacoes(estado.usuario!.id);
       if (mounted) setState(() => _solicitacoes = lista);
     } catch (_) {
-      // silencioso: não impede o resto do painel de carregar
     } finally {
       if (mounted && !silencioso) setState(() => _carregandoSolicitacoes = false);
     }
@@ -93,8 +90,6 @@ class _PainelCuidadorState extends State<PainelCuidador> {
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            // No celular a data não cabe no cabeçalho (o web também a esconde
-            // abaixo de 640px), então ela aparece aqui no topo.
             if (MediaQuery.sizeOf(context).width < Cabecalho.larguraComDataHora) ...[
               const FaixaDataHora(),
               const SizedBox(height: 16),
@@ -124,9 +119,6 @@ class _PainelCuidadorState extends State<PainelCuidador> {
     );
   }
 
-  /// Card "Pacientes vinculados": com espaço, o botão fica no cabeçalho do card
-  /// (como no web); no celular ele desce pra baixo do título, na largura toda,
-  /// pra o texto "+ Cadastrar paciente" caber inteiro.
   Widget _cartaoPacientes(BuildContext context, AppEstado estado) {
     final lista = estado.pacientes.isEmpty
         ? Padding(
@@ -164,8 +156,6 @@ class _PainelCuidadorState extends State<PainelCuidador> {
     );
   }
 
-  /// Pedido de vínculo: dados do paciente em cima e "Aceitar" / "Recusar" em
-  /// texto embaixo, como no web (antes eram só ícones ✓/✗ espremidos na linha).
   Widget _linhaSolicitacao(Paciente paciente) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -232,7 +222,6 @@ class _PainelCuidadorState extends State<PainelCuidador> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(dados.paciente.nome, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-                  // Mesmo texto do web: "26 anos · 4 medicamentos" (só os ativos).
                   Text(
                     '${dados.paciente.dataNascimento != null ? '${dados.paciente.calcularIdade()} anos · ' : ''}'
                     '${dados.medicamentosAtivos().length} medicamentos',
@@ -259,8 +248,6 @@ class _PainelCuidadorState extends State<PainelCuidador> {
   }
 }
 
-/// Os quatro indicadores do topo — mesmas contas do PainelCuidador.jsx do web.
-/// 4 lado a lado com espaço; 2x2 no celular. Cards de cada linha com a mesma altura.
 class _Estatisticas extends StatelessWidget {
   final List<PacienteComDados> pacientes;
   const _Estatisticas({required this.pacientes});
@@ -271,7 +258,6 @@ class _Estatisticas extends StatelessWidget {
       final doses = construirDosesHoje(dados.medicamentos, dados.historicoHoje());
       return doses.any((dose) => dose.status == 'atrasado' || dose.status == 'perdido');
     }).length;
-    // Só os ativos: medicamentos de tratamentos encerrados não estão mais sendo monitorados.
     final totalMedicamentos = pacientes.fold<int>(0, (soma, dados) => soma + dados.medicamentosAtivos().length);
     final adesaoMedia = pacientes.isEmpty
         ? 0
@@ -320,7 +306,7 @@ class _CartaoEstatistica extends StatelessWidget {
   final String valor;
   final String rotulo;
   final Color cor;
-  final Color? corBorda; // null = borda padrão do tema
+  final Color? corBorda;
   const _CartaoEstatistica({required this.valor, required this.rotulo, required this.cor, this.corBorda});
 
   @override

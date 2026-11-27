@@ -18,12 +18,8 @@ import '../utilitarios/tema.dart';
 import '../utilitarios/animacoes.dart';
 import 'formulario_medicamento.dart';
 
-/// "1 medicamento em uso" / "3 medicamentos em uso".
 String _contar(int quantidade, String singular, String plural) => '$quantidade ${quantidade == 1 ? singular : plural}';
 
-/// Agenda com duas abas, como no web: "Em uso" (remédios ativos) e
-/// "Encerrados" (tratamentos que já terminaram). Abre em "Encerrados" com
-/// ?aba=encerrados (é para onde vai o endereço antigo /ciclos-encerrados).
 class AgendaMedicamentos extends StatefulWidget {
   const AgendaMedicamentos({super.key});
 
@@ -32,7 +28,7 @@ class AgendaMedicamentos extends StatefulWidget {
 }
 
 class _AgendaMedicamentosState extends State<AgendaMedicamentos> {
-  bool? _encerrados; // null = ainda não leu a URL
+  bool? _encerrados;
 
   @override
   void didChangeDependencies() {
@@ -58,7 +54,6 @@ class _AgendaMedicamentosState extends State<AgendaMedicamentos> {
 
     final medicamentosAtivos = dados.medicamentosAtivos();
     final medicamentosEncerrados = dados.medicamentos.where((m) => !medicamentosAtivos.contains(m)).toList();
-    // Paciente sem cuidador cuida da própria agenda; com cuidador, só se ele liberou.
     final podeEditar =
         estado.usuario!.tipo == 'cuidador' || dados.paciente.cuidadorId == null || dados.paciente.permiteAlteracoes;
 
@@ -237,7 +232,6 @@ class _CartaoMedicamento extends StatelessWidget {
     );
   }
 
-  /// "dura 3 dias" / "dura 1 dia" / "não dá para o dia todo" (antes: "dura ~0 dias").
   String _duracao(int dias) => dias <= 0 ? 'não dá para o dia todo' : 'dura $dias dia${dias == 1 ? '' : 's'}';
 
   String _dataCurta(DateTime data) =>
@@ -271,9 +265,6 @@ class _CartaoMedicamento extends StatelessWidget {
   }
 }
 
-/// Topo da agenda igual ao web: abas "Em uso" / "Encerrados" à esquerda e
-/// "+ Inserir medicamento" à direita (só em "Em uso"). No celular empilha, com o
-/// botão na largura toda.
 class _TopoAgenda extends StatelessWidget {
   final bool podeEditar;
   final bool encerrados;
@@ -297,8 +288,6 @@ class _TopoAgenda extends StatelessWidget {
       totalEncerrados: totalEncerrados,
       aoTrocar: aoTrocarAba,
     );
-    // Só o aviso de "sem permissão" aparece (e só em "Em uso"); o texto
-    // explicando a finalidade da tela foi removido (a ajuda "?" cobre isso).
     final aviso = !encerrados && !podeEditar
         ? Text(
             'Seu cuidador ainda não liberou alterações nessa agenda. Fale com ele(a) se precisar ajustar algo.',
@@ -332,7 +321,6 @@ class _TopoAgenda extends StatelessWidget {
   }
 }
 
-/// Controle segmentado com a contagem em cada aba.
 class _Abas extends StatelessWidget {
   final bool encerrados;
   final int totalEmUso;

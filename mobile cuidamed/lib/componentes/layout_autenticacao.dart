@@ -4,19 +4,12 @@ import '../utilitarios/animacoes.dart';
 import '../utilitarios/tema.dart';
 import 'cabecalho.dart';
 
-/// Moldura das telas de Login, Cadastro e Ativar acesso — equivalente ao
-/// `.autenticacao` do web (estilos/autenticacao.css):
-/// - o gradiente azul escuro ocupa a tela inteira;
-/// - tela larga: marca (logo, frase, rodapé) à esquerda e o card branco do
-///   formulário "flutuando" à direita; só o formulário rola;
-/// - celular: logo grande centralizada no topo e o card logo abaixo.
 class LayoutAutenticacao extends StatelessWidget {
   final String heroTitulo;
   final String heroSubtitulo;
   final String rodape;
   final Widget cartao;
 
-  /// Largura a partir da qual a marca fica ao lado do formulário (igual ao web).
   static const larguraDividida = 900.0;
 
   const LayoutAutenticacao({
@@ -31,7 +24,6 @@ class LayoutAutenticacao extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CorApp.azulEscuro,
-      // expand: o fundo cobre a tela toda, mesmo quando o conteúdo é mais baixo.
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -46,7 +38,6 @@ class LayoutAutenticacao extends StatelessWidget {
   }
 
   Widget _textoHero() {
-    // Troca com fade quando a frase muda (ex.: Paciente ↔ Cuidador no cadastro).
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 220),
       transitionBuilder: transicaoTrocaSuave(),
@@ -90,13 +81,11 @@ class LayoutAutenticacao extends StatelessWidget {
       decoration: BoxDecoration(
         color: CorApp.fundoCard,
         borderRadius: BorderRadius.circular(22),
-        // Sombra longa e escura: o card parece sair do fundo azul.
         boxShadow: const [
           BoxShadow(color: Color(0x7303102A), blurRadius: 70, offset: Offset(0, 32)),
           BoxShadow(color: Color(0x2E03102A), blurRadius: 14, offset: Offset(0, 4)),
         ],
       ),
-      // Entrada da tela igual ao web (opacity 0 → 1, subindo 10 px em 0,25 s).
       child: EntradaSuave(
         deslocamento: 10,
         escalaInicial: 1,
@@ -156,7 +145,6 @@ class LayoutAutenticacao extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Encolhe proporcionalmente em telas muito estreitas, sem cortar.
                 const Center(
                   child: FittedBox(
                     fit: BoxFit.scaleDown,
@@ -176,8 +164,6 @@ class LayoutAutenticacao extends StatelessWidget {
   }
 }
 
-/// Gradiente azul escuro da tela inteira, com duas luzes suaves que dão
-/// profundidade (mesmos radial-gradients do web).
 class _FundoAutenticacao extends StatelessWidget {
   const _FundoAutenticacao();
 
@@ -212,7 +198,6 @@ class _FundoAutenticacao extends StatelessWidget {
   }
 }
 
-/// Título do card ("Entrar na minha conta", "Criar cadastro"...).
 class TituloAutenticacao extends StatelessWidget {
   final String titulo;
   final String? subtitulo;
@@ -239,7 +224,6 @@ class TituloAutenticacao extends StatelessWidget {
   }
 }
 
-/// Link em azul e negrito ("Cadastre-se", "Ativar meu acesso", "Entrar").
 class LinkAutenticacao extends StatelessWidget {
   final String texto;
   final VoidCallback onTap;
@@ -269,7 +253,6 @@ class LinkAutenticacao extends StatelessWidget {
   }
 }
 
-/// "Esqueci minha senha": discreto, alinhado à direita logo abaixo da senha.
 class LinkEsqueciSenha extends StatelessWidget {
   final VoidCallback onTap;
   const LinkEsqueciSenha({super.key, required this.onTap});
@@ -283,9 +266,6 @@ class LinkEsqueciSenha extends StatelessWidget {
   }
 }
 
-/// Rodapé do card: linha divisória e os outros caminhos (criar conta, ativar
-/// acesso, entrar) como dois botões de contorno lado a lado — como no web.
-/// Mais fáceis de achar e tocar que links no meio do texto.
 class BotoesAlternativosAutenticacao extends StatelessWidget {
   final List<({String texto, VoidCallback onTap})> opcoes;
   const BotoesAlternativosAutenticacao({super.key, required this.opcoes});
@@ -303,8 +283,6 @@ class BotoesAlternativosAutenticacao extends StatelessWidget {
             foregroundColor: CorApp.azul,
             side: const BorderSide(color: Color(0xFFCFDCEC), width: 1.5),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(RaioApp.medio)),
-            // A partir do estilo do tema, para manter a fonte do app (um TextStyle
-            // solto aqui trocaria a fonte pela padrão do sistema).
             textStyle: Theme.of(context).textTheme.labelLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w700),
           ),
           child: Text(opcao.texto, textAlign: TextAlign.center),
@@ -316,7 +294,6 @@ class BotoesAlternativosAutenticacao extends StatelessWidget {
         Divider(height: 1, color: CorApp.borda),
         const SizedBox(height: 18),
         LayoutBuilder(
-          // Tela muito estreita: um botão abaixo do outro.
           builder: (context, restricoes) => restricoes.maxWidth < 240
               ? Column(children: [for (final (i, b) in botoes.indexed) ...[if (i > 0) const SizedBox(height: 10), b]])
               : Row(children: [for (final (i, b) in botoes.indexed) ...[if (i > 0) const SizedBox(width: 12), Expanded(child: b)]]),

@@ -17,7 +17,6 @@ import '../utilitarios/tema.dart';
 class HistoricoPagina extends StatefulWidget {
   final int? pacienteId;
 
-  /// Busca um período antigo; por padrão, no servidor. Trocado nos testes.
   final Future<List<Historico>> Function(int pacienteId, DateTime de, DateTime ate)? carregarAntigos;
 
   const HistoricoPagina({super.key, this.pacienteId, this.carregarAntigos});
@@ -32,15 +31,10 @@ const _mesesPtBr = [
 ];
 
 class _HistoricoPaginaState extends State<HistoricoPagina> {
-  // Período por datas "De" e "Até" (as duas começam em hoje), como no web.
-  // Datas futuras não são aceitas e, se uma passar da outra, a outra acompanha.
   late DateTime _inicio;
   late DateTime _fim;
   String _filtroMedicamento = 'todos';
 
-  // O app guarda só os últimos dias do histórico; período mais antigo vem do
-  // servidor. Até chegar, nada é calculado: sem os registros, doses tomadas
-  // apareceriam como perdidas.
   String? _chaveAntigos;
   List<Historico>? _antigos;
   bool _erroAntigos = false;
@@ -54,7 +48,6 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
     try {
       itens = await carregar(pacienteId, de, ate);
     } catch (_) {
-      // Mostra o aviso na lista, sem calcular nada com dados incompletos.
     }
     if (!mounted || _chaveAntigos != chave) return;
     setState(() {
@@ -126,6 +119,7 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
     final hojeSemHora = DateTime(hoje.year, hoje.month, hoje.day);
 
     final inicioJanela = inicioJanelaHistorico(hojeSemHora);
+    // Período antigo vem do servidor; até chegar não calcula nada, senão doses tomadas aparecem como perdidas.
     final chaveAntigos = _inicio.isBefore(inicioJanela) ? '${dados.paciente.id}|${_inicio.toIso8601String()}' : null;
     if (chaveAntigos != null && chaveAntigos != _chaveAntigos) {
       _buscarAntigos(estado, chaveAntigos, dados.paciente.id, _inicio, inicioJanela.subtract(const Duration(days: 1)));
@@ -137,8 +131,6 @@ class _HistoricoPaginaState extends State<HistoricoPagina> {
     final nomesMedicamentos =
         {...historicoDoPeriodo.map((h) => h.nomeMedicamento), ...dados.medicamentos.map((m) => m.nome)}.toList()..sort();
 
-    // Registros do banco + doses que passaram do horário sem registro (as
-    // mesmas que o Início mostra como atrasadas/perdidas).
     final semRegistro =
         periodoDisponivel ? dosesSemRegistro(dados.paciente.id, dados.medicamentos, historicoDoPeriodo, _inicio, _fim) : const <Historico>[];
     final entradas = [...(periodoDisponivel ? historicoDoPeriodo : const <Historico>[]), ...semRegistro]

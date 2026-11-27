@@ -116,8 +116,7 @@ public class ChatService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe a mensagem.");
         }
 
-        // Lê tudo do banco antes de chamar a IA: a resposta leva segundos e, nesse
-        // tempo, a conexão fica livre para as outras telas.
+        // Lê o banco antes de chamar a IA, para não segurar a conexão durante a chamada.
         String contexto = transacaoDeLeitura.execute(status -> montarContexto(pacienteRepository.findById(pacienteId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Paciente não encontrado."))));
         String conteudoUsuario = contexto + "\nAPARELHO: " + descreverAparelho(dto.plataforma())
@@ -162,7 +161,6 @@ public class ChatService {
         }
     }
 
-    // O valor vem do cliente: nunca entra no texto, só escolhe uma das frases abaixo.
     static String descreverAparelho(String plataforma) {
         return switch (plataforma == null ? "" : plataforma) {
             case "site" -> "site, no navegador. Nos passos, diga \"clique\" e siga o que o guia diz para o site.";
@@ -171,7 +169,6 @@ public class ChatService {
         };
     }
 
-    // O prompt já pede texto simples; isto garante caso a IA use marcação mesmo assim.
     static String semFormatacao(String texto) {
         return texto
                 .replaceAll("(?m)^#{1,6}\\s+", "")

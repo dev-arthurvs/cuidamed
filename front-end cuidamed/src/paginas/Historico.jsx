@@ -24,7 +24,6 @@ function rotuloDoDia(dataIso, diferenca) {
   return formatarDiaMes(dataIso)
 }
 
-// Data local (não UTC) no formato do <input type="date">: AAAA-MM-DD.
 function dataIsoLocal(data) {
   const mes = String(data.getMonth() + 1).padStart(2, '0')
   const dia = String(data.getDate()).padStart(2, '0')
@@ -49,9 +48,6 @@ export default function Historico() {
     return data
   }, [])
 
-  // Período por datas "De" e "Até" (as duas começam em hoje). Datas futuras não
-  // são aceitas e, se uma passar da outra, a outra acompanha — o intervalo
-  // nunca fica invertido.
   const hojeIso = dataIsoLocal(hoje)
   const [dataInicio, setDataInicio] = useState(hojeIso)
   const [dataFim, setDataFim] = useState(hojeIso)
@@ -70,11 +66,9 @@ export default function Historico() {
     if (data < dataInicio) setDataInicio(data)
   }
 
-  // O app guarda só os últimos dias do histórico; período mais antigo vem do
-  // servidor. Até chegar, nada é calculado: sem os registros, doses tomadas
-  // apareceriam como perdidas.
   const inicioJanela = inicioJanelaHistorico(hojeIso)
   const pacienteAtualId = paciente?.id
+  // Período antigo vem do servidor; até chegar não calcula nada, senão doses tomadas aparecem como perdidas.
   const chaveAntigos = pacienteAtualId && dataInicio < inicioJanela ? `${pacienteAtualId}|${dataInicio}` : null
   const [antigos, setAntigos] = useState(null)
   useEffect(() => {
@@ -110,8 +104,6 @@ export default function Historico() {
 
   const entradasFiltradas = useMemo(() => {
     if (!paciente || !periodoDisponivel) return []
-    // Registros do banco + doses que passaram do horário sem registro (as
-    // mesmas que o Início mostra como atrasadas/perdidas).
     const semRegistro = dosesSemRegistro(paciente.medicamentos, historicoDoPeriodo, dataInicio, dataFim)
     return [...historicoDoPeriodo, ...semRegistro]
       .map((item) => ({ ...item, diferenca: diasDeDiferenca(item.data, hoje) }))

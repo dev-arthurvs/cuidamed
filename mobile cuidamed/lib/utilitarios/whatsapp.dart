@@ -1,7 +1,6 @@
 import 'horarios.dart';
 import '../modelos/medicamento.dart';
 
-/// Porta fiel de front-end cuidamed/src/utilitarios/whatsapp.js.
 String formatarTelefoneWhatsApp(String? telefone) {
   final digitos = (telefone ?? '').replaceAll(RegExp(r'\D'), '');
   if (digitos.isEmpty) return '';
@@ -9,8 +8,6 @@ String formatarTelefoneWhatsApp(String? telefone) {
   return '55$digitos';
 }
 
-/// Pomada não tem quantidade por dose: mostra a dosagem (concentração), se o
-/// remédio antigo tiver uma; sem nenhuma das duas, devolve texto vazio.
 String formatarQuantidadePorDose({required String forma, int? quantidadePorDose, required String dosagem}) {
   if (quantidadePorDose == null) return dosagem;
   final unidade = unidadeEstoquePorForma[forma] ?? 'unidades';
@@ -48,9 +45,6 @@ String montarMensagemLembrete({
   return linhas.join('\n');
 }
 
-/// Usa o endpoint direto da WhatsApp (api.whatsapp.com/send) em vez do
-/// encurtador wa.me: o redirect do wa.me corrompe emojis/símbolos (viram
-/// U+FFFD) antes de chegar no destino final — mesmo achado do web.
 String? montarLinkWhatsApp({
   required String? telefone,
   required String nomePaciente,

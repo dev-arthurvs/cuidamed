@@ -14,7 +14,6 @@ import '../utilitarios/animacoes.dart';
 
 const _opcoesSexo = ['Feminino', 'Masculino', 'Outro'];
 
-/// Frase do painel azul muda conforme o papel escolhido — igual ao web.
 const _frasesImpacto = {
   'paciente': (
     titulo: 'O remédio certo, na hora certa, sempre com você.',
@@ -26,7 +25,6 @@ const _frasesImpacto = {
   ),
 };
 
-/// Equivalente a paginas/Cadastro.jsx do web.
 class Cadastro extends StatefulWidget {
   const Cadastro({super.key});
 
@@ -209,7 +207,6 @@ class _CadastroState extends State<Cadastro> {
     );
   }
 
-  /// Caixa "Eu sou" com Paciente/Cuidador — mesmo visual do `.autenticacao__papel` do web.
   Widget _seletorPapel() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -301,11 +298,9 @@ class _CadastroState extends State<Cadastro> {
         ),
       ],
     );
-    // Lado a lado quando cabe (como o grid de 2 colunas do web); empilhado no celular estreito.
     return LayoutBuilder(
       builder: (context, restricoes) => restricoes.maxWidth >= 360
           ? Row(
-              // Alinha pela base: se um rótulo quebrar em 2 linhas, os campos continuam na mesma altura.
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [Expanded(child: campoData), const SizedBox(width: 14), Expanded(child: campoSexo)],
             )

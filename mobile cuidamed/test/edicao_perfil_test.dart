@@ -17,7 +17,7 @@ void main() {
     expect(find.text('Configurações'), findsOneWidget);
     expect(find.text('Dados pessoais'), findsOneWidget);
     expect(find.text('Senha'), findsOneWidget);
-    expect(find.text('Endereço'), findsNothing); // endereço saiu do formulário
+    expect(find.text('Endereço'), findsNothing);
     await rolarAte(tester, find.text('Aparência'));
     expect(find.text('Tamanho da fonte'), findsOneWidget);
 
@@ -57,7 +57,7 @@ void main() {
     await tester.enterText(find.widgetWithText(TextFormField, 'Nome de usuário'), '');
     await rolarAte(tester, find.text('Salvar alterações'));
     await tester.tap(find.text('Salvar alterações'));
-    await tester.pumpAndSettle(); // snackbar anterior sai antes da nova entrar
+    await tester.pumpAndSettle();
     expect(find.text('Preencha o nome.'), findsOneWidget);
   });
 
@@ -71,7 +71,6 @@ void main() {
     expect(estado.tamanhoFonte, 'grande');
     expect(estado.escalaFonte, 1.15);
 
-    // Percorre a tela inteira com a fonte grande — overflow vira exceção no teste.
     await rolarAte(tester, find.text('Enviar solicitação'));
     expect(tester.takeException(), isNull);
   });

@@ -18,7 +18,6 @@ const _avisoTelefone = 'Sem e-mail, informe o telefone com DDD.';
 
 AppEstado _deslogado() => AppEstado()..carregandoSessao = false;
 
-/// Login por e-mail ou telefone e cadastro sem e-mail (muitos idosos não têm).
 void main() {
   testWidgets('Login e ativação pedem "E-mail ou telefone"', (tester) async {
     await montarPagina(tester, _deslogado(), '/login', (_) => const Login());
@@ -72,7 +71,6 @@ void main() {
     expect(find.text(_semEmail), findsOneWidget);
     expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isTrue);
 
-    // Com e-mail: campo visível e caixa desmarcada.
     await montarPagina(tester, estadoPaciente(), '/configuracoes', (_) => const EdicaoPerfil());
     expect(find.text('E-mail'), findsOneWidget);
     expect(tester.widget<Checkbox>(find.byType(Checkbox)).value, isFalse);
